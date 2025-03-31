@@ -1,0 +1,11 @@
+add a njk layout (let us use good old sbadmin)
+use nice rendering inputs for each field type or keep it very simple and just use a key value pair
+    if it is the first they we can have custom information for fields dropdown lists etc.
+create an api
+expose it all via API
+create a bash script
+create the d1 database on deploy (in the bash script)
+how do we handle joins etc maybe look at how orms do it (the backwards way is neat)
+figure out how save, update, delete logic is going to work (interfaces with API I assume)
+copy across the custom assets folder (custom js etc) do we want to do this, if so how does the person dev how is this easy to do.
+copy across the custom njks (think about this one some more) do we want to do this, if so how does the person dev how is this easy to do.
