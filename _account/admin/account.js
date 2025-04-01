@@ -152,7 +152,7 @@ whenDocumentReady(
             //string it
             var bodyobjectjson = JSON.stringify(bodyobj);
             //call the login endpoint
-            url = apiUrl + "admin/account";
+            url = apiUrl + "account";
             xhrcall(0, url, bodyobjectjson, "json", "", loginDone);
           }
         });
@@ -242,7 +242,7 @@ whenDocumentReady(
             //call the create account endpoint
             xhrcall(
               0,
-              apiUrl + "admin/account",
+              apiUrl + "account",
               bodyobjectjson,
               "json",
               "",
@@ -470,30 +470,6 @@ whenDocumentReady(
               );
               return;
             }
-
-            /*
-                use this if you want to use strapi js
-                //todo : get the private code
-
-                let privateCode = "12345"
-
-                //build the json
-                let bodyobj = {
-                    code: privateCode,
-                    password: password1.value,
-                    passwordConfirmation: password2.value,
-                }
-                //string it 
-                var bodyobjectjson = JSON.stringify(bodyobj);
-                //done function
-                let resetPasswordDone = () => {
-                    let alert = document.getElementById('accountsAlert')
-                    alert.innerHTML = "Password has been reset"
-                    alert.classList.remove('d-none')
-                }
-                //call the create account endpoint
-                xhrcall(0, "auth/reset-password", bodyobjectjson, "json", "", resetPasswordDone)
-                */
           }
         });
     }

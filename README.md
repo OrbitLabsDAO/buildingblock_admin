@@ -1,6 +1,7 @@
 git clone https://github.com/OrbitLabsDAO/adminjamstack.git
 put a sql file in the sql dir (or use the example one)
 rename _custom_ to \_custom and you can put your custom in here ie \_api.njk will override the standard API
+rename \_env to .env and set the vars
 run
 ./build.sh
 

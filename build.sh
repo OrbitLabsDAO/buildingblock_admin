@@ -14,8 +14,17 @@ start_time=$(get_current_time_in_ms)
 
 echo "Starting build script"
 
-# Execute the build script with any arguments passed to this script
-node buildit.js "$@"
+ACTION="${1:-local}" # Default to "build" if no parameter is passed
+
+# handle production or local build
+if [ "$ACTION" = "prod" ]; then
+    echo "Building production site"
+    node buildit.js prod
+else
+    echo "Building local site"
+    node buildit.js
+fi
+
 
 # Capture the end time in milliseconds
 end_time=$(get_current_time_in_ms)
@@ -35,3 +44,23 @@ else
     printf "Build script completed in %d minutes %d.%03d seconds\n" $minutes $seconds $milliseconds
 fi
 
+if [ "$ACTION" = "start" ]; then
+    echo "killing rouge wrangler"
+    kill -9 `lsof -t -i:8789`
+    echo "Starting wrangler"
+    npx wrangler pages dev _site --port 8789 --d1=DB  --binding SECRET=fdfdf  --kv=kvdata --local --live-reload  &
+fi
+
+
+if [ "$ACTION" = "kill" ]; then
+    echo "killing rouge wrangler"
+    kill -9 `lsof -t -i:8789`
+ fi
+
+if [ "$ACTION" = "db:local" ]; then
+    echo "Building local database"
+fi
+
+ if [ "$ACTION" = "db:prod" ]; then
+    echo "Building production database"
+fi

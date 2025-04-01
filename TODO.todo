@@ -1,4 +1,7 @@
 clean up the account pages
+ move the table index page to account
+
+build database option
 delete the /do not create the account create pages if the env file not set
 create the account api endpoints
 wire up auth code to the api 
@@ -7,7 +10,6 @@ use nice rendering inputs for each field type or keep it very simple and just us
     if it is the first they we can have custom information for fields dropdown lists etc.
 create an api
 expose it all via API
-create a bash script
 create the d1 database on deploy (in the bash script)
 how do we handle joins etc maybe look at how orms do it (the backwards way is neat)
 figure out how save, update, delete logic is going to work (interfaces with API I assume)
