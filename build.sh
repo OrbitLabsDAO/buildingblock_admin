@@ -2,6 +2,33 @@
 
 # Supported parameters:
 # delete (node buildit.js ) 
+ACTION="${1:-local}" # Default to "build" if no parameter is passed
+
+if [ "$ACTION" = "kill" ]; then
+    echo "killing rouge wrangler"
+    kill -9 `lsof -t -i:8789`
+    exit
+ fi
+
+
+echo "$ACTION" 
+if [ "$ACTION" = "db" ]; then
+    echo "Creating database"
+    npx wrangler d1 create adminjamstack
+    exit
+fi
+
+if [ "$ACTION" = "dbimport:local" ]; then
+    echo "Building database"
+    npx wrangler d1 execute adminjamstack --local --file=./sql/schema.sql
+    exit
+fi
+
+if [ "$ACTION" = "dbimport:prod" ]; then
+    echo "Building database"
+    npx wrangler d1 execute adminjamstack --remote --file=./sql/schema.sql
+    exit
+fi
 
 
 # Function to get current time in milliseconds
@@ -14,7 +41,6 @@ start_time=$(get_current_time_in_ms)
 
 echo "Starting build script"
 
-ACTION="${1:-local}" # Default to "build" if no parameter is passed
 
 # handle production or local build
 if [ "$ACTION" = "prod" ]; then
@@ -45,22 +71,11 @@ else
 fi
 
 if [ "$ACTION" = "start" ]; then
+
     echo "killing rouge wrangler"
     kill -9 `lsof -t -i:8789`
     echo "Starting wrangler"
-    npx wrangler pages dev _site --port 8789 --d1=DB  --binding SECRET=fdfdf  --kv=kvdata --local --live-reload  &
+    npx wrangler pages dev _site --port 8789 --d1=adminjamstack  --binding SECRET=fdfdf  --kv=kvdata --local --live-reload  &
 fi
 
 
-if [ "$ACTION" = "kill" ]; then
-    echo "killing rouge wrangler"
-    kill -9 `lsof -t -i:8789`
- fi
-
-if [ "$ACTION" = "db:local" ]; then
-    echo "Building local database"
-fi
-
- if [ "$ACTION" = "db:prod" ]; then
-    echo "Building production database"
-fi

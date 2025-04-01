@@ -141,6 +141,7 @@ whenDocumentReady(
               window.localStorage.token = token;
               window.localStorage.user = JSON.stringify(user);
               //direct the redirect URL
+              alert("yay");
               window.location.href = "/dashboard/";
             };
             //build the json

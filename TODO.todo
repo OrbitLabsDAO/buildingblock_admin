@@ -1,11 +1,17 @@
-clean up the account pages
-    move the table index page to account
-    make it delete the tables function api databas
+clean up the account pages make it delete the tables function api databas
+
+account api 
+    login test isDeleted
+    login test isBlocked
+    login test isAdmin
+    register create user
+    update update user
+    get shows method not allowed
     
+add dashboard page
 have the logged in check on the table pages
 build database option
 delete the /do not create the account create pages if the env file not set
-create the account api endpoints
 wire up auth code to the api 
 add a njk layout (let us use good old sbadmin)
 use nice rendering inputs for each field type or keep it very simple and just use a key value pair
