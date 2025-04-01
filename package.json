@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "gray-matter": "^4.0.3",
     "nunjucks": "^3.2.4",
     "sqlite-parser": "^1.0.1"
   }

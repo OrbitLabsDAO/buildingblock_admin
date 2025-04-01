@@ -1,4 +1,7 @@
-add auth code, login in etc
+clean up the account pages
+delete the /do not create the account create pages if the env file not set
+create the account api endpoints
+wire up auth code to the api 
 add a njk layout (let us use good old sbadmin)
 use nice rendering inputs for each field type or keep it very simple and just use a key value pair
     if it is the first they we can have custom information for fields dropdown lists etc.

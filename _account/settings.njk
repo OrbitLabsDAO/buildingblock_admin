@@ -1,0 +1,29 @@
+---
+layout: layout.njk
+---
+{% set theJs %}
+    {% include 'admin/account.js' %}
+{% endset %}
+<!-- Page Heading -->
+
+<div class="alert alert-success  d-none" role="alert" id="accountsSuccess">
+</div>
+<div class="alert alert-danger  d-none" role="alert" id="accountsAlert">
+</div>
+   <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800" id="data-header">Settings</h1>
+        <a href="/dashboard/" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+        <i class="fas fa-backward fa-sm text-white-50"></i> Back</a>
+    </div>
+<p class="mb-4">
+</p>
+<div class="form-group">
+    <label>Add a company name</label>
+    <input type="text" class="form-control form-control-user" id="inp-companyname" aria-describedby="companyNameHelp" placeholder="Enter company name...">
+    <span class="text-danger" id="error-companyname"> </span>  
+</div>
+<button class="btn btn-primary btn-user btn-block" id="btn-edit">
+    Update
+</button>
+    <script type="text/javascript">{{theJs | safe}}</script>
+
