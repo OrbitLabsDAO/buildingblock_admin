@@ -75,7 +75,7 @@ function processFile(templateName, folder) {
 
 // Utility: Generate pages with front matter
 function generatePages(tableName, fields) {
-  const tableDir = path.join(siteDir, tableName);
+  const tableDir = path.join(siteDir, `/tables/${tableName}`);
   if (!fs.existsSync(tableDir)) {
     fs.mkdirSync(tableDir, { recursive: true });
   }
@@ -167,20 +167,17 @@ function processAccountFiles() {
 function generateApiFunctions(tableNames) {
   const functionsDir = path.join(siteDir, "functions");
 
-  if (!fs.existsSync(functionsDir)) {
-    fs.mkdirSync(functionsDir, { recursive: true });
-  }
+  // if (!fs.existsSync(functionsDir)) {
+  //   fs.mkdirSync(functionsDir, { recursive: true });
+  // }
 
   tableNames.forEach((tableName) => {
     const templateContent = nunjucks.render("api.njk", {
       tableName,
       env, // ✅ Pass env object here
     });
-
-    fs.writeFileSync(
-      path.join(functionsDir, `${tableName}.js`),
-      templateContent
-    );
+    //console.log(`functions/api/${tableName}.js`);
+    fs.writeFileSync(`functions/api/tables/${tableName}.js`, templateContent);
   });
 
   console.log("✅ CRUD API functions generated!");
@@ -224,9 +221,17 @@ if (Array.isArray(parsedSchema.statement)) {
   processAccountFiles();
   generateApiFunctions(tableNames);
 
+  //create the tables index file
+  fs.writeFileSync(
+    path.join(siteDir, "tables/index.html"),
+    nunjucks.render("indexTable.njk", { tables: tableNames })
+  );
+  console.log("✅ Tables index page generated!");
+
+  //create the index file
   fs.writeFileSync(
     path.join(siteDir, "index.html"),
-    nunjucks.render("mainIndex.njk", { tables: tableNames, env })
+    nunjucks.render("indexMain.njk", {})
   );
   console.log("✅ Main index page generated!");
 } else {

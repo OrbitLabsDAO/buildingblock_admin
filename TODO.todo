@@ -1,6 +1,8 @@
 clean up the account pages
- move the table index page to account
-
+    move the table index page to account
+    make it delete the tables function api databas
+    
+have the logged in check on the table pages
 build database option
 delete the /do not create the account create pages if the env file not set
 create the account api endpoints
@@ -8,8 +10,6 @@ wire up auth code to the api
 add a njk layout (let us use good old sbadmin)
 use nice rendering inputs for each field type or keep it very simple and just use a key value pair
     if it is the first they we can have custom information for fields dropdown lists etc.
-create an api
-expose it all via API
 create the d1 database on deploy (in the bash script)
 how do we handle joins etc maybe look at how orms do it (the backwards way is neat)
 figure out how save, update, delete logic is going to work (interfaces with API I assume)

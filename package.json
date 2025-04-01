@@ -1,9 +1,11 @@
 {
   "dependencies": {
+    "@tsndr/cloudflare-worker-jwt": "^3.1.4",
     "dotenv": "^16.4.7",
     "gray-matter": "^4.0.3",
     "nunjucks": "^3.2.4",
-    "sqlite-parser": "^1.0.1"
+    "sqlite-parser": "^1.0.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "wrangler": "^4.6.0"

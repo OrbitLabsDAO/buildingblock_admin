@@ -2,3 +2,4 @@ _custom/
 _site/
 node_modules
 .wrangler
+functions/api/tables
