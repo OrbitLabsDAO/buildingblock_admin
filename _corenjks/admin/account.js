@@ -126,9 +126,6 @@ whenDocumentReady(
             let loginDone = (response) => {
               //get the repsonse
               let res = JSON.parse(response);
-              //debug
-              //console.log("res")
-              //console.log(res)
               //get the JWT
               let token = res.jwt;
               //set the user object
@@ -141,7 +138,6 @@ whenDocumentReady(
               window.localStorage.token = token;
               window.localStorage.user = JSON.stringify(user);
               //direct the redirect URL
-              alert("yay");
               window.location.href = "/dashboard/";
             };
             //build the json

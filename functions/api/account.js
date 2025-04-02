@@ -43,19 +43,15 @@ export async function onRequest(context) {
 
     try {
       const user = await fetchUser(email, password, context);
-      console.log(user);
       if (!user) return jsonResponse(400, { message: "User not found" });
-
       // Check user status
       if (user.isBlocked)
         return jsonResponse(400, { error: "User account is blocked" });
       if (user.isDeleted)
         return jsonResponse(400, { error: "User does not exist" });
-
       // Generate and verify token
       const token = await createToken(user, context.env.SECRET);
       const isValid = await jwt.verify(token, context.env.SECRET);
-
       if (isValid) {
         return jsonResponse(200, {
           jwt: token,

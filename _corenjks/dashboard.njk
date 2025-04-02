@@ -1,0 +1,24 @@
+---
+layout: layout.njk
+---
+{% set theJs %}
+    {% include 'dashboard.js' %}
+{% endset %}
+<!-- Page Heading -->
+<h1 class="h3 mb-2 text-gray-800">Dashboard</h1>
+<p class="mb-4" >{{dashboardstrap}}</p>
+<!-- add your custom dashboard code here -->
+   {% include '_dashboard_example.njk' %}
+<!-- Content Row -->
+<div class="row">
+    <div class="card shadow mb-4 d-none" id="settingscard">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Settings</h6>
+        </div>
+        <div class="card-body">
+            <p>Before you can use this admin you update your settings.  
+            Click to go to your <a href="/settings/">settings</a>.</p>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">{{theJs | safe}}</script>

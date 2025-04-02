@@ -31,15 +31,8 @@
     //env var from the env var
     var apiUrl ="{{env.APIURL}}";
     var adminUrl = "{{env.ADMINURL}}";
-    //dats main method default is main
-    var level1name = "{{env.LEVEL1NAME}}";
-    var level2name = "{{env.LEVEL2NAME}}";
-    var dataItemsMainMethod ="{{env.ITEMSDATAMAIN}}";
     var complexPassword = "{{env.COMPLEXPASSWORD}}";
-    var crowdFundUrl = "{{env.CROWDFUNDURL}}";
     var envMode = "{{env.ENVIRONMENT}}";
-    var payMeUrl = "{{env.PAYMEURL}}";
-    var payMeUserId = "{{env.PAYMEUSERID}}";
 </script>
 
 </head>
@@ -72,78 +65,46 @@
                     <span>Dashboard</span></a>
             </li>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
+             <li class="nav-item" id="navadmin">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne"
                     aria-expanded="true" aria-controls="collapseOne">
                     <i class="fas fa-fw fa-cog"></i>
-                    <span>{{env.LEVEL1NAME | capitalize}}</span>
+                    <span>Tables</span>
                 </a>
-                
                 <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">{{env.LEVEL1NAME | capitalize}}:</h6>
+                        <h6 class="collapse-header">Tables</h6>
                         <div id="backpageprojectmenu"></div>
-                        <a class="collapse-item" href="/{{env.LEVEL1NAME}}/">View</a>
+
+                         {% for tableName in tableNames %}
+                           <a class="collapse-item" href="/tables/{{ tableName }}/">{{ tableName | safe}}</a>
+                        {% endfor %}
+
+
+                      
                     </div>
                 </div>
-
-                
-               
             </li>
-            <li class="nav-item" >
+
+
+            <!-- add you custom menu items here -->
+           <!--
+            This is not working yet as the layout it pulled from frontmatter it is having 
+            issues looking in the custom directory, I will fix this (i promise) until then just
+            cut and paste the menu items here. 
+          
+            -->
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item" id="navadmin">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Agents</span>
-                </a>
-                
-
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Agents </h6>
-                        <div id="backpageprojectmenu"></div>
-                        <a class="collapse-item" href="/agents/">Manage Agents</a>
-                        
-                    </div>
-                </div>
-               
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Tenants</span>
-                </a>
-                
-
-                <div id="collapseThree" class="collapse " aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Tenants </h6>
-                        <div id="backpageprojectmenu"></div>
-                        <a class="collapse-item" href="/tenants/">Manage Tenants</a>
-                        
-                    </div>
-                </div>
-               
-            </li>
-
-                <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item d-none" id="navadmin">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFour"
                     aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Admin settings</span>
                 </a>
-                
-
-                <div id="collapseFour" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">ADMIN SETTINGS</h6>
                         <div id="backpageprojectmenu"></div>
@@ -151,13 +112,14 @@
                         
                     </div>
                 </div>
-               
             </li>
+
 
             <!-- Divider -->
             <hr class="sidebar-divider">   
         </ul>
         <!-- End of Sidebar -->
+        
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
