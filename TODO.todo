@@ -20,9 +20,6 @@ register create user
    forgot password
 
 
-
-
-
 fix the custom rendering in layout served from frontmatter
 use nice rendering inputs for each field type or keep it very simple and just use a key value pair
     if it is the first they we can have custom information for fields dropdown lists etc.
