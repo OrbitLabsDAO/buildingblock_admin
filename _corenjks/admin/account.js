@@ -157,11 +157,6 @@ whenDocumentReady(
 
     //check if the create account button exists
     if (checkElement("btn-create-account") == true) {
-      //check if they are allowed
-      if (canCreateAccount == 0) {
-        window.location = "/login/";
-      }
-
       //add a click event listener
       document
         .getElementById("btn-create-account")

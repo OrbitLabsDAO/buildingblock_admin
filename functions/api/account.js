@@ -24,25 +24,76 @@ export async function onRequest(context) {
     });
   }
 
-  // Action Handlers
+  /**
+   * Handle the register user endpoint
+   * @param {Object} body The request body
+   * @param {Object} context The context of the request
+   * @return {Promise<Response>}
+   */
   async function handleRegister(body, context) {
-    const { email, password } = body;
-    if (!email || !password) {
-      return jsonResponse(400, { error: "Email and password are required." });
+    const { username, email, password } = body;
+    if (!username || !email || !password) {
+      return jsonResponse(400, {
+        error:
+          "Username, email, and password are required. Please check your inputs and try again.",
+      });
     }
 
-    const query = context.env.DB.prepare(
-      `SELECT COUNT(*) as total from user where email = '${email}'`
-    );
-    const queryResult = await query.first();
-    if (queryResult.total == 0) {
-      console.log("register user");
+    // Check if the email already exists
+    const queryResult = await context.env.DB.prepare(
+      "SELECT COUNT(*) as total FROM user WHERE email = ?"
+    )
+      .bind(email)
+      .first();
+
+    if (queryResult.total > 0) {
+      return jsonResponse(400, {
+        error:
+          "Email already exists. Please try registering with a different email address.",
+      });
     }
 
-    // Perform registration logic here
-    return jsonResponse(201, { message: "User registered", data: { email } });
+    // Generate API secret and verification code
+    const apiSecret = uuid.v4();
+    const verifyCode = uuid.v4();
+
+    // Insert the user into the database
+    const info = await context.env.DB.prepare(
+      "INSERT INTO user (username, email, password, apiSecret, confirmed, isBlocked, isAdmin, verifyCode) VALUES (?, ?, ?, ?, 0, 0, 0, ?)"
+    )
+      .bind(username, email, password, apiSecret, verifyCode)
+      .run();
+
+    if (!info.success) {
+      return jsonResponse(400, {
+        error: "Error registering. Please try again later.",
+      });
+    }
+
+    if (context.env.EMAILAPIURL) {
+      // Send the verification email
+      const data = {
+        templateId: context.env.SIGNUPEMAILTEMPLATEID,
+        to: email,
+        templateVariables: {
+          name: username,
+          product_name: context.env.PRODUCTNAME,
+          action_url: `${context.env.ADMINURL}verify?verifycode=${verifyCode}`,
+          login_url: `${context.env.ADMINURL}account-login`,
+          username: username,
+          sender_name: context.env.SENDEREMAILNAME,
+        },
+      };
+      const responseEmail = await fetch(context.env.EMAILAPIURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      await responseEmail.json(); // Process email response if necessary
+    }
+
+    return jsonResponse(200, { status: "ok" });
   }
-
   async function handleLogin(body, context) {
     const { email, password } = body;
     if (!email || !password) {

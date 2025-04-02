@@ -4,16 +4,16 @@ account api
     login test isDeleted
     login test isBlocked
     login test isAdmin
-
     update profile / update user 
     get shows method not allowed
     
 forgot password flow
 register create user
-    complex password test
-    register flow
+   check email is being sent 
+   validate email
+   
 
-fix the custom rendering in layout served from fronmatter
+fix the custom rendering in layout served from frontmatter
 delete the /do not create the account create pages if the env file not set
 wire up auth code to the api 
 add a njk layout (let us use good old sbadmin)
