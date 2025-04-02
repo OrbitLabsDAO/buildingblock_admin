@@ -5,7 +5,7 @@ let _YEAR = todaysDate.getFullYear();
 
 module.exports = {
   YEAR: _YEAR,
-  TITLE: "Admin Jackstack",
+  TITLE: "Admin Jamstack",
   APIURL: process.env.APIURL,
   ADMINURL: process.env.ADMINURL,
   COPYRIGHT: "CRYPTOSKILLZ " + _YEAR,
