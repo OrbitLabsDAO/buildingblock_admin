@@ -1,0 +1,80 @@
+export async function onRequest(context) {
+  const { request, env, params } = context;
+  const method = request.method.toUpperCase();
+  console.log(method);
+  switch (method) {
+    case "GET":
+      return handleGet(request, env, params, context);
+    case "POST":
+      return handlePost(request, env, params, context);
+    case "PUT":
+      return handlePut(request, env, params, context);
+    case "DELETE":
+      return handleDelete(request, env, params), context;
+    default:
+      return new Response("Method Not Allowede", { status: 405 });
+  }
+}
+
+async function handleGet(request, env, params, context) {
+  const { id } = params;
+  console.log(id);
+  console.log(params);
+  const tableName = "{{ tableName }}";
+  const query = context.env.DB.prepare(
+    `SELECT * FROM ${tableName} ${id ? "WHERE id = ?" : ""}`
+  );
+  try {
+    const result = id ? await query.first(id) : await query.all();
+    return new Response(JSON.stringify({ data: result.results || result }), {
+      status: 200,
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+    });
+  }
+}
+
+async function handlePost(request, env, params, context) {
+  try {
+    const data = await request.json();
+    return new Response(
+      JSON.stringify({ message: "POST create new ${table}", data }),
+      { status: 201 }
+    );
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+    });
+  }
+}
+
+async function handlePut(request, env, params, context) {
+  try {
+    const { id } = params;
+    const data = await request.json();
+    return new Response(
+      JSON.stringify({ message: "PUT update ${table} by ID", id, data }),
+      { status: 200 }
+    );
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+    });
+  }
+}
+
+async function handleDelete(request, env, params, context) {
+  try {
+    const { id } = params;
+    return new Response(
+      JSON.stringify({ message: "DELETE ${table} by ID", id }),
+      { status: 200 }
+    );
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+    });
+  }
+}

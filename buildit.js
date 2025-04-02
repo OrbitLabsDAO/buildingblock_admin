@@ -92,6 +92,44 @@ function renderTemplateWithLayout(layoutName, context) {
   return nunjucks.renderString(templateContent, context);
 }
 
+// Utility: Generate API Endpoints for Each Table
+function generateApiFunctions(tableNames) {
+  const apiFolder = path.join(siteDir, "../functions/api/tables");
+
+  // Clear existing API folder
+  if (fs.existsSync(apiFolder)) {
+    fs.rmSync(apiFolder, { recursive: true, force: true });
+  }
+
+  if (!fs.existsSync(apiFolder)) {
+    fs.mkdirSync(apiFolder, { recursive: true });
+  }
+
+  tableNames.forEach((tableName) => {
+    const templatePath = path.join("_includes", "apiGenerator.njk");
+
+    if (!fs.existsSync(templatePath)) {
+      console.error("❌ apiGenerator.njk template not found");
+      return;
+    }
+
+    const apiContent = fs.readFileSync(templatePath, "utf-8");
+
+    try {
+      const renderedApi = nunjucks.renderString(apiContent, {
+        tableName,
+        env,
+      });
+
+      const outputPath = path.join(apiFolder, `${tableName}.js`);
+      fs.writeFileSync(outputPath, renderedApi);
+      console.log(`✅ Created API endpoint for ${tableName}`);
+    } catch (error) {
+      console.error(`❌ Error rendering API for ${tableName}:`, error);
+    }
+  });
+}
+
 // Utility: Generate Pages
 function generatePages(tableName, fields, tableNames) {
   const tableDir = path.join(siteDir, `/tables/${tableName}`);
@@ -227,6 +265,9 @@ if (Array.isArray(parsedSchema.statement)) {
   });
 
   processAccountFiles(tableNames);
+
+  // Generate individual API endpoints
+  generateApiFunctions(tableNames);
 
   // Create main index
   fs.writeFileSync(
