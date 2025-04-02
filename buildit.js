@@ -145,6 +145,21 @@ function processAccountFiles(tableNames) {
   accountFiles.forEach((file) => {
     const pageData = processFile(file, coreFolder) || {};
 
+    // Check if CANCREATEACCOUNT is set to 0, and skip 'account-create.njk' if so
+    if (file === "account-create.njk" && env.CANCREATEACCOUNT === "0") {
+      console.log(
+        "✅ Skipping account-create.njk due to CANCREATEACCOUNT being set to 0."
+      );
+      return; // Exit early to prevent processing
+    }
+
+    if (file === "account-resetpassword.njk" && env.RESETPASSWORD === "0") {
+      console.log(
+        "✅ Skipping forgot-password.njk due to FORGOTPASSWORD being set to 0."
+      );
+      return; // Exit early to prevent processing
+    }
+
     if (pageData.content) {
       const tmpFile = file.replace(".njk", "");
       const outputDir = path.join(siteDir, tmpFile);
@@ -159,7 +174,10 @@ function processAccountFiles(tableNames) {
       if (pageData.layout) {
         try {
           renderedContent = renderTemplateWithLayout(pageData.layout, {
-            content: nunjucks.renderString(pageData.content),
+            content: nunjucks.renderString(pageData.content, {
+              env,
+              tableNames, // Ensure these are passed within the content rendering
+            }),
             env,
             tableNames, // Pass tableNames here as well
           });
@@ -169,7 +187,7 @@ function processAccountFiles(tableNames) {
       } else {
         renderedContent = nunjucks.renderString(pageData.content, {
           env,
-          tableNames, // Pass tableNames here as well
+          tableNames, // Ensure tableNames is passed here as well
         });
       }
 

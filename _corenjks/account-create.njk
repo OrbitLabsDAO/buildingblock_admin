@@ -1,5 +1,5 @@
 ---
-layout: layout.njk
+layout: login-layout.njk
 ---
 {% set theJs %}
     {% include 'admin/account.js' %}
@@ -65,9 +65,11 @@ layout: layout.njk
                                         </button>
                                    
                                     <hr>
-                                    <div class="text-center">
-                                        <a class="small" href="/forgot-password/">Forgot Password?</a>
-                                    </div>
+                                  {% if env.RESETPASSWORD == 1 %}
+                                        <div class="text-center">
+                                            <a id="cy_forgotpassword" class="small" href="/account-resetpassword/">Forgot Password?</a>
+                                        </div>  
+                                    {% endif %}
                                     <div class="text-center">
                                         <a class="small" href="/login/">Login</a>
                                     </div>

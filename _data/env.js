@@ -13,4 +13,5 @@ module.exports = {
   SECRET: process.env.SECRET,
   CANCREATEACCOUNT: process.env.CANCREATEACCOUNT,
   COMPLEXPASSWORD: process.env.COMPLEXPASSWORD,
+  RESETPASSWORD: process.env.RESETPASSWORD,
 };

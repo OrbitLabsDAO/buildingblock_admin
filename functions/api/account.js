@@ -31,6 +31,14 @@ export async function onRequest(context) {
       return jsonResponse(400, { error: "Email and password are required." });
     }
 
+    const query = context.env.DB.prepare(
+      `SELECT COUNT(*) as total from user where email = '${email}'`
+    );
+    const queryResult = await query.first();
+    if (queryResult.total == 0) {
+      console.log("register user");
+    }
+
     // Perform registration logic here
     return jsonResponse(201, { message: "User registered", data: { email } });
   }
