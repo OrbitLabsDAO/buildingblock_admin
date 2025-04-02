@@ -1,5 +1,11 @@
 clean up the account pages make it delete the tables function api databas
 
+apigeneator
+    rendertable
+    post
+    put
+    delete
+
 account api 
     login test isDeleted
     login test isBlocked
@@ -14,22 +20,11 @@ register create user
    forgot password
 
 
-apigeneator
-    rendertable
-    get with id 
-    post
-    put
-    delete
+
 
 
 fix the custom rendering in layout served from frontmatter
-delete the /do not create the account create pages if the env file not set
-wire up auth code to the api 
-add a njk layout (let us use good old sbadmin)
 use nice rendering inputs for each field type or keep it very simple and just use a key value pair
     if it is the first they we can have custom information for fields dropdown lists etc.
-create the d1 database on deploy (in the bash script)
 how do we handle joins etc maybe look at how orms do it (the backwards way is neat)
-figure out how save, update, delete logic is going to work (interfaces with API I assume)
 copy across the custom assets folder (custom js etc) do we want to do this, if so how does the person dev how is this easy to do.
-copy across the custom njks (think about this one some more) do we want to do this, if so how does the person dev how is this easy to do.

@@ -1,7 +1,6 @@
 export async function onRequest(context) {
   const { request, env, params } = context;
   const method = request.method.toUpperCase();
-  console.log(method);
   switch (method) {
     case "GET":
       return handleGet(request, env, params, context);
@@ -17,21 +16,22 @@ export async function onRequest(context) {
 }
 
 async function handleGet(request, env, params, context) {
-  const { id } = params;
-  console.log(id);
-  console.log(params);
+  const url = new URL(request.url);
+  const id = url.searchParams.get("id"); // Get 'id' from query string
   const tableName = "{{ tableName }}";
-  const query = context.env.DB.prepare(
-    `SELECT * FROM ${tableName} ${id ? "WHERE id = ?" : ""}`
-  );
-  try {
-    const result = id ? await query.first(id) : await query.all();
-    return new Response(JSON.stringify({ data: result.results || result }), {
+  if (id != null) {
+    let query = context.env.DB.prepare(
+      `SELECT * FROM ${tableName} WHERE "id" = ${id}`
+    );
+    const result = await query.first();
+    return new Response(JSON.stringify({ data: result }), {
       status: 200,
     });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
+  } else {
+    let query = context.env.DB.prepare(`SELECT * FROM ${tableName}`);
+    const result = await query.all();
+    return new Response(JSON.stringify({ data: result.results }), {
+      status: 200,
     });
   }
 }
