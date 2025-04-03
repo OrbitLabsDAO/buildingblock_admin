@@ -1,7 +1,7 @@
 tableIndex
-    check it is using is logged in function
     fix table menu rendering when you are on a table (it only renders to the last table we have to have a full table list before we generate the pages)
     when no data fix the datatables sort 
+    add jwt signing 
 
 apigeneator
     post
