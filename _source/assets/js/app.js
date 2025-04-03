@@ -212,6 +212,14 @@ let checkLogin = () => {
   }
 };
 
+let clearCache = (clearUser = 0) => {
+  if (clearUser == 1) {
+    window.localStorage.token = "";
+    window.localStorage.user = "";
+    window.localStorage.settings = "";
+  }
+};
+
 /* 
 end of global account stuff
 */
