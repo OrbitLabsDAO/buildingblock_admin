@@ -133,7 +133,7 @@ function generateApiFunctions(tableNames) {
 }
 
 // Utility: Generate Pages
-function generatePages(tableName, fields, tableNames) {
+function generateTablePages(tableName, fields, tableNames) {
   const tableDir = path.join(siteDir, `/tables/${tableName}`);
   if (!fs.existsSync(tableDir)) {
     fs.mkdirSync(tableDir, { recursive: true });
@@ -251,17 +251,22 @@ if (fs.existsSync(functionsFolder)) {
   copyDirectory(functionsFolder, path.join(siteDir, "functions"));
 }
 
+//get all the table names so we can process the menu correctly
 let tableNames = [];
-
+if (Array.isArray(parsedSchema.statement)) {
+  parsedSchema.statement.forEach((statement) => {
+    if (statement.variant === "create" && statement.format === "table")
+      tableNames.push(statement.name.name);
+  });
+}
 if (Array.isArray(parsedSchema.statement)) {
   parsedSchema.statement.forEach((statement) => {
     if (statement.variant === "create" && statement.format === "table") {
       const tableName = statement.name.name;
       const fields = statement.definition;
-
       if (!fields.some((field) => field.name === "as_internal")) {
-        tableNames.push(tableName);
-        generatePages(tableName, fields, tableNames);
+        //tableNames.push(tableName);
+        generateTablePages(tableName, fields, tableNames);
       }
     }
   });
