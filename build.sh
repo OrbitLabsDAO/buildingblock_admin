@@ -72,8 +72,16 @@ fi
 
 if [ "$ACTION" = "start" ]; then
 
-    echo "killing rouge wrangler"
+    echo "killing rouge wrangler(s)"
+   
+    # there are different methods to kill the running process chose the one that works for you.
+    #1: kill wrangler
+     ps aux | grep "npx wrangler pages dev"
+    pkill -f "npx wrangler pages dev"
+    #2: Kill the running processed
     kill -9 `lsof -t -i:8789`
+    #3: kill all node based in the logged in user
+    #pkill -u $(whoami) -f "node"
     echo "Starting wrangler"
     npx wrangler pages dev _site --port 8789 --d1=adminjamstack  --binding SECRET=fdfdf  --kv=kvdata --local --live-reload  &
 fi

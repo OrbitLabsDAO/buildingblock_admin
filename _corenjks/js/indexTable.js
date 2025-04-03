@@ -1,11 +1,51 @@
+// Get table name and ID from URL
+const url = new URL(window.location.href);
+let tableName = url.pathname.split("/").filter(Boolean).pop();
+let id = url.searchParams.get("id");
+
 let whenDocumentReady = (f) => {
   /in/.test(document.readyState)
     ? setTimeout("whenDocumentReady(" + f + ")", 9)
     : f();
 };
 
+let deleteItemDone = (response) => {
+  response = JSON.parse(response);
+  console.log(response.id);
+  if (response.id > 0) {
+    const itemId = response.status; // or get it from the event if needed
+    // Initialize DataTable
+    const table = $("#dataTable").DataTable();
+    //delete the row
+    const row = table
+      .rows()
+      .eq(0)
+      .filter(function (rowIdx) {
+        return table.cell(rowIdx, 0).data() == response.id; // Adjust column index as needed
+      });
+
+    // Remove the row from the DataTable
+    table.row(row).remove().draw();
+  }
+};
+
+let deleteItem = (id) => {
+  if (confirm("Are you sure you want to delete this item?")) {
+    xhrcall(
+      3,
+      apiUrl + `tables/${tableName}`,
+      `{"id":${id}}`,
+      "json",
+      "",
+      deleteItemDone
+    );
+  }
+};
+
 whenDocumentReady(
   (isReady = () => {
+    //get the btn delete click event
+
     let getTableDone = (response) => {
       response = JSON.parse(response);
 
@@ -68,7 +108,7 @@ whenDocumentReady(
         rowData.push(
           `<a href="view.html?id=${item.id}" class="btn btn-success">View</a>
           <a href="edit.html?id=${item.id}" class="btn btn-primary">Edit</a>
-          <a href="delete.html?id=${item.id}" class="btn btn-danger">Delete</a>`
+          <a href="javascript:deleteItem(${item.id});" data-id="${item.id}" class="btn btn-danger btn-delete">Delete</a>`
         );
 
         table.row.add(rowData).draw(false);
@@ -77,11 +117,10 @@ whenDocumentReady(
       // Show the table
       document.getElementById("showBody").classList.remove("d-none");
     };
-
-    // Get table name and ID from URL
-    const url = new URL(window.location.href);
-    let tableName = url.pathname.split("/").filter(Boolean).pop();
-    let id = url.searchParams.get("id");
+    //show the create button
+    const user = JSON.parse(window.localStorage.user);
+    if (user.isAdmin == 1)
+      document.getElementById("btn-create-cy").classList.remove("d-none");
 
     // Call the table endpoint
     let theUrl = apiUrl + `tables/${tableName}`;

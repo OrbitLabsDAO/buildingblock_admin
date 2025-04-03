@@ -9,7 +9,7 @@ export async function onRequest(context) {
     case "PUT":
       return handlePut(request, env, params, context);
     case "DELETE":
-      return handleDelete(request, env, params), context;
+      return handleDelete(request, params, context);
     default:
       return new Response("Method Not Allowede", { status: 405 });
   }
@@ -18,9 +18,8 @@ export async function onRequest(context) {
 async function handleGet(request, env, params, context) {
   const url = new URL(request.url);
   const id = url.searchParams.get("id"); // Get 'id' from query string
-  const tableName = "{{ tableName}}";
+  const tableName = "{{tableName}}";
 
-  //const tableName = "property";
   let result;
 
   // Handle query based on 'id' parameter
@@ -30,7 +29,9 @@ async function handleGet(request, env, params, context) {
     );
     result = await query.first(id);
   } else {
-    let query = context.env.DB.prepare(`SELECT * FROM ${tableName} where "as_isDeleted" = 0`);
+    let query = context.env.DB.prepare(
+      `SELECT * FROM ${tableName} where "as_isDeleted" = 0`
+    );
 
     result = await query.all();
   }
@@ -87,15 +88,35 @@ async function handlePut(request, env, params, context) {
   }
 }
 
-async function handleDelete(request, env, params, context) {
+async function handleDelete(request, params, context) {
   try {
-    const { id } = params;
-    return new Response(
-      JSON.stringify({ message: "DELETE ${table} by ID", id }),
-      { status: 200 }
+    const data = await request.json();
+    if (!data.id) {
+      return new Response(JSON.stringify({ error: "ID is required" }), {
+        status: 400,
+      });
+    }
+
+  const tableName = "{{tableName}}";
+  //we would have to sanitise this delete at some point but we are getting binding issues
+    const query = context.env.DB.prepare(
+      `UPDATE ${tableName} SET "as_isDeleted" = 1 WHERE "id" = ${data.id}`
     );
+
+    // The query should be run with data.id, which should be a single value
+    const result = await query.run(); // Ensure this runs with just the ID
+
+    // Check if any rows were affected
+    if (result.changes === 0) {
+      return new Response(JSON.stringify({ error: "No record found" }), {
+        status: 404,
+      });
+    }
+
+    return new Response(JSON.stringify({ id: data.id }), { status: 200 });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("Error in handleDelete:", error);
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       status: 500,
     });
   }
