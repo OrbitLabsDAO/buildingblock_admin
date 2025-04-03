@@ -26,13 +26,13 @@ async function handleGet(request, env, params, context) {
   // Handle query based on 'id' parameter
   if (id != null) {
     let query = context.env.DB.prepare(
-      `SELECT * FROM ${tableName} WHERE "id" = ? and "isDeleted" = ?`
+      `SELECT * FROM ${tableName} WHERE "id" = ? and "as_isDeleted" = 0`
     );
-    result = await query.first(id,0);
+    result = await query.first(id);
   } else {
-    let query = context.env.DB.prepare(`SELECT * FROM ${tableName} where "isDeleted" = ?`);
+    let query = context.env.DB.prepare(`SELECT * FROM ${tableName} where "as_isDeleted" = 0`);
 
-    result = await query.all(0);
+    result = await query.all();
   }
 
   // Exclude specific fields from the result

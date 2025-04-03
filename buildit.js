@@ -5,7 +5,7 @@ const nunjucks = require("nunjucks");
 const matter = require("gray-matter");
 
 // ✅ Set up Nunjucks environment with multiple loaders
-nunjucks.configure(["_custom", "_includes", "_corenjks"], {
+nunjucks.configure(["_custom", "_corenjks"], {
   autoescape: true,
   noCache: true,
 });
@@ -70,11 +70,13 @@ function processFile(templateName, folder) {
 // ✅ FIX 2: Dynamic Template Loading
 function renderTemplateWithLayout(layoutName, context) {
   // Check search paths for the template
-  const searchPaths = ["_custom", "_includes", "_corenjks"];
+  const searchPaths = ["_custom", "_corenjks"];
   let layoutPath = null;
 
   for (const dir of searchPaths) {
     const possiblePath = path.join(dir, layoutName);
+    //debug
+    //console.log(possiblePath);
     if (fs.existsSync(possiblePath)) {
       layoutPath = possiblePath;
       break;
@@ -106,7 +108,7 @@ function generateApiFunctions(tableNames) {
   }
 
   tableNames.forEach((tableName) => {
-    const templatePath = path.join("_includes", "apiGenerator.njk");
+    const templatePath = path.join("_corenjks", "apiGenerator.njk");
 
     if (!fs.existsSync(templatePath)) {
       console.error("❌ apiGenerator.njk template not found");
@@ -139,7 +141,7 @@ function generatePages(tableName, fields, tableNames) {
 
   const pageTypes = ["index", "view", "add", "edit"];
   pageTypes.forEach((pageType) => {
-    const pageData = processFile(`${pageType}Table.njk`, "_includes") || {};
+    const pageData = processFile(`${pageType}Table.njk`, "_corenjks") || {};
     const outputFile = path.join(tableDir, `${pageType}.html`);
 
     let renderedContent;

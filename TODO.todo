@@ -6,6 +6,13 @@ apigeneator
     put
     delete
 
+kill the node instances in the build script
+have an install mode in the build script
+    
+
+fix table menu rendering when you are on a table
+rename all internal fields to start with as_
+
 account api 
     login test isDeleted
     login test isBlocked
