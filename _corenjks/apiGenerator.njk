@@ -90,8 +90,25 @@ async function handleGet(request, env, params, context) {
 async function handlePost(request, env, params, context) {
   try {
     const data = await request.json();
+    const tableName = "{{tableName}}";
+    const keys = Object.keys(data);
+    const values = Object.values(data);
+
+    if (!tableName || keys.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "Invalid table name or empty data" }),
+        { status: 400 }
+      );
+    }
+
+    // Construct SQL query
+    const placeholders = keys.map(() => "?").join(", ");
+    const sql = `INSERT INTO ${tableName} (${keys.join(", ")}) VALUES (${placeholders})`;
+    // Execute query
+    const result = await env.DB.prepare(sql).bind(...values).run();
+
     return new Response(
-      JSON.stringify({ message: "POST create new ${table}", data }),
+      JSON.stringify({ status: `ok` }),
       { status: 201 }
     );
   } catch (error) {
@@ -100,6 +117,7 @@ async function handlePost(request, env, params, context) {
     });
   }
 }
+
 
 async function handlePut(request, env, params, context) {
   try {

@@ -335,14 +335,14 @@ let xhrcall = async (
     }
 
     //check if it was ok.
-    if (xhr.status == 200) {
+    if (xhr.status == 200 || xhr.status == 201) {
       //check if a redirecr url as passed.
       if (redirectUrl != "") {
         window.location = redirectUrl;
       } else {
         //console.log(res)
         //res = JSON.parse(res)
-        //console.log(res)
+        //console.log(res);
         eval(callback(res));
       }
     }

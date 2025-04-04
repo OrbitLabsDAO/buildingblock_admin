@@ -1,5 +1,6 @@
 const url = new URL(window.location.href);
-let tableName = url.pathname.split("/").filter(Boolean).pop();
+let parts = url.pathname.split("/").filter(Boolean);
+let tableName = parts.length > 1 ? parts[parts.length - 2] : null;
 
 document
   .getElementById("btn-create")
@@ -46,9 +47,17 @@ document
     if (isValid) {
       // Convert the object to JSON
       const requestBody = JSON.stringify(formDataObject);
-      console.log(requestBody);
+      // Call the table endpoint
+      let theUrl = apiUrl + `tables/${tableName}`;
+      xhrcall(0, theUrl, requestBody, "json", "", getAddDone);
     }
   });
+
+let getAddDone = (response) => {
+  response = JSON.parse(response);
+  if (response.status == "ok") showAlert("Record Added", 1);
+  else showAlert(response.error, 2);
+};
 
 /**
  * Show an error message for a field
