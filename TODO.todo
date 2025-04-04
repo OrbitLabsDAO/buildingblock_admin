@@ -1,16 +1,7 @@
 tableEdit
 
 apigeneator
-    view
-        get the record
-        output the results
 
-    post
-        do the post
-        do the correct update elements
-
-
-       
     put
         post the new record
 
@@ -25,8 +16,6 @@ INPUTS
     how we do required fields
     
 API
-rename all internal fields to start with as_
-make sure they all have the key fields our update the system so it does not fail if they are not there
 account api 
     login test isDeleted
     login test isBlocked
