@@ -139,9 +139,10 @@ function generateTablePages(tableName, fields, tableNames) {
     fs.mkdirSync(tableDir, { recursive: true });
   }
 
-  const pageTypes = ["index", "view", "add", "edit"];
+  const pageTypes = ["Index", "View", "Add", "Edit"];
   pageTypes.forEach((pageType) => {
-    const pageData = processFile(`${pageType}Table.njk`, "_corenjks") || {};
+    console.log(`table${pageType}.njk`);
+    const pageData = processFile(`table${pageType}.njk`, "_corenjks") || {};
     const outputFile = path.join(tableDir, `${pageType}.html`);
 
     let renderedContent;

@@ -1,5 +1,4 @@
-tableIndex
-    add jwt signing 
+tableEdit
 
 apigeneator
     post
@@ -7,10 +6,12 @@ apigeneator
 
 kill the node instances in the build script
 have an install mode in the build script
+
+clean up content.js
     
-
+API
 rename all internal fields to start with as_
-
+make sure they all have the key fields our update the system so it does not fail if they are not there
 account api 
     login test isDeleted
     login test isBlocked
