@@ -239,8 +239,7 @@ let xhrcall = async (
   bodyObj = "",
   setHeader = "",
   redirectUrl = "",
-  callback = "",
-  auth = ""
+  callback = ""
 ) => {
   //debug
   //console.log(apiUrl)
@@ -248,8 +247,8 @@ let xhrcall = async (
   //console.log(method)
   //console.log(callback)
 
-  //maybe we should always send the auth token if it is blank
-  if (auth == "") auth = getToken();
+  //get  auth token if it is blank
+  const auth = getToken();
 
   //checkElement = document.getElementById("spinner");
   if (checkElement("spinner") == true) {
