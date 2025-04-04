@@ -1,6 +1,25 @@
+//JWT model
+const jwt = require('@tsndr/cloudflare-worker-jwt');
+//token var
+let theToken = "";
+//decode the jwt token
+let decodeJwt = async (req, secret) => {
+    let bearer = req.get('authorization')
+    let details = "";
+    if (bearer != null) {
+        bearer = bearer.replace("Bearer ", "");
+        details = await jwt.decode(bearer, secret)
+    }
+    return (details)
+}
+
 export async function onRequest(context) {
+  //get the vars we care about
   const { request, env, params } = context;
+  //get the methosd
   const method = request.method.toUpperCase();
+  //decode the token so we can use it later.
+  theToken = await decodeJwt(request.headers, env.SECRET);
   switch (method) {
     case "GET":
       return handleGet(request, env, params, context);
@@ -20,21 +39,28 @@ async function handleGet(request, env, params, context) {
   const id = url.searchParams.get("id"); // Get 'id' from query string
   const tableName = "{{tableName}}";
 
-  let result;
+  // Check if 'as_isDeleted' exists in the table schema
+  const schemaQuery = context.env.DB.prepare(`PRAGMA table_info(${tableName})`);
+  const schema = await schemaQuery.all();
+  const hasIsDeleted = schema.results.some(col => col.name === "as_isDeleted");
 
-  // Handle query based on 'id' parameter
+  // Build the query dynamically
+  let queryStr = `SELECT * FROM ${tableName}`;
+  const paramsArray = [];
+
   if (id != null) {
-    let query = context.env.DB.prepare(
-      `SELECT * FROM ${tableName} WHERE "id" = ? and "as_isDeleted" = 0`
-    );
-    result = await query.first(id);
-  } else {
-    let query = context.env.DB.prepare(
-      `SELECT * FROM ${tableName} where "as_isDeleted" = 0`
-    );
+    queryStr += ` WHERE "id" = ?`;
+    paramsArray.push(id);
 
-    result = await query.all();
+    if (hasIsDeleted) {
+      queryStr += ` AND "as_isDeleted" = 0`;
+    }
+  } else if (hasIsDeleted) {
+    queryStr += ` WHERE "as_isDeleted" = 0`;
   }
+
+  const query = context.env.DB.prepare(queryStr);
+  const result = id ? await query.first(...paramsArray) : await query.all();
 
   // Exclude specific fields from the result
   const excludedFields = [
@@ -44,20 +70,23 @@ async function handleGet(request, env, params, context) {
     "updatedAt",
     "publishedAt",
     "deletedAt",
-  ]; // Add more if needed
+  ];
 
-  // Map through the results and remove excluded fields
-  const filteredResults = result.results.map((item) => {
-    return Object.fromEntries(
+  // Normalize to array of results
+  const resultArray = Array.isArray(result.results) ? result.results : [result];
+
+  // Filter out excluded fields
+  const filteredResults = resultArray.map((item) =>
+    Object.fromEntries(
       Object.entries(item).filter(([key]) => !excludedFields.includes(key))
-    );
-  });
+    )
+  );
 
-  // Return filtered results
   return new Response(JSON.stringify({ data: filteredResults }), {
     status: 200,
   });
 }
+
 
 async function handlePost(request, env, params, context) {
   try {

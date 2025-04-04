@@ -248,9 +248,8 @@ let xhrcall = async (
   //console.log(method)
   //console.log(callback)
 
-  /*
-      Note if we are not using strai and have a custom URL we can change it here like wise if we want to use 2 we can check the method to select the correct base url
-    */
+  //maybe we should always send the auth token if it is blank
+  if (auth == "") auth = getToken();
 
   //checkElement = document.getElementById("spinner");
   if (checkElement("spinner") == true) {
