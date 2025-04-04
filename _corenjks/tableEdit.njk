@@ -1,22 +1,36 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit {{ tableName }}</title>
-</head>
-<body>
-    <h1>Edit {{ tableName }}</h1>
-    <form action="/edit_{{ tableName }}" method="post">
+---
+layout: layout.njk
+---
+{% set theJs %}
+    {% include 'js/tableAdd.js' %}
+{% endset %}
+<!-- Page Heading -->
+   <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800" id="data-header"></h1>
+        <a href="javascript:history.back()" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+        <i class="fas fa-backward fa-sm text-white-50" id="btn-back-cy"></i> Back</a>
+    </div>
+<p class="mb-4">
+</p>
+
+    <div id="formInputs">
+     <form action="/add_{{ tableName }}" method="post">
         {% for field in fields %}
-            {% if field.name and field.name | slice(0, 3) != "_as" %}
-                <label>{{ field.name }}
-                    <input name="{{ field.name }}" type="text" {% if field.default %} value="{{ field.default }}" {% endif %}>
-                </label><br>
-            {% endif %}
+            <div class="form-group ">
+                <label>{{ field.name }}</label>
+                <input type="text" class="form-control form-control-user" name="inp-${"{{ field.name }}}" id="inp-"{{ field.name }}" aria-describedby=""{{ field.name }}" placeholder="Enter "{{ field.name }}" value=""{{ field.value }}" disabled>
+                <span class="text-danger d-none" id="error-"{{ field.name }}"></span>  
+            </div>
         {% endfor %}
-        <button type="submit">Submit</button>
+       
     </form>
-</body>
-</html>
+    </div>
+     <input type="hidden" id="formTableName" name="formTableName" value="">
+
+<button class="btn btn-primary btn-user btn-block" id="btn-create">
+    Create
+</button>
+<script type="text/javascript">{{theJs | safe}}</script>
 
 
 

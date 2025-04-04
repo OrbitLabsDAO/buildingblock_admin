@@ -1,13 +1,22 @@
 tableEdit
 
 apigeneator
+    view
+        get the record
+        output the results
+
     post
+        get the record
+        output the results
+        create the edit elements
     put
+        post the new record
 
 kill the node instances in the build script
 have an install mode in the build script
 
 clean up content.js
+
     
 API
 rename all internal fields to start with as_

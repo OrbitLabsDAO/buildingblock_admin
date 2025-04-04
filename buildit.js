@@ -256,19 +256,43 @@ if (fs.existsSync(functionsFolder)) {
 let tableNames = [];
 if (Array.isArray(parsedSchema.statement)) {
   parsedSchema.statement.forEach((statement) => {
-    if (statement.variant === "create" && statement.format === "table")
-      tableNames.push(statement.name.name);
+    if (statement.variant === "create" && statement.format === "table") {
+      if (!env.EXCLUDETABLES.includes(statement.name.name)) {
+        tableNames.push(statement.name.name);
+
+        // Add a label for each field only if field.name is not empty or null
+        statement.definition.forEach((field) => {
+          if (field.name !== null && field.name !== undefined) {
+            // Check if field.name is not null, undefined, or empty
+            field.label = field.name
+              // Replace underscores with spaces
+              .replace(/_/g, " ")
+              // Add spaces for camelCase (before each uppercase letter)
+              .replace(/([a-z])([A-Z])/g, "$1 $2")
+              // Capitalize the first letter of each word (optional)
+              .replace(/\b\w/g, (char) => char.toUpperCase());
+          } else {
+            // Handle cases where field.name is undefined, null, or empty
+            console.warn(`Skipping field with invalid name:`, field);
+          }
+        });
+      }
+    }
   });
 }
+
 if (Array.isArray(parsedSchema.statement)) {
   parsedSchema.statement.forEach((statement) => {
     if (statement.variant === "create" && statement.format === "table") {
       const tableName = statement.name.name;
       const fields = statement.definition;
-      if (!fields.some((field) => field.name === "as_internal")) {
-        //tableNames.push(tableName);
-        generateTablePages(tableName, fields, tableNames);
-      }
+      //santise the fields
+
+      const sanitisedFields = fields.filter(
+        (field) => !env.EXCLUDEDFIELDS.includes(field.name)
+      );
+
+      generateTablePages(tableName, sanitisedFields, tableNames);
     }
   });
 

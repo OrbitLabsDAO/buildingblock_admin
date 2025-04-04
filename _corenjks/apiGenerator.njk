@@ -39,10 +39,10 @@ async function handleGet(request, env, params, context) {
   const id = url.searchParams.get("id"); // Get 'id' from query string
   const tableName = "{{tableName}}";
 
-  // Check if 'as_isDeleted' exists in the table schema
+  // Check if 'isDeleted' exists in the table schema
   const schemaQuery = context.env.DB.prepare(`PRAGMA table_info(${tableName})`);
   const schema = await schemaQuery.all();
-  const hasIsDeleted = schema.results.some(col => col.name === "as_isDeleted");
+  const hasIsDeleted = schema.results.some(col => col.name === "isDeleted");
 
   // Build the query dynamically
   let queryStr = `SELECT * FROM ${tableName}`;
@@ -53,10 +53,10 @@ async function handleGet(request, env, params, context) {
     paramsArray.push(id);
 
     if (hasIsDeleted) {
-      queryStr += ` AND "as_isDeleted" = 0`;
+      queryStr += ` AND "isDeleted" = 0`;
     }
   } else if (hasIsDeleted) {
-    queryStr += ` WHERE "as_isDeleted" = 0`;
+    queryStr += ` WHERE "isDeleted" = 0`;
   }
 
   const query = context.env.DB.prepare(queryStr);
@@ -64,7 +64,6 @@ async function handleGet(request, env, params, context) {
 
   // Exclude specific fields from the result
   const excludedFields = [
-    "as_isDeleted",
     "isDeleted",
     "createdAt",
     "updatedAt",
@@ -129,7 +128,7 @@ async function handleDelete(request, params, context) {
   const tableName = "{{tableName}}";
   //we would have to sanitise this delete at some point but we are getting binding issues
     const query = context.env.DB.prepare(
-      `UPDATE ${tableName} SET "as_isDeleted" = 1 WHERE "id" = ${data.id}`
+      `UPDATE ${tableName} SET "isDeleted" = 1 WHERE "id" = ${data.id}`
     );
 
     // The query should be run with data.id, which should be a single value

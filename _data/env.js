@@ -14,4 +14,13 @@ module.exports = {
   CANCREATEACCOUNT: process.env.CANCREATEACCOUNT,
   COMPLEXPASSWORD: process.env.COMPLEXPASSWORD,
   RESETPASSWORD: process.env.RESETPASSWORD,
+  EXCLUDEDFIELDS: [
+    "id",
+    "isDeleted",
+    "createdAt",
+    "updatedAt",
+    "publishedAt",
+    "deletedAt",
+  ], //these are the fields that will be removed from any rendering
+  EXCLUDETABLES: ["payment_types", "yesno_lookup", "userAccess"],
 };
