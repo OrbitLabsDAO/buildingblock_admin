@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View {{ tableName }}</title>
+</head>
+<body>
+    <h1>View {{ tableName }}</h1>
+    <table>
+        <thead>
+            <tr>
+                {% for field in fields %}
+                    <th>{{ field.name }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamic Rows Here -->
+        </tbody>
+    </table>
+    <a href="add_{{ tableName }}.html">Add New</a>
+</body>
+</html>
