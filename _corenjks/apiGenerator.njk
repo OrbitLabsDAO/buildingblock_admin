@@ -37,6 +37,7 @@ export async function onRequest(context) {
 async function handleGet(request, env, params, context) {
   const url = new URL(request.url);
   const id = url.searchParams.get("id"); // Get 'id' from query string
+  console.log(id);
   const tableName = "{{tableName}}";
 
   // Check if 'isDeleted' exists in the table schema
@@ -45,46 +46,33 @@ async function handleGet(request, env, params, context) {
   const hasIsDeleted = schema.results.some(col => col.name === "isDeleted");
 
   // Build the query dynamically
-  let queryStr = `SELECT * FROM ${tableName}`;
-  const paramsArray = [];
+  let queryStr = "";
 
   if (id != null) {
-    queryStr += ` WHERE "id" = ?`;
-    paramsArray.push(id);
-
-    if (hasIsDeleted) {
-      queryStr += ` AND "isDeleted" = 0`;
-    }
-  } else if (hasIsDeleted) {
-    queryStr += ` WHERE "isDeleted" = 0`;
+    queryStr = `SELECT * FROM ${tableName} WHERE "id" = ${id}`;
   }
 
-  const query = context.env.DB.prepare(queryStr);
-  const result = id ? await query.first(...paramsArray) : await query.all();
+  if (hasIsDeleted) {
+    queryStr = `SELECT * FROM ${tableName} WHERE "id" = ${id} and isDeleted = 0`
+  }
+  console.log(queryStr)
+  const result = await env.DB.prepare(queryStr).bind().run();
+
 
   // Exclude specific fields from the result
-  const excludedFields = [
-    "isDeleted",
-    "createdAt",
-    "updatedAt",
-    "publishedAt",
-    "deletedAt",
-  ];
+  const excludedFields = ["isDeleted", "createdAt", "updatedAt", "publishedAt", "deletedAt"];
 
   // Normalize to array of results
   const resultArray = Array.isArray(result.results) ? result.results : [result];
 
   // Filter out excluded fields
   const filteredResults = resultArray.map((item) =>
-    Object.fromEntries(
-      Object.entries(item).filter(([key]) => !excludedFields.includes(key))
-    )
+    Object.fromEntries(Object.entries(item).filter(([key]) => !excludedFields.includes(key)))
   );
 
-  return new Response(JSON.stringify({ data: filteredResults }), {
-    status: 200,
-  });
+  return new Response(JSON.stringify({ data: filteredResults }), { status: 200 });
 }
+
 
 
 async function handlePost(request, env, params, context) {
