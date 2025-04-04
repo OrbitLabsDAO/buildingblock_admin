@@ -75,8 +75,7 @@ function renderTemplateWithLayout(layoutName, context) {
 
   for (const dir of searchPaths) {
     const possiblePath = path.join(dir, layoutName);
-    //debug
-    //console.log(possiblePath);
+
     if (fs.existsSync(possiblePath)) {
       layoutPath = possiblePath;
       break;
@@ -141,7 +140,6 @@ function generateTablePages(tableName, fields, tableNames) {
 
   const pageTypes = ["Index", "View", "Add", "Edit"];
   pageTypes.forEach((pageType) => {
-    console.log(`table${pageType}.njk`);
     const pageData = processFile(`table${pageType}.njk`, "_corenjks") || {};
     const outputFile = path.join(tableDir, `${pageType}.html`);
 
@@ -181,7 +179,7 @@ function generateTablePages(tableName, fields, tableNames) {
 function processAccountFiles(tableNames) {
   const accountFiles = fs
     .readdirSync(coreFolder)
-    .filter((file) => file.endsWith(".njk"));
+    .filter((file) => file.endsWith(".njk") && file.startsWith("account-")); // ✅ Only account-*.njk files
 
   accountFiles.forEach((file) => {
     const pageData = processFile(file, coreFolder) || {};
@@ -202,7 +200,13 @@ function processAccountFiles(tableNames) {
     }
 
     if (pageData.content) {
-      const tmpFile = file.replace(".njk", "");
+      let tmpFile = file.replace(".njk", "");
+
+      // Check if permalink is provided and not empty
+      if (pageData.permalink && pageData.permalink !== "") {
+        tmpFile = pageData.permalink;
+      }
+
       const outputDir = path.join(siteDir, tmpFile);
       const outputFile = path.join(outputDir, "index.html");
 
@@ -232,8 +236,9 @@ function processAccountFiles(tableNames) {
         });
       }
 
+      // Write the rendered content to the output file
       fs.writeFileSync(outputFile, renderedContent);
-      console.log(`✅ Created account page: ${file}`);
+      console.log(`✅ Created account page: ${tmpFile}.html`);
     }
   });
 }
@@ -273,7 +278,7 @@ if (Array.isArray(parsedSchema.statement)) {
               .replace(/\b\w/g, (char) => char.toUpperCase());
           } else {
             // Handle cases where field.name is undefined, null, or empty
-            console.warn(`Skipping field with invalid name:`, field);
+            //console.warn(`Skipping field with invalid name:`, field);
           }
         });
       }

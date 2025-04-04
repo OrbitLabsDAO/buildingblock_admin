@@ -1,3 +1,10 @@
+ADMIN USERS
+    only show if person is an ADMIN
+    render the users table view/edit/delete (we should be able to user the same table code for this)
+
+
+SETTINGS
+
 clean up content.js
 
 
@@ -12,6 +19,8 @@ tableAdd
 
 kill the node instances in the build script
 have an install mode in the build script
+
+
 
 
 
@@ -34,7 +43,6 @@ register create user
    forgot password
 
 
-fix the custom rendering in layout served from frontmatter
 use nice rendering inputs for each field type or keep it very simple and just use a key value pair
     if it is the first they we can have custom information for fields dropdown lists etc.
 how do we handle joins etc maybe look at how orms do it (the backwards way is neat)
