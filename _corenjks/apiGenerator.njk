@@ -37,7 +37,6 @@ export async function onRequest(context) {
 async function handleGet(request, env, params, context) {
   const url = new URL(request.url);
   const id = url.searchParams.get("id"); // Get 'id' from query string
-  console.log(id);
   const tableName = "{{tableName}}";
 
   // Check if 'isDeleted' exists in the table schema
@@ -62,7 +61,6 @@ async function handleGet(request, env, params, context) {
   }
 
   
-  console.log(queryStr)
   const result = await env.DB.prepare(queryStr).bind().run();
 
 
@@ -116,18 +114,41 @@ async function handlePost(request, env, params, context) {
 
 async function handlePut(request, env, params, context) {
   try {
-    const { id } = params;
+    const tableName = "{{tableName}}";
     const data = await request.json();
-    return new Response(
-      JSON.stringify({ message: "PUT update ${table} by ID", id, data }),
-      { status: 200 }
-    );
+    if (!data.id) {
+      return new Response(JSON.stringify({ error: "ID is required for update" }), {
+        status: 400,
+      });
+    }
+    const id = data.id;
+    delete data.id; // Remove id from the object
+    const keys = Object.keys(data);
+    const values = Object.values(data);
+
+    if (keys.length === 0) {
+      return new Response(JSON.stringify({ error: "No data provided" }), {
+        status: 400,
+      });
+    }
+
+    // Construct SET clause dynamically
+    const setClause = keys.map((key) => `"${key}" = ?`).join(", ");
+    const sql = `UPDATE ${tableName} SET ${setClause} WHERE "id" = ?`;
+
+    // Execute query
+    const result = await env.DB.prepare(sql).bind(...values, id).run();
+
+    return new Response(JSON.stringify({ status: "ok", updatedRows: result.meta.changes }), {
+      status: 200,
+    });
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
     });
   }
 }
+
 
 async function handleDelete(request, params, context) {
   try {

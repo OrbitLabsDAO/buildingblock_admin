@@ -79,11 +79,13 @@ document
           showAlert("Error updating record please try again", 2);
         }
       };
+      //this is kind of sucky as anyone can just chnage the id and we edit any record, fix later.
+      formDataObject.id = id;
       // Convert the object to JSON
       const requestBody = JSON.stringify(formDataObject);
-      console.log(requestBody);
       // Call the table endpoint
       let theUrl = apiUrl + `tables/${tableName}`;
+
       xhrcall(4, theUrl, requestBody, "json", "", getEditDone);
     }
   });

@@ -1,14 +1,18 @@
+clean up content.js
+
+
 tableEdit
+    block update until there is an actual change
+    move the id from url paramter to something better and maybe check that the user has the right to modify this record
 
-apigeneator
+tableAdd
+    move the id from url paramter to something better and maybe check that the user has the right to modify this record
+      
 
-    put
-        post the new record
 
 kill the node instances in the build script
 have an install mode in the build script
 
-clean up content.js
 
 
 INPUTS
