@@ -16,11 +16,11 @@ layout: layout.njk
     <div id="formInputs">
      <form action="/add_{{ tableName }}" method="post">
     {% set disabled = false %} 
+    {% set defaultInteger = 0 %}
      {% for field in fields %}
         {% if field.name != "" and field.name != null %}
             <div class="form-group">
                 <label>{{ field.label }}</label>
-
                 {% if field.datatype.variant == "integer" %}
                     {% include "htmlinputs/integer.njk"  %}
                 {% elif field.datatype.variant == "real" %}

@@ -6,9 +6,11 @@ apigeneator
         output the results
 
     post
-        get the record
-        output the results
-        create the edit elements
+        do the post
+        do the correct update elements
+
+
+       
     put
         post the new record
 
@@ -17,6 +19,10 @@ have an install mode in the build script
 
 clean up content.js
 
+
+INPUTS
+    think about look ups?
+    how we do required fields
     
 API
 rename all internal fields to start with as_

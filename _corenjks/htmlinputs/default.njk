@@ -2,3 +2,4 @@
        name="inp-{{ field.name }}" id="inp-{{ field.name }}" 
        aria-describedby="{{ field.name }}" value="" {% if disabled %}disabled{% endif %} 
        placeholder="Unsupported Type: {{ field.datatype.variant }}">
+              <span class="text-danger d-none" id="error-{{field.name}}"></span>  
