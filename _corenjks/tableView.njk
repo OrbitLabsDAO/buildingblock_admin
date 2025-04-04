@@ -1,22 +1,45 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>View {{ tableName }}</title>
-</head>
-<body>
-    <h1>View {{ tableName }}</h1>
-    <table>
-        <thead>
-            <tr>
-                {% for field in fields %}
-                    <th>{{ field.name }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Dynamic Rows Here -->
-        </tbody>
-    </table>
-    <a href="add_{{ tableName }}.html">Add New</a>
-</body>
-</html>
+---
+layout: layout.njk
+---
+{% set theJs %}
+    {% include 'js/tableView.js' %}
+{% endset %}
+<!-- Page Heading -->
+   <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800" id="data-header"></h1>
+        <a href="javascript:history.back()" class="d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+        <i class="fas fa-backward fa-sm text-white-50" id="btn-back-cy"></i> Back</a>
+    </div>
+<p class="mb-4">
+</p>
+
+    <div id="formInputs">
+     <form action="/add_{{ tableName }}" method="post">
+    {% set disabled = true %} 
+   
+     {% for field in fields %}
+        {% if field.name != "" and field.name != null %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {% if field.datatype.variant == "integer" %}
+                    {% include "htmlinputs/integer.njk"  %}
+                {% elif field.datatype.variant == "real" %}
+                    {% include "htmlinputs/real.njk"  %}
+                {% elif field.datatype.variant == "text" %}
+                    {% include "htmlinputs/text.njk" %}
+                {% elif field.datatype.variant == "varchar" %}
+                    {% include "htmlinputs/varchar.njk"  %}
+                {% else %}
+                    {% include "htmlinputs/default.njk" %}
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    </form>
+    </div>
+     <input type="hidden" id="formTableName" name="formTableName" value="">
+
+
+<script type="text/javascript">{{theJs | safe}}</script>
+

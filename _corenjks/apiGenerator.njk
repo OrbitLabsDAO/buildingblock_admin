@@ -50,11 +50,18 @@ async function handleGet(request, env, params, context) {
 
   if (id != null) {
     queryStr = `SELECT * FROM ${tableName} WHERE "id" = ${id}`;
+     if (hasIsDeleted) 
+      queryStr += ` and isDeleted = 0`
+  }
+  else
+  {
+    queryStr = `SELECT * FROM ${tableName}`;
+    if (hasIsDeleted) 
+      queryStr += ` where isDeleted = 0`
+  
   }
 
-  if (hasIsDeleted) {
-    queryStr = `SELECT * FROM ${tableName} WHERE "id" = ${id} and isDeleted = 0`
-  }
+  
   console.log(queryStr)
   const result = await env.DB.prepare(queryStr).bind().run();
 
