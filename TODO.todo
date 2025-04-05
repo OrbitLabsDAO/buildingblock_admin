@@ -1,7 +1,7 @@
-ADMIN USERS
-    only show if person is an ADMIN
-    render the users table view/edit/delete (we should be able to user the same table code for this)
+account profile
+account settings 
 
+clean up account.js break it down to  sepeate account file for each page
 
 SETTINGS
 

@@ -185,8 +185,12 @@ let checkLogin = () => {
       if (user.isAdmin == 1) {
         //if (checkElement("btn-create-cy") == true)
         // document.getElementById('btn-create-cy').classList.remove("d-none");
-        document.getElementById("navadmin").classList.remove("d-none");
+        document.getElementById("hideAdmin").classList.remove("d-none");
+      } else {
+        //delete the html node
+        document.getElementById("hideAdmin").remove();
       }
+
       //check the user is logged in some one could spoof this so we could do a valid jwt check here
       //but i prefer to do it when we ping the api for the data for this user.
       if (user.loggedin != 1) {
@@ -208,6 +212,17 @@ let checkLogin = () => {
       }
     } else {
       window.location = "/login/";
+    }
+
+    //check if they are on an admin page, this is a JS check so it is not optimal but it will do for now
+    if (user.isAdmin == 0) {
+      console.log(window.location.pathname);
+      if (
+        window.location.pathname == "/tables/adminuser/" ||
+        window.location.pathname == "/tables/adminuser/add" ||
+        window.location.pathname == "/tables/adminuser/edit"
+      )
+        window.location = "/dashboard/";
     }
   }
 };

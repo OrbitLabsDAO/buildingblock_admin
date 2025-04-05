@@ -86,7 +86,6 @@
                 </div>
             </li>
 
-
             <!-- add you custom menu items here -->
            <!--
             This is not working yet as the layout it pulled from frontmatter it is having 
@@ -97,6 +96,7 @@
 
             <!-- Divider -->
             <hr class="sidebar-divider">
+            <div id="hideAdmin" class="d-none">
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item" id="navadmin">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
@@ -108,7 +108,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">ADMIN SETTINGS</h6>
                         <div id="backpageprojectmenu"></div>
-                        <a class="collapse-item" href="/admin/users/">Manage Users</a>
+                        <a class="collapse-item" href="/tables/adminuser/">Manage Users</a>
                         
                     </div>
                 </div>
@@ -116,7 +116,8 @@
 
 
             <!-- Divider -->
-            <hr class="sidebar-divider">   
+            <hr class="sidebar-divider">  
+            </div> 
         </ul>
         <!-- End of Sidebar -->
         

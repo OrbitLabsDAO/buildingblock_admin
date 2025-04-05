@@ -2,7 +2,6 @@
 const url = new URL(window.location.href);
 let tableName = url.pathname.split("/").filter(Boolean).pop();
 let id = url.searchParams.get("id");
-
 let whenDocumentReady = (f) => {
   /in/.test(document.readyState)
     ? setTimeout("whenDocumentReady(" + f + ")", 9)
@@ -130,7 +129,9 @@ whenDocumentReady(
     //show admin stuff
     showElements();
     // Call the table endpoint
+
     let theUrl = apiUrl + `tables/${tableName}`;
+    //if (tableName == "user") theUrl = apiUrl + `admin/${tableName}`;
     if (id != null) theUrl += `?id=${id}`;
     xhrcall(1, theUrl, "", "json", "", getTableDone);
   })

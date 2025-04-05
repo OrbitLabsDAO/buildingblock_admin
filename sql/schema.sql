@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS rental_payment;
 DROP TABLE IF EXISTS property_distribution;
 DROP TABLE IF EXISTS agent;
 DROP TABLE IF EXISTS tenant;
-DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS adminuser;
 DROP TABLE IF EXISTS userAccess;
 DROP TABLE IF EXISTS payment_types;
 DROP TABLE IF EXISTS yesno_lookup;
@@ -404,7 +404,7 @@ CREATE TABLE "tenant" (
 
 INSERT INTO "tenant" ("name","email","phone") VALUES ('tenanat 1','tenant1@gmail.com','0123456789');
 
-CREATE TABLE "user" (
+CREATE TABLE "adminuser" (
 	"id"	INTEGER,
 	"name"	TEXT,
 	"email" TEXT,
@@ -428,8 +428,8 @@ CREATE TABLE "user" (
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 
-INSERT INTO "user" ("name","email","phone","cryptoAddress","username","password","apiSecret","confirmed","isBlocked","isAdmin","isDeleted","adminId") VALUES ('cryptoskillz','test@orbitlabs.xyz','123456789','0x1521a6B56fFF63c9e97b9adA59716efF9D3A60eB','cryptoskillz','test','a7fd098f-79cf-4c37-a527-2c9079a6e6a1',1,0,1,0,0);
-INSERT INTO "user" ("name","email","phone","cryptoAddress","username","password","apiSecret","confirmed","isBlocked","isAdmin","isDeleted","adminId") VALUES ('seller 2','test@test.com','123456789','0x060A17B831BFB09Fe95B244aaf4982ae7E8662B7','test','test','a7fd098f-79cf-4c37-a527-2c9079a6e6a1',1,0,0,0,1);
+INSERT INTO "adminuser" ("name","email","phone","cryptoAddress","username","password","apiSecret","confirmed","isBlocked","isAdmin","isDeleted","adminId") VALUES ('cryptoskillz','test@orbitlabs.xyz','123456789','0x1521a6B56fFF63c9e97b9adA59716efF9D3A60eB','cryptoskillz','test','a7fd098f-79cf-4c37-a527-2c9079a6e6a1',1,0,1,0,0);
+INSERT INTO "adminuser" ("name","email","phone","cryptoAddress","username","password","apiSecret","confirmed","isBlocked","isAdmin","isDeleted","adminId") VALUES ('seller 2','test@test.com','123456789','0x060A17B831BFB09Fe95B244aaf4982ae7E8662B7','test','test','a7fd098f-79cf-4c37-a527-2c9079a6e6a1',1,0,0,0,1);
 
 
 CREATE TABLE "userAccess" (

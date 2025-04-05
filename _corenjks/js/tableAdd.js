@@ -1,6 +1,8 @@
 const url = new URL(window.location.href);
 let parts = url.pathname.split("/").filter(Boolean);
 let tableName = parts.length > 1 ? parts[parts.length - 2] : null;
+console.log(parts);
+console.log(tableName);
 
 document
   .getElementById("btn-create")

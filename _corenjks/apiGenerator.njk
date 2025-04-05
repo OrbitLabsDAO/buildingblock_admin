@@ -16,7 +16,7 @@ let decodeJwt = async (req, secret) => {
 export async function onRequest(context) {
   //get the vars we care about
   const { request, env, params } = context;
-  //get the methosd
+  //get the methods
   const method = request.method.toUpperCase();
   //decode the token so we can use it later.
   theToken = await decodeJwt(request.headers, env.SECRET);

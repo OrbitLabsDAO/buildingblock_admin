@@ -105,17 +105,18 @@ function generateApiFunctions(tableNames) {
   if (!fs.existsSync(apiFolder)) {
     fs.mkdirSync(apiFolder, { recursive: true });
   }
+  const templatePath = path.join("_corenjks", "apiGenerator.njk");
+  if (!fs.existsSync(templatePath)) {
+    console.error("❌ apiGenerator.njk template not found");
+    return;
+  }
 
-  tableNames.forEach((tableName) => {
-    const templatePath = path.join("_corenjks", "apiGenerator.njk");
+  //add the uer endpoint
+  let modifiedTableNames = tableNames;
+  modifiedTableNames.push("adminuser");
 
-    if (!fs.existsSync(templatePath)) {
-      console.error("❌ apiGenerator.njk template not found");
-      return;
-    }
-
+  modifiedTableNames.forEach((tableName) => {
     const apiContent = fs.readFileSync(templatePath, "utf-8");
-
     try {
       const renderedApi = nunjucks.renderString(apiContent, {
         tableName,
@@ -133,7 +134,9 @@ function generateApiFunctions(tableNames) {
 
 // Utility: Generate Pages
 function generateTablePages(tableName, fields, tableNames) {
+  if (tableName == "internal_user") tableName = "adminuser";
   const tableDir = path.join(siteDir, `/tables/${tableName}`);
+
   if (!fs.existsSync(tableDir)) {
     fs.mkdirSync(tableDir, { recursive: true });
   }
@@ -263,7 +266,8 @@ if (Array.isArray(parsedSchema.statement)) {
   parsedSchema.statement.forEach((statement) => {
     if (statement.variant === "create" && statement.format === "table") {
       if (!env.EXCLUDETABLES.includes(statement.name.name)) {
-        tableNames.push(statement.name.name);
+        if (statement.name.name != "internal_user")
+          tableNames.push(statement.name.name);
 
         // Add a label for each field only if field.name is not empty or null
         statement.definition.forEach((field) => {
@@ -296,8 +300,8 @@ if (Array.isArray(parsedSchema.statement)) {
       const sanitisedFields = fields.filter(
         (field) => !env.EXCLUDEDFIELDS.includes(field.name)
       );
-
-      generateTablePages(tableName, sanitisedFields, tableNames);
+      if (!env.EXCLUDETABLES.includes(tableName))
+        generateTablePages(tableName, sanitisedFields, tableNames);
     }
   });
 
