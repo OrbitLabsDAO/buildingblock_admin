@@ -29,6 +29,12 @@ function hideError(fieldName) {
 }
 
 document
+  .getElementById("btn-update-password")
+  .addEventListener("click", function (event) {
+
+    event.preventDefault(); // Prevent form submission
+
+document
   .getElementById("btn-update")
   .addEventListener("click", function (event) {
     event.preventDefault(); // Prevent form submission

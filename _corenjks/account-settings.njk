@@ -1,8 +1,9 @@
 ---
 layout: layout.njk
+permalink: settings
 ---
 {% set theJs %}
-    {% include 'js/account.js' %}
+    {% include 'js/account-settings.js' %}
 {% endset %}
 <!-- Page Heading -->
 
@@ -18,12 +19,46 @@ layout: layout.njk
 <p class="mb-4">
 </p>
 <div class="form-group">
-    <label>Add a company name</label>
-    <input type="text" class="form-control form-control-user" id="inp-companyname" aria-describedby="companyNameHelp" placeholder="Enter company name...">
-    <span class="text-danger" id="error-companyname"> </span>  
+    <label>Name</label>
+    <input type="text" class="form-control form-control-user" id="inp-name" aria-describedby="Name" value="" >
+    <span class="text-danger" id="error-name"> </span>  
 </div>
-<button class="btn btn-primary btn-user btn-block" id="btn-edit">
-    Update
+<div class="form-group">
+    <label>Email</label>
+    <input type="text" class="form-control form-control-user" id="inp-email" aria-describedby="Name" value="" >
+    <span class="text-danger" id="error-name"> </span>  
+</div>
+<div class="form-group">
+    <label>Phone</label>
+    <input type="text" class="form-control form-control-user" id="inp-phone" aria-describedby="Name" value="" >
+    <span class="text-danger" id="error-name"> </span>  
+</div>
+<div class="form-group">
+    <label>Username</label>
+    <input type="text" class="form-control form-control-user" id="inp-username" aria-describedby="Name" value="" >
+    <span class="text-danger" id="error-name"> </span>  
+</div>
+<button class="btn btn-primary btn-user btn-block" id="btn-update">
+    Update  
+</button>
+Change Password
+<div class="form-group">
+  <label>Old Password</label>
+  <input type="password" class="form-control form-control-user" id="inp-old-password">
+  <span class="text-danger" id="error-old-password"></span>
+</div>
+<div class="form-group">
+  <label>New Password</label>
+  <input type="password" class="form-control form-control-user" id="inp-new-password">
+  <span class="text-danger" id="error-new-password"></span>
+</div>
+<div class="form-group">
+  <label>Confirm New Password</label>
+  <input type="password" class="form-control form-control-user" id="inp-confirm-password">
+  <span class="text-danger" id="error-confirm-password"></span>
+</div>
+<button class="btn btn-primary btn-user btn-block" id="btn-update-password">
+  Update Password
 </button>
     <script type="text/javascript">{{theJs | safe}}</script>
 
