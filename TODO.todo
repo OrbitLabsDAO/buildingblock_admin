@@ -1,5 +1,5 @@
-account profile
-account settings 
+
+
 
 clean up account.js break it down to  sepeate account file for each page
 
@@ -15,7 +15,6 @@ tableEdit
 tableAdd
     move the id from url paramter to something better and maybe check that the user has the right to modify this record
       
-
 
 kill the node instances in the build script
 have an install mode in the build script
