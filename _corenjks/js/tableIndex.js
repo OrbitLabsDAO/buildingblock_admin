@@ -8,14 +8,6 @@ let whenDocumentReady = (f) => {
     : f();
 };
 
-let showElements = () => {
-  const user = JSON.parse(window.localStorage.user);
-  if (user.isAdmin == 1)
-    document.getElementById("btn-create-cy").classList.remove("d-none");
-  // Show the table
-  document.getElementById("showBody").classList.remove("d-none");
-};
-
 let deleteItemDone = (response) => {
   response = JSON.parse(response);
   console.log(response.id);
@@ -57,7 +49,6 @@ whenDocumentReady(
       response = JSON.parse(response);
       if (response.data.length == 0) {
         showAlert("No data found", 2);
-        showElements();
         return;
       }
 
@@ -125,9 +116,9 @@ whenDocumentReady(
 
         table.row.add(rowData).draw(false);
       });
+      showElements();
     };
-    //show admin stuff
-    showElements();
+
     // Call the table endpoint
 
     let theUrl = apiUrl + `tables/${tableName}`;

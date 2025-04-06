@@ -134,7 +134,7 @@ function generateApiFunctions(tableNames) {
 
 // Utility: Generate Pages
 function generateTablePages(tableName, fields, tableNames) {
-  if (tableName == "internal_user") tableName = "adminuser";
+  if (tableName == "adminuser") tableName = "adminuser";
   const tableDir = path.join(siteDir, `/tables/${tableName}`);
 
   if (!fs.existsSync(tableDir)) {
@@ -266,7 +266,7 @@ if (Array.isArray(parsedSchema.statement)) {
   parsedSchema.statement.forEach((statement) => {
     if (statement.variant === "create" && statement.format === "table") {
       if (!env.EXCLUDETABLES.includes(statement.name.name)) {
-        if (statement.name.name != "internal_user")
+        if (statement.name.name != "adminuser")
           tableNames.push(statement.name.name);
 
         // Add a label for each field only if field.name is not empty or null

@@ -1,76 +1,83 @@
-//JWT model
 const jwt = require('@tsndr/cloudflare-worker-jwt');
-//token var
-let theToken = "";
-//decode the jwt token
-let decodeJwt = async (req, secret) => {
-    let bearer = req.get('authorization')
-    let details = "";
-    if (bearer != null) {
-        bearer = bearer.replace("Bearer ", "");
-        details = await jwt.decode(bearer, secret)
-    }
-    return (details)
-}
+
+// Utility: Check if a value is null, undefined, empty, or string "null"/"undefined"
+const isInvalid = (val) =>
+  val === null || val === undefined || val === "" || val === "null" || val === "undefined";
+
+// Decode and validate the JWT token
+const decodeJwt = async (headers, secret) => {
+  let bearer = headers.get("authorization");
+  if (!bearer) return null;
+
+  bearer = bearer.replace("Bearer ", "");
+  const isValid = await jwt.verify(bearer, secret);
+  if (!isValid) return null;
+
+  return await jwt.decode(bearer);
+};
 
 export async function onRequest(context) {
-  //get the vars we care about
   const { request, env, params } = context;
-  //get the methods
   const method = request.method.toUpperCase();
-  //decode the token so we can use it later.
-  theToken = await decodeJwt(request.headers, env.SECRET);
+
+  const tableName = "{{tableName}}"; // Replace dynamically or via template engine
+
+  // Decode JWT
+  const theToken = await decodeJwt(request.headers, env.SECRET);
+  if (!theToken) {
+    return new Response(JSON.stringify({ error: "Invalid or missing token" }), {
+      status: 401,
+    });
+  }
+
+  // Extra check for adminuser table: must include isAdmin = 1 in JWT
+  
+  //admin debug
+  //theToken.isAdmin = 0;
+  //console.log(tableName)
+  //console.log(theToken)
+  if (tableName === "adminuser" && theToken.payload.isAdmin !== 1) {
+    return new Response(JSON.stringify({ error: "Admin access required" }), {
+      status: 401,
+    });
+  }
+
   switch (method) {
     case "GET":
-      return handleGet(request, env, params, context);
+      return handleGet(request, env, params, tableName);
     case "POST":
-      return handlePost(request, env, params, context);
+      return handlePost(request, env, params, tableName);
     case "PUT":
-      return handlePut(request, env, params, context);
+      return handlePut(request, env, params, tableName);
     case "DELETE":
-      return handleDelete(request, params, context);
+      return handleDelete(request, env, params, tableName);
     default:
-      return new Response("Method Not Allowede", { status: 405 });
+      return new Response("Method Not Allowed", { status: 405 });
   }
 }
 
-async function handleGet(request, env, params, context) {
+async function handleGet(request, env, params, tableName) {
   const url = new URL(request.url);
-  const id = url.searchParams.get("id"); // Get 'id' from query string
-  const tableName = "{{tableName}}";
+  const id = url.searchParams.get("id");
 
-  // Check if 'isDeleted' exists in the table schema
-  const schemaQuery = context.env.DB.prepare(`PRAGMA table_info(${tableName})`);
+  const schemaQuery = env.DB.prepare(`PRAGMA table_info(${tableName})`);
   const schema = await schemaQuery.all();
-  const hasIsDeleted = schema.results.some(col => col.name === "isDeleted");
+  const hasIsDeleted = schema.results.some((col) => col.name === "isDeleted");
 
-  // Build the query dynamically
   let queryStr = "";
-
-  if (id != null) {
+  if (!isInvalid(id)) {
     queryStr = `SELECT * FROM ${tableName} WHERE "id" = ${id}`;
-     if (hasIsDeleted) 
-      queryStr += ` and isDeleted = 0`
-  }
-  else
-  {
+    if (hasIsDeleted) queryStr += ` AND isDeleted = 0`;
+  } else {
     queryStr = `SELECT * FROM ${tableName}`;
-    if (hasIsDeleted) 
-      queryStr += ` where isDeleted = 0`
-  
+    if (hasIsDeleted) queryStr += ` WHERE isDeleted = 0`;
   }
 
-  
   const result = await env.DB.prepare(queryStr).bind().run();
 
-
-  // Exclude specific fields from the result
   const excludedFields = ["isDeleted", "createdAt", "updatedAt", "publishedAt", "deletedAt"];
-
-  // Normalize to array of results
   const resultArray = Array.isArray(result.results) ? result.results : [result];
 
-  // Filter out excluded fields
   const filteredResults = resultArray.map((item) =>
     Object.fromEntries(Object.entries(item).filter(([key]) => !excludedFields.includes(key)))
   );
@@ -78,51 +85,45 @@ async function handleGet(request, env, params, context) {
   return new Response(JSON.stringify({ data: filteredResults }), { status: 200 });
 }
 
-
-
-async function handlePost(request, env, params, context) {
+async function handlePost(request, env, params, tableName) {
   try {
     const data = await request.json();
-    const tableName = "{{tableName}}";
+
     const keys = Object.keys(data);
     const values = Object.values(data);
 
-    if (!tableName || keys.length === 0) {
-      return new Response(
-        JSON.stringify({ error: "Invalid table name or empty data" }),
-        { status: 400 }
-      );
+    if (isInvalid(tableName) || keys.length === 0) {
+      return new Response(JSON.stringify({ error: "Invalid table name or empty data" }), {
+        status: 400,
+      });
     }
 
-    // Construct SQL query
     const placeholders = keys.map(() => "?").join(", ");
     const sql = `INSERT INTO ${tableName} (${keys.join(", ")}) VALUES (${placeholders})`;
-    // Execute query
+
     const result = await env.DB.prepare(sql).bind(...values).run();
 
-    return new Response(
-      JSON.stringify({ status: `ok` }),
-      { status: 201 }
-    );
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
+    return new Response(JSON.stringify({ status: "ok", id: result.lastRowId }), {
+      status: 201,
     });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }
 
-
-async function handlePut(request, env, params, context) {
+async function handlePut(request, env, params, tableName) {
   try {
-    const tableName = "{{tableName}}";
     const data = await request.json();
-    if (!data.id) {
+
+    if (isInvalid(data.id)) {
       return new Response(JSON.stringify({ error: "ID is required for update" }), {
         status: 400,
       });
     }
+
     const id = data.id;
-    delete data.id; // Remove id from the object
+    delete data.id;
+
     const keys = Object.keys(data);
     const values = Object.values(data);
 
@@ -132,11 +133,9 @@ async function handlePut(request, env, params, context) {
       });
     }
 
-    // Construct SET clause dynamically
     const setClause = keys.map((key) => `"${key}" = ?`).join(", ");
     const sql = `UPDATE ${tableName} SET ${setClause} WHERE "id" = ?`;
 
-    // Execute query
     const result = await env.DB.prepare(sql).bind(...values, id).run();
 
     return new Response(JSON.stringify({ status: "ok", updatedRows: result.meta.changes }), {
@@ -149,35 +148,29 @@ async function handlePut(request, env, params, context) {
   }
 }
 
-
-async function handleDelete(request, params, context) {
+async function handleDelete(request, env, params, tableName) {
   try {
     const data = await request.json();
-    if (!data.id) {
+
+    if (isInvalid(data.id)) {
       return new Response(JSON.stringify({ error: "ID is required" }), {
         status: 400,
       });
     }
 
-  const tableName = "{{tableName}}";
-  //we would have to sanitise this delete at some point but we are getting binding issues
-    const query = context.env.DB.prepare(
-      `UPDATE ${tableName} SET "isDeleted" = 1 WHERE "id" = ${data.id}`
-    );
+    const query = `UPDATE ${tableName} SET "isDeleted" = 1 WHERE "id" = ${data.id}`;
+    const result = await env.DB.prepare(query).run();
 
-    // The query should be run with data.id, which should be a single value
-    const result = await query.run(); // Ensure this runs with just the ID
-
-    // Check if any rows were affected
-    if (result.changes === 0) {
+    if (result.meta.changes === 0) {
       return new Response(JSON.stringify({ error: "No record found" }), {
         status: 404,
       });
     }
 
-    return new Response(JSON.stringify({ id: data.id }), { status: 200 });
+    return new Response(JSON.stringify({ status: "deleted", id: data.id }), {
+      status: 200,
+    });
   } catch (error) {
-    console.error("Error in handleDelete:", error);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       status: 500,
     });

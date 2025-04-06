@@ -29,12 +29,6 @@ function hideError(fieldName) {
 }
 
 document
-  .getElementById("btn-update-password")
-  .addEventListener("click", function (event) {
-
-    event.preventDefault(); // Prevent form submission
-
-document
   .getElementById("btn-update")
   .addEventListener("click", function (event) {
     event.preventDefault(); // Prevent form submission
@@ -79,6 +73,7 @@ document
     if (isValid) {
       let getEditDone = (response) => {
         response = JSON.parse(response);
+        //console.log(response);
         if (response.status == "ok") {
           showAlert("Record Updated", 1);
         } else {

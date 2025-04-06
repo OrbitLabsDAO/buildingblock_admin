@@ -68,6 +68,14 @@ let user;
   });
 })(jQuery); // End of use strict
 
+let showElements = () => {
+  const user = JSON.parse(window.localStorage.user);
+  if (user.isAdmin == 1)
+    document.getElementById("btn-create-cy").classList.remove("d-none");
+  // Show the table
+  document.getElementById("showBody").classList.remove("d-none");
+};
+
 //this function checks if an element exits
 let checkElement = (element) => {
   let checkedElement = document.getElementById(element);
@@ -337,12 +345,10 @@ let xhrcall = async (
       errorMessage = res.error;
       if (errorMessage == "") errorMessage = "Server Error";
     }
-    if (xhr.status == 405) {
-      errorMessage = res;
-    }
-
-    if (xhr.status == 205) {
-      errorMessage = res;
+    if (xhr.status == 405 || xhr.status == 401 || xhr.status == 205) {
+      //console.log(res);
+      const tmp = JSON.parse(res);
+      errorMessage = tmp.error;
     }
 
     if (errorMessage != "") {
