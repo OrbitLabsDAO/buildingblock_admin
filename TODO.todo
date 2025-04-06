@@ -2,14 +2,37 @@ check custom code section still works
     api overriding
     custom copying function
         assets is fine as you just put in the assets dir
-
-        functions_<api-name>.njk // copy api to functions
-        njks you include the actual njk files you want to use them in, there is an argument to allowing this as .js files and 
         
-        just copy them across as well
+        just copy them across to the functions directory (should this allow sub folders?)
 
-        complete new sections should be:
-        custom-<njk name>.njk // this will take the njk file process it normally and put it in the _site dir when processed
+    
+        includes
+            the way i was thinking about njk files is wrong as it would mean doing the core files, we will have to think of a better
+            way to do this. Maybe you just replace the whole thing and dont have includes atall
+
+        layout
+            put custom layout files in here
+
+        apigenerator
+            override the entire api generator file (seems dumb but some may want to do it) 
+
+        account
+            dashboard.njk
+            login.njk
+            resetpassword.njk
+            settings.njk
+            verify.njk
+
+        not sure if we should let them override this or not. 
+
+        new_<njk name>
+        
+        hold completely new sections of the dashboard here. 
+
+        menu
+            this will include custom menu stuff. 
+
+
 add testing 
         login test isDeleted
     login test isBlocked

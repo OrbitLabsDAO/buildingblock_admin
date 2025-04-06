@@ -223,8 +223,8 @@ const processAccountFiles = (tableNames) => {
  * This function will take all the folders in the _custom folder that start with
  * "table_" and treat them as custom pages for the corresponding table.
  */
-const processCustomFiles = () => {
-  console.log("✅ Processing Custom files!");
+const processCustomTables = () => {
+  console.log("✅ Processing Custom tables!");
   const customFolders = fs
     .readdirSync(customFolder)
     .filter((f) => f.startsWith("table_"));
@@ -265,7 +265,23 @@ const processCustomFiles = () => {
       console.log(`✅ Created custom page: ${file}`);
     });
   });
-  console.log("✅ Custom files processed!");
+  console.log("✅ Custom tables processed!");
+};
+
+const processCustomFunctions = () => {
+  console.log("✅ Processing Custom functions!");
+  const files = fs.readdirSync(customFolder + "/functions");
+  files.forEach((file) => {
+    // If the file is a .js file, copy it to the functions folder
+    const fullPath = path.join(customFolder, "functions", file);
+    if (file.endsWith(".js")) {
+      const dest = `functions/api/${file}`;
+      fs.copyFileSync(fullPath, dest);
+      console.log(`✅ Created custom function: ${file}`);
+      return;
+    }
+  });
+  console.log("✅ Custom functions processed!");
 };
 
 // === BUILD START ===
@@ -337,7 +353,8 @@ if (Array.isArray(parsedSchema.statement)) {
   // === ADDITIONAL PAGES ===
   processAccountFiles(tableNames);
   generateApiFunctions(tableNames);
-  processCustomFiles();
+  processCustomTables();
+  processCustomFunctions();
 
   // === MAIN INDEX PAGE ===
   fs.writeFileSync(

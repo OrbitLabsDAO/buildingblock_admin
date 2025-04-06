@@ -40,3 +40,24 @@ This will launch a local version of the site
 Your admin is now in \_site run a http-server there and away you go.
 
 There is a custom table called adminuser so dont call one of your tables this.
+
+CUSTOM OVERRIDES
+
+custom table overrides should be a folder laid out in the following manner
+
+table\_<tablename>
+..tableIndex <--- overrides the the table Index file
+..tableAdd.nkj <--- overrides the table Add file
+..tableEdit.njk <--- overides the table edit file
+..api.js <--- overrides the api endpoint (this can be called anything.js)
+
+custom function overrides should be in a folder laid out in the following manner
+
+\_customs/functions
+..customfunction1.js
+..customfunction2.js
+
+This will move the to
+
+functions/api/commonfunction1.js
+functions/api/commonfunction2.js
