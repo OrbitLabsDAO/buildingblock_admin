@@ -1,23 +1,17 @@
 
 
-
+check custom code section still works
+add testing 
+        login test isDeleted
+    login test isBlocked
+    login test isAdmin
+add nice edit inputs for edit pages
 clean up account.js break it down to  sepeate account file for each page
+clean up table add/edit/put as it is using the same validation in each js file we can add them all to app.js for simplicity going forward
+add a function to override cannot be blank for certain tables / fields  
+    
 
-SETTINGS
 
-clean up content.js
-
-
-tableEdit
-    block update until there is an actual change
-    move the id from url paramter to something better and maybe check that the user has the right to modify this record
-
-tableAdd
-    move the id from url paramter to something better and maybe check that the user has the right to modify this record
-      
-
-kill the node instances in the build script
-have an install mode in the build script
 
 
 
@@ -26,23 +20,15 @@ have an install mode in the build script
 INPUTS
     think about look ups?
     how we do required fields
-    
-API
-account api 
-    login test isDeleted
-    login test isBlocked
-    login test isAdmin
-    update profile / update user 
-    get shows method not allowed
-    
-forgot password flow
-register create user
-   check email is being sent 
-   validate email
-   forgot password
 
 
-use nice rendering inputs for each field type or keep it very simple and just use a key value pair
-    if it is the first they we can have custom information for fields dropdown lists etc.
+SIGN UP    
+    forgot password flow
+    register create user
+        check email is being sent 
+        validate email
+
+
+
 how do we handle joins etc maybe look at how orms do it (the backwards way is neat)
 copy across the custom assets folder (custom js etc) do we want to do this, if so how does the person dev how is this easy to do.

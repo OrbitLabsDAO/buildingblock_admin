@@ -74,26 +74,55 @@ document
   });
 
 document.getElementById("btn-update").addEventListener("click", () => {
-  const payload = {
-    id: user.id, // include id so the backend knows who to update
-    name: document.getElementById("inp-name").value,
-    email: document.getElementById("inp-email").value,
-    phone: document.getElementById("inp-phone").value,
-    username: document.getElementById("inp-username").value,
-  };
-  const theUrl = `${apiUrl}account-settings/`;
-  const requestBody = JSON.stringify(payload);
+  const email = document.getElementById("inp-email").value;
+  let isValid = true;
+  // Email validation (if the field name contains "email")
+  if (validateEmail(email) == false) {
+    isValid = false;
+    showFieldError("email", "Please enter a valid email address.");
+  } else hideFieldError("email");
 
-  let getUpdateDone = (response) => {
-    let res = JSON.parse(response);
-    if (res.status == "ok") {
-      showAlert("Settings Updated", 1);
-    } else {
-      showAlert("Error updating settings please try again", 2);
-    }
-  };
+  const name = document.getElementById("inp-name").value;
+  const phone = document.getElementById("inp-phone").value;
+  const username = document.getElementById("inp-username").value;
+  if (name == "") {
+    isValid = false;
+    showFieldError("name", "Please enter a valid name .");
+  } else hideFieldError("name");
 
-  xhrcall(4, theUrl, requestBody, "json", "", getUpdateDone);
+  if (phone == "") {
+    isValid = false;
+    showFieldError("phone", "Please enter a valid phone number.");
+  } else hideFieldError("phone");
+
+  if (username == "") {
+    isValid = false;
+    showFieldError("username", "Please enter a valid username.");
+  } else hideFieldError("username");
+
+  if (isValid == true) {
+    const payload = {
+      id: user.id, // include id so the backend knows who to update
+      name: name,
+      email: email,
+      phone: phone,
+      username: username,
+    };
+    const theUrl = `${apiUrl}account-settings/`;
+    const requestBody = JSON.stringify(payload);
+    let getUpdateDone = (response) => {
+      let res = JSON.parse(response);
+      if (res.status == "ok") {
+        showAlert("Settings Updated", 1);
+      } else {
+        showAlert("Error updating settings please try again", 2);
+      }
+    };
+
+    xhrcall(4, theUrl, requestBody, "json", "", getUpdateDone);
+  } else {
+    showAlert("Error updating settings please try again", 2);
+  }
 });
 
 whenDocumentReady(() => {

@@ -1,8 +1,6 @@
 const url = new URL(window.location.href);
 let parts = url.pathname.split("/").filter(Boolean);
 let tableName = parts.length > 1 ? parts[parts.length - 2] : null;
-console.log(parts);
-console.log(tableName);
 
 document
   .getElementById("btn-create")
@@ -23,13 +21,30 @@ document
       // Get the field element
       const field = document.getElementById("inp-" + cleanedKey);
 
+      // Basic validation for non-empty fields
+      if (value.trim() === "") {
+        isValid = false;
+        showFieldError(cleanedKey, "This field cannot be blank.");
+      } else {
+        hideFieldError(cleanedKey);
+      }
+
+      // Email validation (if the field name contains "email")
+      //console.log
+      if (cleanedKey.toLowerCase().includes("email")) {
+        if (validateEmail(value) == false) {
+          isValid = false;
+          showFieldError(cleanedKey, "Please enter a valid email address.");
+        } else hideFieldError(cleanedKey);
+      }
+
       // Basic integer validation
       if (field && field.type === "number") {
         if (isNaN(value) || value.trim() === "") {
           isValid = false;
-          showError(cleanedKey, "Please enter a valid integer.");
+          showFieldError(cleanedKey, "Please enter a valid integer.");
         } else {
-          hideError(cleanedKey);
+          hideFieldError(cleanedKey);
         }
       }
 
@@ -38,9 +53,9 @@ document
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email regex
         if (!emailPattern.test(value)) {
           isValid = false;
-          showError(cleanedKey, "Please enter a valid email address.");
+          showFieldError(cleanedKey, "Please enter a valid email address.");
         } else {
-          hideError(cleanedKey);
+          hideFieldError(cleanedKey);
         }
       }
     });
@@ -64,24 +79,6 @@ let getAddDone = (response) => {
 /**
  * Show an error message for a field
  */
-function showError(fieldName, message) {
-  const errorElement = document.getElementById("error-" + fieldName);
-  if (errorElement) {
-    errorElement.classList.remove("d-none");
-    errorElement.textContent = message;
-  }
-}
-
-/**
- * Hide the error message for a field
- */
-function hideError(fieldName) {
-  const errorElement = document.getElementById("error-" + fieldName);
-  if (errorElement) {
-    errorElement.classList.add("d-none");
-    errorElement.textContent = "";
-  }
-}
 
 let whenDocumentReady = (f) => {
   /in/.test(document.readyState)

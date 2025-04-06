@@ -123,6 +123,28 @@ let showPassword = (elementName, eyeNumber) => {
   }
 };
 
+function showFieldError(fieldName, message) {
+  const errorElement = document.getElementById("error-" + fieldName);
+  const fieldElement = document.getElementById("inp-" + fieldName);
+  if (errorElement) {
+    // Focus on the field with the error
+    fieldElement.focus();
+    errorElement.classList.remove("d-none");
+    errorElement.textContent = message;
+  }
+}
+
+/**
+ * Hide the error message for a field
+ */
+function hideFieldError(fieldName) {
+  const errorElement = document.getElementById("error-" + fieldName);
+  if (errorElement) {
+    errorElement.classList.add("d-none");
+    errorElement.textContent = "";
+  }
+}
+
 //this fucntion validates an email address.
 let validateEmail = (email) => {
   const re =
