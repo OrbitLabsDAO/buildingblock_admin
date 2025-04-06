@@ -307,9 +307,7 @@ if (Array.isArray(parsedSchema.statement)) {
         !env.EXCLUDETABLES.includes(stmt.name.name)
     )
     .map((stmt) => stmt.name.name)
-    .filter((name) => name !== "adminuser"); // explicitly remove adminuser;
-
-  console.log(tableNames);
+    .filter((name) => !env.RESERVEDTABLES.includes(name)); // filter out reserved tables
 }
 
 // === GENERATE TABLE PAGES ===

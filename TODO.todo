@@ -5,13 +5,24 @@ check custom code section still works
         
         just copy them across to the functions directory (should this allow sub folders?)
 
+
+        new
+            folder
+                file1.njk
+                file2.njk
+                endpoint.js
+
+        layout
+            put custom layout files in here
+
     
+
+    MAY NOT DO THESE INCLUDES, COULD BE OVERKILL MORE THOUGHT IS REQUIRED.
         includes
             the way i was thinking about njk files is wrong as it would mean doing the core files, we will have to think of a better
             way to do this. Maybe you just replace the whole thing and dont have includes atall
 
-        layout
-            put custom layout files in here
+
 
         apigenerator
             override the entire api generator file (seems dumb but some may want to do it) 
@@ -25,7 +36,7 @@ check custom code section still works
 
         not sure if we should let them override this or not. 
 
-        new_<njk name>
+
         
         hold completely new sections of the dashboard here. 
 
