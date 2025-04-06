@@ -1,4 +1,3 @@
-<input type="text" class="form-control form-control-user" 
-       name="inp-{{ field.name }}" id="inp-{{ field.name }}" 
-       aria-describedby="{{ field.name }}" value="" {% if disabled %}disabled{% endif %}>
-              <span class="text-danger d-none" id="error-{{field.name}}"></span>  
+<textarea  data-type="text"  class="form-control form-control-user" name="inp-{{ field.name }}" id="inp-{{ field.name }}"  rows="4" cols="50" aria-describedby="{{ field.name }}" {% if disabled %}disabled{% endif %}>
+</textarea>
+<span class="text-danger d-none" id="error-{{field.name}}"></span>  

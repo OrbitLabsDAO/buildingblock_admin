@@ -116,7 +116,20 @@ function generateApiFunctions(tableNames) {
   modifiedTableNames.push("adminuser");
 
   modifiedTableNames.forEach((tableName) => {
-    const apiContent = fs.readFileSync(templatePath, "utf-8");
+    //check if the tableName+_api.njk is in the customer folder and if so use this instrad of apiGenefator.njk this is
+    //only to overwrite the api endpoints generated from the tables as otherwise you can put the files directly in the functions dir
+    let customTemplatePath = path.join("_custom", `${tableName}_api.njk`);
+    //console.log(customTemplatePath);
+    let apiContent;
+    if (fs.existsSync(customTemplatePath)) {
+      //templatePath = path.join("+", "apiGenerator.njk");
+      apiContent = fs.readFileSync(customTemplatePath, "utf-8");
+      console.log(`✅ Using ${tableName} template from custom`);
+    } else {
+      apiContent = fs.readFileSync(templatePath, "utf-8");
+      console.log(`✅ Using ${tableName} template from core`);
+    }
+
     try {
       const renderedApi = nunjucks.renderString(apiContent, {
         tableName,

@@ -20,7 +20,7 @@ layout: layout.njk
      {% for field in fields %}
         {% if field.name != "" and field.name != null %}
             <div class="form-group">
-                <label>{{ field.label }}</label>
+                <label>{{ field.label }} </label>
                 {% if field.datatype.variant == "integer" %}
                     {% include "htmlinputs/integer.njk"  %}
                 {% elif field.datatype.variant == "real" %}

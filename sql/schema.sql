@@ -2,11 +2,11 @@ DROP TABLE IF EXISTS property;
 DROP TABLE IF EXISTS property_amenities;
 DROP TABLE IF EXISTS property_images;
 DROP TABLE IF EXISTS userAccess;
-DROP TABLE IF EXISTS internal_user;
+DROP TABLE IF EXISTS adminuser;
 
 CREATE TABLE "property" (
 	"id"	INTEGER,
-	"name"	TEXT,
+	"name"	VARCHAR(255),
 	"paymentAddress" TEXT,
 	"address_1"	TEXT,
 	"address_2"	TEXT,
