@@ -41,17 +41,38 @@ const coreFolder = path.join(__dirname, "_corenjks");
 const customFolder = path.join(__dirname, "_custom");
 
 // === UTILITIES ===
+/**
+ * Copy a directory from the source path to the destination path.
+ * @param {string} src - The source path.
+ * @param {string} dest - The destination path.
+ */
 const copyDirectory = (src, dest) => {
-  if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+  if (!fs.existsSync(dest)) {
+    // Create the destination directory if it doesn't exist
+    fs.mkdirSync(dest, { recursive: true });
+  }
+
+  // Iterate over the files in the source directory
   for (const item of fs.readdirSync(src)) {
     const srcPath = path.join(src, item);
     const destPath = path.join(dest, item);
-    fs.lstatSync(srcPath).isDirectory()
-      ? copyDirectory(srcPath, destPath)
-      : fs.copyFileSync(srcPath, destPath);
+
+    // If the item is a directory, recursively copy it
+    if (fs.lstatSync(srcPath).isDirectory()) {
+      copyDirectory(srcPath, destPath);
+    } else {
+      // Otherwise, copy the file
+      fs.copyFileSync(srcPath, destPath);
+    }
   }
 };
 
+/**
+ * Process a single file and return the layout, permalink, and content.
+ * @param {string} templateName - The name of the file to process.
+ * @param {string} folder - The folder to look for the file in.
+ * @returns {Object|null} - An object with the layout, permalink, and content if the file exists, null otherwise.
+ */
 const processFile = (templateName, folder) => {
   const filePath = path.join(folder, templateName);
   if (!fs.existsSync(filePath)) return null;
@@ -63,11 +84,21 @@ const processFile = (templateName, folder) => {
   };
 };
 
+/**
+ * Renders a template with a given layout.
+ * @param {string} layoutName - The name of the layout template.
+ * @param {Object} context - The context object to pass to the template.
+ * @returns {string} - The rendered template with the layout.
+ * @throws {Error} - If the layout template is not found.
+ */
 const renderTemplateWithLayout = (layoutName, context) => {
+  // Iterate over the directories where layouts could be stored
   for (const dir of ["_custom", "_corenjks"]) {
     const layoutPath = path.join(dir, layoutName);
     if (fs.existsSync(layoutPath)) {
+      // Read the layout template
       const template = fs.readFileSync(layoutPath, "utf-8");
+      // Render the template with the context
       return nunjucks.renderString(template, context);
     }
   }
@@ -75,6 +106,10 @@ const renderTemplateWithLayout = (layoutName, context) => {
 };
 
 // === GENERATORS ===
+/**
+ * Generates API functions for all tables.
+ * @param {string[]} tableNames - The names of the tables to generate API functions for.
+ */
 const generateApiFunctions = (tableNames) => {
   console.log("✅ Processing API files!");
 
@@ -90,22 +125,33 @@ const generateApiFunctions = (tableNames) => {
   const apiContent = fs.readFileSync(templatePath, "utf-8");
   const allTables = [...tableNames, "adminuser"];
 
+  // Loop through all tables
   allTables.forEach((tableName) => {
     try {
+      // Render the API template with the table name and environment
       const rendered = nunjucks.renderString(apiContent, { tableName, env });
+      // Write the rendered API function to disk
       fs.writeFileSync(path.join(apiFolder, `${tableName}.js`), rendered);
       console.log(`✅ Created API endpoint for ${tableName}`);
     } catch (err) {
+      // Log any errors
       console.error(`❌ Error rendering API for ${tableName}:`, err);
     }
   });
   console.log("✅ API files Processed!");
 };
 
+/**
+ * Generates the table pages for the given table name and fields.
+ * @param {string} tableName - The name of the table to generate pages for.
+ * @param {Object[]} fields - The fields of the table to generate pages for.
+ * @param {string[]} tableNames - The names of all tables.
+ */
 const generateTablePages = (tableName, fields, tableNames) => {
   const pageDir = path.join(siteDir, `tables/${tableName}`);
   fs.mkdirSync(pageDir, { recursive: true });
 
+  // Generate the table pages
   ["Index", "View", "Add", "Edit"].forEach((type) => {
     const data = processFile(`table${type}.njk`, "_corenjks") || {};
     const filePath = path.join(pageDir, `${type.toLowerCase()}.html`);
@@ -116,6 +162,7 @@ const generateTablePages = (tableName, fields, tableNames) => {
       env,
     });
 
+    // Render the layout if it exists
     const content = data.layout
       ? renderTemplateWithLayout(data.layout, {
           tableName,
@@ -126,11 +173,16 @@ const generateTablePages = (tableName, fields, tableNames) => {
         })
       : inner;
 
+    // Write the rendered page to disk
     fs.writeFileSync(filePath, content);
     console.log(`✅ Created page ${tableName}/${type}.html`);
   });
 };
 
+/**
+ * Process the custom account files.
+ * @param {string[]} tableNames - The names of all tables.
+ */
 const processAccountFiles = (tableNames) => {
   console.log("✅ Processing Account files!");
   const files = fs
@@ -165,6 +217,12 @@ const processAccountFiles = (tableNames) => {
   console.log("✅ Account files Processed!");
 };
 
+/**
+ * Process the custom files in the _custom folder.
+ *
+ * This function will take all the folders in the _custom folder that start with
+ * "table_" and treat them as custom pages for the corresponding table.
+ */
 const processCustomFiles = () => {
   console.log("✅ Processing Custom files!");
   const customFolders = fs
@@ -179,6 +237,7 @@ const processCustomFiles = () => {
       const outputPath = path.join(siteDir, tableName);
       fs.mkdirSync(outputPath, { recursive: true });
 
+      // If the file is a .js file, copy it to the functions folder
       if (file.endsWith(".js")) {
         const dest = `functions/api/${tableName}.js`;
         fs.copyFileSync(fullPath, dest);
@@ -186,6 +245,7 @@ const processCustomFiles = () => {
         return;
       }
 
+      // Process the file as a njk template
       const { layout, content } =
         processFile(file, path.join(customFolder, folder)) || {};
       const viewType = file
@@ -194,11 +254,13 @@ const processCustomFiles = () => {
         .toLowerCase();
       const outputFile = path.join(outputPath, `${viewType}.html`);
 
+      // Render the template with the layout if it exists
       const inner = nunjucks.renderString(content, { env, tableNames });
       const final = layout
         ? renderTemplateWithLayout(layout, { content: inner, env, tableNames })
         : inner;
 
+      // Write the rendered template to the output file
       fs.writeFileSync(outputFile, final);
       console.log(`✅ Created custom page: ${file}`);
     });
@@ -219,7 +281,7 @@ if (fs.existsSync(functionsFolder))
 // === PARSE TABLES FROM SCHEMA ===
 let tableNames = [];
 
-// === Step 1: Collect all valid table names (after exclusions) ===
+// === Collect all valid table names (after exclusions) ===
 if (Array.isArray(parsedSchema.statement)) {
   tableNames = parsedSchema.statement
     .filter(
@@ -233,9 +295,14 @@ if (Array.isArray(parsedSchema.statement)) {
 
   console.log(tableNames);
 }
+
+// === GENERATE TABLE PAGES ===
 console.log("✅ Processing Table files!");
+
 if (Array.isArray(parsedSchema.statement)) {
+  // Process each statement in the parsed schema
   parsedSchema.statement.forEach((stmt) => {
+    // Check if the statement is a CREATE TABLE statement
     if (
       stmt.variant === "create" &&
       stmt.format === "table" &&
@@ -254,10 +321,12 @@ if (Array.isArray(parsedSchema.statement)) {
         }
       });
 
+      // Filter out fields that should be excluded
       const sanitizedFields = fields.filter(
         (f) => !env.EXCLUDEDFIELDS.includes(f.name)
       );
-      //tableNames.push(tableName);
+
+      // Generate table pages
       if (!env.EXCLUDETABLES.includes(tableName)) {
         generateTablePages(tableName, sanitizedFields, tableNames);
       }
