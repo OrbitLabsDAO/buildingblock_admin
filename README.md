@@ -1,3 +1,15 @@
+adminjamstack is a back end admin control panel buid to run on cloudflare pages.
+
+It has the following
+
+    Builds table managment and full API from a schema.sql file
+    Build the whole admin is as jam stack allowing you to easily push to CF
+    Create an endpoint for each table in CF pages functions directory from the APIgenerator file
+    Full user management using JWT
+    allows you to write custom code in the _custom directory to avoid code mix
+
+USAGE
+
 git clone https://github.com/OrbitLabsDAO/adminjamstack.git
 put a sql file in the sql dir (or use the example one)
 rename _custom_ to \_custom and you can put your custom in here ie \_api.njk will override the standard API
@@ -5,7 +17,8 @@ rename \_env to .env and set the vars
 rename \_wrangler.toml to wrangler.toml
 rename \_.dev.vars to .dev_vars
 
-run
+run one of the following
+
 ./build.sh kill
 this will kill wrangler
 
