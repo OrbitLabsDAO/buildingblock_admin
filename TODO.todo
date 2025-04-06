@@ -1,4 +1,15 @@
+check custom code section still works
+    api overriding
+    custom copying function
+        assets is fine as you just put in the assets dir
 
+        functions_<api-name>.njk // copy api to functions
+        njks you include the actual njk files you want to use them in, there is an argument to allowing this as .js files and 
+        
+        just copy them across as well
+
+        complete new sections should be:
+        custom-<njk name>.njk // this will take the njk file process it normally and put it in the _site dir when processed
 add testing 
         login test isDeleted
     login test isBlocked

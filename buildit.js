@@ -4,16 +4,16 @@ const sqliteParser = require("sqlite-parser");
 const nunjucks = require("nunjucks");
 const matter = require("gray-matter");
 
-// ✅ Set up Nunjucks environment with multiple loaders
+// === ENVIRONMENT SETUP ===
+const args = process.argv.slice(2);
+const environment = args.includes("prod") ? "production" : "local";
+
 nunjucks.configure(["_custom", "_corenjks"], {
   autoescape: true,
   noCache: true,
 });
 
-const args = process.argv.slice(2);
-const environment = args.includes("prod") ? "production" : "local";
-
-// Load environment config
+// === ENV CONFIG LOADING ===
 let env = {};
 try {
   if (fs.existsSync("./_data/env.js")) {
@@ -24,306 +24,253 @@ try {
   console.error("❌ Error loading env.js:", err);
 }
 
-// Check SQL file
-let sqlFilePath = "sql/schema.sql";
+// === READ SQL SCHEMA ===
+const sqlFilePath = "sql/schema.sql";
 if (!fs.existsSync(sqlFilePath)) {
   console.error("❌ Invalid path. Please specify a valid SQL file.");
   process.exit(1);
 }
-
 const sqlContent = fs.readFileSync(sqlFilePath, "utf-8");
 const parsedSchema = sqliteParser(sqlContent);
 
-// Define directories
+// === PATHS ===
 const siteDir = path.join(__dirname, "_site");
-const assetsFolder = path.join("./_source", "assets");
-const functionsFolder = path.join("./_source", "functions");
+const assetsFolder = path.join("_source", "assets");
+const functionsFolder = path.join("_source", "functions");
 const coreFolder = path.join(__dirname, "_corenjks");
+const customFolder = path.join(__dirname, "_custom");
 
-// Utility: Copy Directory
-function copyDirectory(src, dest) {
+// === UTILITIES ===
+const copyDirectory = (src, dest) => {
   if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
-  fs.readdirSync(src).forEach((item) => {
+  for (const item of fs.readdirSync(src)) {
     const srcPath = path.join(src, item);
     const destPath = path.join(dest, item);
-    if (fs.lstatSync(srcPath).isDirectory()) {
-      copyDirectory(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
-  });
-}
+    fs.lstatSync(srcPath).isDirectory()
+      ? copyDirectory(srcPath, destPath)
+      : fs.copyFileSync(srcPath, destPath);
+  }
+};
 
-// Utility: Process File
-function processFile(templateName, folder) {
+const processFile = (templateName, folder) => {
   const filePath = path.join(folder, templateName);
   if (!fs.existsSync(filePath)) return null;
-  const fileContent = fs.readFileSync(filePath, "utf-8");
-  const { data: frontMatter, content } = matter(fileContent);
+  const { data, content } = matter(fs.readFileSync(filePath, "utf-8"));
   return {
-    layout: frontMatter.layout || "",
-    permalink: frontMatter.permalink || "",
+    layout: data.layout || "",
+    permalink: data.permalink || "",
     content,
   };
-}
+};
 
-// ✅ FIX 2: Dynamic Template Loading
-function renderTemplateWithLayout(layoutName, context) {
-  // Check search paths for the template
-  const searchPaths = ["_custom", "_corenjks"];
-  let layoutPath = null;
-
-  for (const dir of searchPaths) {
-    const possiblePath = path.join(dir, layoutName);
-
-    if (fs.existsSync(possiblePath)) {
-      layoutPath = possiblePath;
-      break;
+const renderTemplateWithLayout = (layoutName, context) => {
+  for (const dir of ["_custom", "_corenjks"]) {
+    const layoutPath = path.join(dir, layoutName);
+    if (fs.existsSync(layoutPath)) {
+      const template = fs.readFileSync(layoutPath, "utf-8");
+      return nunjucks.renderString(template, context);
     }
   }
+  throw new Error(`Layout template '${layoutName}' not found`);
+};
 
-  if (!layoutPath) {
-    throw new Error(
-      `Layout template '${layoutName}' not found in search paths.`
-    );
-  }
+// === GENERATORS ===
+const generateApiFunctions = (tableNames) => {
+  console.log("✅ Processing API files!");
 
-  // Read template content manually
-  const templateContent = fs.readFileSync(layoutPath, "utf-8");
-  return nunjucks.renderString(templateContent, context);
-}
-
-// Utility: Generate API Endpoints for Each Table
-function generateApiFunctions(tableNames) {
   const apiFolder = path.join(siteDir, "../functions/api/tables");
-
-  // Clear existing API folder
-  if (fs.existsSync(apiFolder)) {
+  if (fs.existsSync(apiFolder))
     fs.rmSync(apiFolder, { recursive: true, force: true });
-  }
+  fs.mkdirSync(apiFolder, { recursive: true });
 
-  if (!fs.existsSync(apiFolder)) {
-    fs.mkdirSync(apiFolder, { recursive: true });
-  }
   const templatePath = path.join("_corenjks", "apiGenerator.njk");
-  if (!fs.existsSync(templatePath)) {
-    console.error("❌ apiGenerator.njk template not found");
-    return;
-  }
+  if (!fs.existsSync(templatePath))
+    return console.error("❌ apiGenerator.njk not found");
 
-  //add the uer endpoint
-  let modifiedTableNames = tableNames;
-  modifiedTableNames.push("adminuser");
+  const apiContent = fs.readFileSync(templatePath, "utf-8");
+  const allTables = [...tableNames, "adminuser"];
 
-  modifiedTableNames.forEach((tableName) => {
-    //check if the tableName+_api.njk is in the customer folder and if so use this instrad of apiGenefator.njk this is
-    //only to overwrite the api endpoints generated from the tables as otherwise you can put the files directly in the functions dir
-    let customTemplatePath = path.join("_custom", `${tableName}_api.njk`);
-    //console.log(customTemplatePath);
-    let apiContent;
-    if (fs.existsSync(customTemplatePath)) {
-      //templatePath = path.join("+", "apiGenerator.njk");
-      apiContent = fs.readFileSync(customTemplatePath, "utf-8");
-      console.log(`✅ Using ${tableName} template from custom`);
-    } else {
-      apiContent = fs.readFileSync(templatePath, "utf-8");
-      console.log(`✅ Using ${tableName} template from core`);
-    }
-
+  allTables.forEach((tableName) => {
     try {
-      const renderedApi = nunjucks.renderString(apiContent, {
-        tableName,
-        env,
-      });
-
-      const outputPath = path.join(apiFolder, `${tableName}.js`);
-      fs.writeFileSync(outputPath, renderedApi);
+      const rendered = nunjucks.renderString(apiContent, { tableName, env });
+      fs.writeFileSync(path.join(apiFolder, `${tableName}.js`), rendered);
       console.log(`✅ Created API endpoint for ${tableName}`);
-    } catch (error) {
-      console.error(`❌ Error rendering API for ${tableName}:`, error);
+    } catch (err) {
+      console.error(`❌ Error rendering API for ${tableName}:`, err);
     }
   });
-}
+  console.log("✅ API files Processed!");
+};
 
-// Utility: Generate Pages
-function generateTablePages(tableName, fields, tableNames) {
-  if (tableName == "adminuser") tableName = "adminuser";
-  const tableDir = path.join(siteDir, `/tables/${tableName}`);
+const generateTablePages = (tableName, fields, tableNames) => {
+  const pageDir = path.join(siteDir, `tables/${tableName}`);
+  fs.mkdirSync(pageDir, { recursive: true });
 
-  if (!fs.existsSync(tableDir)) {
-    fs.mkdirSync(tableDir, { recursive: true });
-  }
+  ["Index", "View", "Add", "Edit"].forEach((type) => {
+    const data = processFile(`table${type}.njk`, "_corenjks") || {};
+    const filePath = path.join(pageDir, `${type.toLowerCase()}.html`);
+    const inner = nunjucks.renderString(data.content, {
+      tableName,
+      fields,
+      tableNames,
+      env,
+    });
 
-  const pageTypes = ["Index", "View", "Add", "Edit"];
-  pageTypes.forEach((pageType) => {
-    const pageData = processFile(`table${pageType}.njk`, "_corenjks") || {};
-    const outputFile = path.join(tableDir, `${pageType}.html`);
-
-    let renderedContent;
-
-    if (pageData.layout) {
-      try {
-        renderedContent = renderTemplateWithLayout(pageData.layout, {
+    const content = data.layout
+      ? renderTemplateWithLayout(data.layout, {
           tableName,
           fields,
-          content: nunjucks.renderString(pageData.content, {
-            tableName,
-            fields,
-            tableNames, // Pass tableNames to the context
-          }),
+          content: inner,
+          tableNames,
           env,
-          tableNames, // Pass tableNames here as well
-        });
-      } catch (err) {
-        console.error(`❌ Error rendering layout ${pageData.layout}:`, err);
-      }
-    } else {
-      renderedContent = nunjucks.renderString(pageData.content, {
-        tableName,
-        fields,
-        env,
-        tableNames, // Pass tableNames here as well
-      });
-    }
+        })
+      : inner;
 
-    fs.writeFileSync(outputFile, renderedContent);
-    console.log(`✅ Created page ${tableName}/${pageType}.html`);
+    fs.writeFileSync(filePath, content);
+    console.log(`✅ Created page ${tableName}/${type}.html`);
   });
-}
+};
 
-// Utility: Process Account Files
-function processAccountFiles(tableNames) {
-  const accountFiles = fs
+const processAccountFiles = (tableNames) => {
+  console.log("✅ Processing Account files!");
+  const files = fs
     .readdirSync(coreFolder)
-    .filter((file) => file.endsWith(".njk") && file.startsWith("account-")); // ✅ Only account-*.njk files
+    .filter((f) => f.startsWith("account-") && f.endsWith(".njk"));
 
-  accountFiles.forEach((file) => {
-    const pageData = processFile(file, coreFolder) || {};
-
-    // Check if CANCREATEACCOUNT is set to 0, and skip 'account-create.njk' if so
-    if (file === "account-create.njk" && env.CANCREATEACCOUNT === "0") {
-      console.log(
-        "✅ Skipping account-create.njk due to CANCREATEACCOUNT being set to 0."
-      );
-      return; // Exit early to prevent processing
+  files.forEach((file) => {
+    const skipCreate =
+      file === "account-create.njk" && env.CANCREATEACCOUNT === "0";
+    const skipReset =
+      file === "account-resetpassword.njk" && env.RESETPASSWORD === "0";
+    if (skipCreate || skipReset) {
+      console.log(`✅ Skipping ${file} based on environment`);
+      return;
     }
 
-    if (file === "account-resetpassword.njk" && env.RESETPASSWORD === "0") {
-      console.log(
-        "✅ Skipping forgot-password.njk due to FORGOTPASSWORD being set to 0."
-      );
-      return; // Exit early to prevent processing
-    }
+    const { layout, permalink, content } = processFile(file, coreFolder) || {};
+    const filename = permalink || file.replace(".njk", "");
+    const outputDir = path.join(siteDir, filename);
+    const outputFile = path.join(outputDir, "index.html");
 
-    if (pageData.content) {
-      let tmpFile = file.replace(".njk", "");
+    fs.mkdirSync(outputDir, { recursive: true });
 
-      // Check if permalink is provided and not empty
-      if (pageData.permalink && pageData.permalink !== "") {
-        tmpFile = pageData.permalink;
-      }
+    const inner = nunjucks.renderString(content, { env, tableNames });
+    const final = layout
+      ? renderTemplateWithLayout(layout, { content: inner, env, tableNames })
+      : inner;
 
-      const outputDir = path.join(siteDir, tmpFile);
-      const outputFile = path.join(outputDir, "index.html");
-
-      if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, { recursive: true });
-      }
-
-      let renderedContent;
-
-      if (pageData.layout) {
-        try {
-          renderedContent = renderTemplateWithLayout(pageData.layout, {
-            content: nunjucks.renderString(pageData.content, {
-              env,
-              tableNames, // Ensure these are passed within the content rendering
-            }),
-            env,
-            tableNames, // Pass tableNames here as well
-          });
-        } catch (err) {
-          console.error(`❌ Error rendering layout ${pageData.layout}:`, err);
-        }
-      } else {
-        renderedContent = nunjucks.renderString(pageData.content, {
-          env,
-          tableNames, // Ensure tableNames is passed here as well
-        });
-      }
-
-      // Write the rendered content to the output file
-      fs.writeFileSync(outputFile, renderedContent);
-      console.log(`✅ Created account page: ${tmpFile}.html`);
-    }
+    fs.writeFileSync(outputFile, final);
+    console.log(`✅ Created account page: ${filename}.html`);
   });
-}
+  console.log("✅ Account files Processed!");
+};
 
-// Delete _site folder
-if (fs.existsSync(siteDir)) {
+const processCustomFiles = () => {
+  console.log("✅ Processing Custom files!");
+  const customFolders = fs
+    .readdirSync(customFolder)
+    .filter((f) => f.startsWith("table_"));
+  customFolders.forEach((folder) => {
+    const tableName = folder.replace("table_", "tables/");
+    const files = fs.readdirSync(path.join(customFolder, folder));
+
+    files.forEach((file) => {
+      const fullPath = path.join(customFolder, folder, file);
+      const outputPath = path.join(siteDir, tableName);
+      fs.mkdirSync(outputPath, { recursive: true });
+
+      if (file.endsWith(".js")) {
+        const dest = `functions/api/${tableName}.js`;
+        fs.copyFileSync(fullPath, dest);
+        console.log(`✅ Copied ${file} to ${dest}`);
+        return;
+      }
+
+      const { layout, content } =
+        processFile(file, path.join(customFolder, folder)) || {};
+      const viewType = file
+        .replace("table", "")
+        .replace(".njk", "")
+        .toLowerCase();
+      const outputFile = path.join(outputPath, `${viewType}.html`);
+
+      const inner = nunjucks.renderString(content, { env, tableNames });
+      const final = layout
+        ? renderTemplateWithLayout(layout, { content: inner, env, tableNames })
+        : inner;
+
+      fs.writeFileSync(outputFile, final);
+      console.log(`✅ Created custom page: ${file}`);
+    });
+  });
+  console.log("✅ Custom files processed!");
+};
+
+// === BUILD START ===
+if (fs.existsSync(siteDir))
   fs.rmSync(siteDir, { recursive: true, force: true });
-}
 fs.mkdirSync(siteDir, { recursive: true });
 
-// Copy assets and functions
-if (fs.existsSync(assetsFolder)) {
+if (fs.existsSync(assetsFolder))
   copyDirectory(assetsFolder, path.join(siteDir, "assets"));
-}
-if (fs.existsSync(functionsFolder)) {
+if (fs.existsSync(functionsFolder))
   copyDirectory(functionsFolder, path.join(siteDir, "functions"));
-}
 
-//get all the table names so we can process the menu correctly
+// === PARSE TABLES FROM SCHEMA ===
 let tableNames = [];
-if (Array.isArray(parsedSchema.statement)) {
-  parsedSchema.statement.forEach((statement) => {
-    if (statement.variant === "create" && statement.format === "table") {
-      if (!env.EXCLUDETABLES.includes(statement.name.name)) {
-        if (statement.name.name != "adminuser")
-          tableNames.push(statement.name.name);
 
-        // Add a label for each field only if field.name is not empty or null
-        statement.definition.forEach((field) => {
-          if (field.name !== null && field.name !== undefined) {
-            // Check if field.name is not null, undefined, or empty
-            field.label = field.name
-              // Replace underscores with spaces
-              .replace(/_/g, " ")
-              // Add spaces for camelCase (before each uppercase letter)
-              .replace(/([a-z])([A-Z])/g, "$1 $2")
-              // Capitalize the first letter of each word (optional)
-              .replace(/\b\w/g, (char) => char.toUpperCase());
-          } else {
-            // Handle cases where field.name is undefined, null, or empty
-            //console.warn(`Skipping field with invalid name:`, field);
-          }
-        });
+// === Step 1: Collect all valid table names (after exclusions) ===
+if (Array.isArray(parsedSchema.statement)) {
+  tableNames = parsedSchema.statement
+    .filter(
+      (stmt) =>
+        stmt.variant === "create" &&
+        stmt.format === "table" &&
+        !env.EXCLUDETABLES.includes(stmt.name.name)
+    )
+    .map((stmt) => stmt.name.name)
+    .filter((name) => name !== "adminuser"); // explicitly remove adminuser;
+
+  console.log(tableNames);
+}
+console.log("✅ Processing Table files!");
+if (Array.isArray(parsedSchema.statement)) {
+  parsedSchema.statement.forEach((stmt) => {
+    if (
+      stmt.variant === "create" &&
+      stmt.format === "table" &&
+      !env.EXCLUDETABLES.includes(stmt.name.name)
+    ) {
+      const tableName = stmt.name.name;
+      const fields = stmt.definition;
+
+      // Generate human-readable field labels
+      fields.forEach((field) => {
+        if (field.name) {
+          field.label = field.name
+            .replace(/_/g, " ")
+            .replace(/([a-z])([A-Z])/g, "$1 $2")
+            .replace(/\b\w/g, (c) => c.toUpperCase());
+        }
+      });
+
+      const sanitizedFields = fields.filter(
+        (f) => !env.EXCLUDEDFIELDS.includes(f.name)
+      );
+      //tableNames.push(tableName);
+      if (!env.EXCLUDETABLES.includes(tableName)) {
+        generateTablePages(tableName, sanitizedFields, tableNames);
       }
     }
   });
-}
+  console.log("✅ Table files Processed!");
 
-if (Array.isArray(parsedSchema.statement)) {
-  parsedSchema.statement.forEach((statement) => {
-    if (statement.variant === "create" && statement.format === "table") {
-      const tableName = statement.name.name;
-      const fields = statement.definition;
-      //santise the fields
-
-      const sanitisedFields = fields.filter(
-        (field) => !env.EXCLUDEDFIELDS.includes(field.name)
-      );
-      if (!env.EXCLUDETABLES.includes(tableName))
-        generateTablePages(tableName, sanitisedFields, tableNames);
-    }
-  });
-
+  // === ADDITIONAL PAGES ===
   processAccountFiles(tableNames);
-
-  // Generate individual API endpoints
   generateApiFunctions(tableNames);
+  processCustomFiles();
 
-  // Create main index
+  // === MAIN INDEX PAGE ===
   fs.writeFileSync(
     path.join(siteDir, "index.html"),
     nunjucks.render("indexMain.njk", { tableNames })
