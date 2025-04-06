@@ -1,5 +1,3 @@
-
-
 check custom code section still works
 add testing 
         login test isDeleted
@@ -9,26 +7,17 @@ add nice edit inputs for edit pages
 clean up account.js break it down to  sepeate account file for each page
 clean up table add/edit/put as it is using the same validation in each js file we can add them all to app.js for simplicity going forward
 add a function to override cannot be blank for certain tables / fields  
-    
-
-
-
-
-
-
+on adminuser create generate an apisecret key on insert    
 
 INPUTS
     think about look ups?
     how we do required fields
-
 
 SIGN UP    
     forgot password flow
     register create user
         check email is being sent 
         validate email
-
-
 
 how do we handle joins etc maybe look at how orms do it (the backwards way is neat)
 copy across the custom assets folder (custom js etc) do we want to do this, if so how does the person dev how is this easy to do.

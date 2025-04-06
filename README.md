@@ -18,9 +18,4 @@ This will launch a local version of the site
 
 Your admin is now in \_site run a http-server there and away you go.
 
-table transformations
-
-is this the best way to achieve this? how do ORMs do it?
-
-add "as\_" at the start of a filed name and it will not be shown in the add / edit pages
-add "as_internal" field to any table and it will not render view, add or edit pages for this table
+There is a custom table called adminuser so dont call one of your tables this.
