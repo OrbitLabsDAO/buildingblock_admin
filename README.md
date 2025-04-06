@@ -2,7 +2,7 @@ adminjamstack is a back end admin control panel buid to run on cloudflare pages.
 
 It has the following
 
-    Builds table managment and full API from a schema.sql file
+    Builds table managment and full API from a schema.sql file in a JAM style
     Build the whole admin is as jam stack allowing you to easily push to CF
     Create an endpoint for each table in CF pages functions directory from the APIgenerator file
     Full user management using JWT
