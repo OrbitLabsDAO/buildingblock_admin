@@ -1,16 +1,22 @@
 //JWT model
 const jwt = require("@tsndr/cloudflare-worker-jwt");
-//token var
-let theToken = "";
-//decode the jwt token
-let decodeJwt = async (req, secret) => {
-  let bearer = req.get("authorization");
-  let details = "";
-  if (bearer != null) {
-    bearer = bearer.replace("Bearer ", "");
-    details = await jwt.decode(bearer, secret);
-  }
-  return details;
+const isInvalid = (val) =>
+  val === null ||
+  val === undefined ||
+  val === "" ||
+  val === "null" ||
+  val === "undefined";
+
+// Decode and validate the JWT token
+const decodeJwt = async (headers, secret) => {
+  let bearer = headers.get("authorization");
+  if (!bearer) return null;
+
+  bearer = bearer.replace("Bearer ", "");
+  const isValid = await jwt.verify(bearer, secret);
+  if (!isValid) return null;
+
+  return await jwt.decode(bearer);
 };
 
 export async function onRequest(context) {
@@ -18,8 +24,7 @@ export async function onRequest(context) {
   const { request, env, params } = context;
   //get the methods
   const method = request.method.toUpperCase();
-  //decode the token so we can use it later.
-  theToken = await decodeJwt(request.headers, env.SECRET);
+
   switch (method) {
     case "GET":
       return handleGet(request, env, params, context);
@@ -34,6 +39,15 @@ async function handleGet(request, env, params, context) {
   const url = new URL(request.url);
   const id = url.searchParams.get("id"); // Get 'id' from query string
   const tableName = "adminuser"; // assuming you're actually querying the "user" table
+
+  // Decode JWT
+  const token = await decodeJwt(request.headers, env.SECRET);
+
+  if (!token) {
+    return new Response(JSON.stringify({ error: "Invalid or missing token" }), {
+      status: 401,
+    });
+  }
 
   if (id == null) {
     return new Response(JSON.stringify({ error: "ID is required" }), {
@@ -93,6 +107,24 @@ export async function handlePut(request, env, params, context) {
     newPassword,
   } = data;
 
+  // Decode JWT
+  const token = await decodeJwt(request.headers, env.SECRET);
+  if (!token) {
+    return new Response(JSON.stringify({ error: "Invalid or missing token" }), {
+      status: 401,
+    });
+  }
+
+  // Check if the token's payload ID matches the provided ID
+  if (token.payload.id !== id) {
+    return new Response(
+      JSON.stringify({
+        error: "Unauthorized: Token ID does not match request ID",
+      }),
+      { status: 403 }
+    );
+  }
+
   // Password check and update
   if (changePassword) {
     if (!oldPassword || !newPassword) {
@@ -142,6 +174,7 @@ export async function handlePut(request, env, params, context) {
       status: 400,
     });
   }
+
   // Update other fields
   const updateUserQuery = `
     UPDATE adminuser
@@ -152,7 +185,7 @@ export async function handlePut(request, env, params, context) {
     WHERE id = ${id};
   `;
 
-  console.log(updateUserQuery);
+  //console.log(updateUserQuery);
 
   try {
     const result = await env.DB.prepare(updateUserQuery).run();
