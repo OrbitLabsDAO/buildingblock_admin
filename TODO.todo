@@ -8,6 +8,8 @@ clean up account.js break it down to  sepeate account file for each page
 clean up table add/edit/put as it is using the same validation in each js file we can add them all to app.js for simplicity going forward
 add a function to override cannot be blank for certain tables / fields  
 on adminuser create generate an apisecret key on insert    
+add a build to prod function
+add a build init function to do renames of _env etc
 
 INPUTS
     think about look ups?

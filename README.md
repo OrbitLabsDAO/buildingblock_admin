@@ -6,13 +6,21 @@ rename \_wrangler.toml to wrangler.toml
 rename \_.dev.vars to .dev_vars
 
 run
+./build.sh kill
+this will kill wrangler
 
 ./build.sh db
 This will create the database
+
 ./build.sh dbimport:local
-This will build the SQL in the schema.sql file
+This will build the SQL in the schema.sql file on local
+
+./build.sh dbimport:prod
+This will build the SQL in the schema.sql file on production
+
 ./build.sh
 This will generate the site
+
 ./build.sh start
 This will launch a local version of the site
 
