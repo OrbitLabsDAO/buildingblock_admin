@@ -1,1 +1,1 @@
-alert("woot");
+alert("custom new test endpoint");

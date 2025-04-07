@@ -217,19 +217,39 @@ const processAccountFiles = (tableNames) => {
   console.log("✅ Account files Processed!");
 };
 
+const processCustomLayouts = () => {
+  console.log("✅ Processing custom layouts!");
+  const files = fs.readdirSync(customFolder + "/layouts");
+  files.forEach((file) => {
+    const fullPath = path.join(customFolder, "layouts", file);
+    if (file.endsWith(".njk")) {
+      const dest = `${coreFolder}/${file}`;
+      console.log(fullPath, dest);
+      fs.copyFileSync(fullPath, dest);
+      console.log(`✅ Created custom layout: ${file}`);
+      return;
+    }
+  });
+  console.log("✅ Custom layouts processed!");
+};
+
 /**
  * Process the custom files in the _custom folder.
  *
  * This function will take all the folders in the _custom folder that start with
  * "table_" and treat them as custom pages for the corresponding table.
  */
-const processCustomTables = () => {
-  console.log("✅ Processing Custom tables!");
+const processCustomFolders = (
+  foldername = "",
+  prefix = "",
+  outputprefix = ""
+) => {
+  console.log(`✅ Processing custom ${foldername}!`);
   const customFolders = fs
     .readdirSync(customFolder)
-    .filter((f) => f.startsWith("table_"));
+    .filter((f) => f.startsWith(foldername));
   customFolders.forEach((folder) => {
-    const tableName = folder.replace("table_", "tables/");
+    const tableName = folder.replace(foldername, prefix);
     const files = fs.readdirSync(path.join(customFolder, folder));
 
     files.forEach((file) => {
@@ -239,7 +259,8 @@ const processCustomTables = () => {
 
       // If the file is a .js file, copy it to the functions folder
       if (file.endsWith(".js")) {
-        const dest = `functions/api/${tableName}.js`;
+        const dest = `${outputprefix}${tableName}.js`;
+        fs.mkdirSync(outputprefix + prefix, { recursive: true });
         fs.copyFileSync(fullPath, dest);
         console.log(`✅ Copied ${file} to ${dest}`);
         return;
@@ -261,11 +282,14 @@ const processCustomTables = () => {
         : inner;
 
       // Write the rendered template to the output file
+      //debug
+      //console.log(file);
+      //console.log(outputFile);
       fs.writeFileSync(outputFile, final);
       console.log(`✅ Created custom page: ${file}`);
     });
   });
-  console.log("✅ Custom tables processed!");
+  console.log(`✅ Custom ${foldername} processed!`);
 };
 
 const processCustomFunctions = () => {
@@ -349,9 +373,11 @@ if (Array.isArray(parsedSchema.statement)) {
   console.log("✅ Table files Processed!");
 
   // === ADDITIONAL PAGES ===
+  processCustomLayouts();
   processAccountFiles(tableNames);
   generateApiFunctions(tableNames);
-  processCustomTables();
+  processCustomFolders("table_", "tables/", "functions/api/");
+  processCustomFolders("new_", "", "functions/api/");
   processCustomFunctions();
 
   // === MAIN INDEX PAGE ===

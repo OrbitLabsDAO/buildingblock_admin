@@ -1,19 +1,6 @@
 check custom code section still works
-    api overriding
-    custom copying function
-        assets is fine as you just put in the assets dir
-        
-        just copy them across to the functions directory (should this allow sub folders?)
+    test custom layouts render correcty
 
-
-        new
-            folder
-                file1.njk
-                file2.njk
-                endpoint.js
-
-        layout
-            put custom layout files in here
 
     
 
