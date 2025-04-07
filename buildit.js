@@ -216,96 +216,104 @@ const processAccountFiles = (tableNames) => {
   });
   console.log("✅ Account files Processed!");
 };
+const pathExists = (p) => fs.existsSync(p);
+const isTemplateFile = (file) => file.endsWith(".njk");
+const isJsFile = (file) => file.endsWith(".js");
 
+/**
+ * Copies all .njk layouts from custom/layouts into the core folder.
+ */
 const processCustomLayouts = () => {
   console.log("✅ Processing custom layouts!");
-  const files = fs.readdirSync(customFolder + "/layouts");
-  files.forEach((file) => {
-    const fullPath = path.join(customFolder, "layouts", file);
-    if (file.endsWith(".njk")) {
-      const dest = `${coreFolder}/${file}`;
-      console.log(fullPath, dest);
-      fs.copyFileSync(fullPath, dest);
+  const layoutPath = path.join(customFolder, "layouts");
+
+  fs.readdirSync(layoutPath)
+    .filter(isTemplateFile)
+    .forEach((file) => {
+      const src = path.join(layoutPath, file);
+      const dest = path.join(coreFolder, file);
+      fs.copyFileSync(src, dest);
       console.log(`✅ Created custom layout: ${file}`);
-      return;
-    }
-  });
+    });
+
   console.log("✅ Custom layouts processed!");
 };
 
 /**
- * Process the custom files in the _custom folder.
- *
- * This function will take all the folders in the _custom folder that start with
- * "table_" and treat them as custom pages for the corresponding table.
+ * Copies all .js functions from _custom/functions to functions/api.
  */
-const processCustomFolders = (
-  foldername = "",
-  prefix = "",
-  outputprefix = ""
-) => {
-  console.log(`✅ Processing custom ${foldername}!`);
-  const customFolders = fs
-    .readdirSync(customFolder)
-    .filter((f) => f.startsWith(foldername));
-  customFolders.forEach((folder) => {
-    const tableName = folder.replace(foldername, prefix);
-    const files = fs.readdirSync(path.join(customFolder, folder));
+const processCustomFunctions = () => {
+  console.log("✅ Processing custom functions!");
+  const functionPath = path.join(customFolder, "functions");
 
-    files.forEach((file) => {
-      const fullPath = path.join(customFolder, folder, file);
-      const outputPath = path.join(siteDir, tableName);
-      fs.mkdirSync(outputPath, { recursive: true });
-
-      // If the file is a .js file, copy it to the functions folder
-      if (file.endsWith(".js")) {
-        const dest = `${outputprefix}${tableName}.js`;
-        fs.mkdirSync(outputprefix + prefix, { recursive: true });
-        fs.copyFileSync(fullPath, dest);
-        console.log(`✅ Copied ${file} to ${dest}`);
-        return;
-      }
-
-      // Process the file as a njk template
-      const { layout, content } =
-        processFile(file, path.join(customFolder, folder)) || {};
-      const viewType = file
-        .replace("table", "")
-        .replace(".njk", "")
-        .toLowerCase();
-      const outputFile = path.join(outputPath, `${viewType}.html`);
-
-      // Render the template with the layout if it exists
-      const inner = nunjucks.renderString(content, { env, tableNames });
-      const final = layout
-        ? renderTemplateWithLayout(layout, { content: inner, env, tableNames })
-        : inner;
-
-      // Write the rendered template to the output file
-      //debug
-      //console.log(file);
-      //console.log(outputFile);
-      fs.writeFileSync(outputFile, final);
-      console.log(`✅ Created custom page: ${file}`);
+  fs.readdirSync(functionPath)
+    .filter(isJsFile)
+    .forEach((file) => {
+      const src = path.join(functionPath, file);
+      const dest = path.join("functions/api", file);
+      fs.copyFileSync(src, dest);
+      console.log(`✅ Created custom function: ${file}`);
     });
-  });
-  console.log(`✅ Custom ${foldername} processed!`);
+
+  console.log("✅ Custom functions processed!");
 };
 
-const processCustomFunctions = () => {
-  console.log("✅ Processing Custom functions!");
-  const files = fs.readdirSync(customFolder + "/functions");
-  files.forEach((file) => {
-    // If the file is a .js file, copy it to the functions folder
-    const fullPath = path.join(customFolder, "functions", file);
-    if (file.endsWith(".js")) {
-      const dest = `functions/api/${file}`;
-      fs.copyFileSync(fullPath, dest);
-      console.log(`✅ Created custom function: ${file}`);
-      return;
-    }
-  });
-  console.log("✅ Custom functions processed!");
+/**
+ * Process custom folders for table- or new- prefixed overrides.
+ */
+const processCustomFolders = (
+  prefix = "",
+  outputSubfolder = "",
+  jsDest = "functions/api/"
+) => {
+  console.log(`✅ Processing custom ${prefix}!`);
+
+  fs.readdirSync(customFolder)
+    .filter((f) => f.startsWith(prefix))
+    .forEach((folder) => {
+      const baseName = folder.replace(prefix, "");
+      const srcFolder = path.join(customFolder, folder);
+      const outputPath = path.join(siteDir, outputSubfolder, baseName);
+      fs.mkdirSync(outputPath, { recursive: true });
+
+      fs.readdirSync(srcFolder).forEach((file) => {
+        const fullPath = path.join(srcFolder, file);
+
+        if (isJsFile(file)) {
+          const destJsPath = path.join(
+            jsDest,
+            `${outputSubfolder}${baseName}.js`
+          );
+          fs.mkdirSync(path.dirname(destJsPath), { recursive: true });
+          fs.copyFileSync(fullPath, destJsPath);
+          console.log(`✅ Copied JS: ${file} to ${destJsPath}`);
+        } else if (isTemplateFile(file)) {
+          const { layout, content } = processFile(file, srcFolder) || {};
+          const viewType = file
+            .replace("table", "")
+            .replace(".njk", "")
+            .toLowerCase();
+          const outputFile = path.join(outputPath, `${viewType}.html`);
+          const renderedInner = nunjucks.renderString(content, {
+            env,
+            tableNames,
+          });
+
+          const final = layout
+            ? renderTemplateWithLayout(layout, {
+                content: renderedInner,
+                env,
+                tableNames,
+              })
+            : renderedInner;
+
+          fs.writeFileSync(outputFile, final);
+          console.log(`✅ Created custom page: ${outputFile}`);
+        }
+      });
+    });
+
+  console.log(`✅ Custom ${prefix} processed!`);
 };
 
 // === BUILD START ===
