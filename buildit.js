@@ -271,7 +271,7 @@ const processCustomFolders = (
   jsDest = "functions/api/"
 ) => {
   console.log(`✅ Processing custom ${prefix}!`);
-
+  fs.mkdirSync(customFolder, { recursive: true });
   fs.readdirSync(customFolder)
     .filter((f) => f.startsWith(prefix))
     .forEach((folder) => {
