@@ -23,4 +23,5 @@ module.exports = {
     "deletedAt",
   ], //these are the fields that will be removed from any rendering
   EXCLUDETABLES: ["userAccess"],
+  RESERVEDTABLES: ["adminuser"], //these are the tables used internally that will be removed from any rendering
 };

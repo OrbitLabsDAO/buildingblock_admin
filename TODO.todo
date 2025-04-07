@@ -1,11 +1,42 @@
 check custom code section still works
+    test custom layouts render correcty
+
+
+
+
+    MAY NOT DO THESE INCLUDES, COULD BE OVERKILL MORE THOUGHT IS REQUIRED.
+        includes
+            the way i was thinking about njk files is wrong as it would mean doing the core files, we will have to think of a better
+            way to do this. Maybe you just replace the whole thing and dont have includes atall
+
+
+
+        apigenerator
+            override the entire api generator file (seems dumb but some may want to do it) 
+
+        account
+            dashboard.njk
+            login.njk
+            resetpassword.njk
+            settings.njk
+            verify.njk
+
+        not sure if we should let them override this or not. 
+
+
+        
+        hold completely new sections of the dashboard here. 
+
+        menu
+            this will include custom menu stuff. 
+
+
 add testing 
         login test isDeleted
     login test isBlocked
     login test isAdmin
 add nice edit inputs for edit pages
 clean up account.js break it down to  sepeate account file for each page
-clean up table add/edit/put as it is using the same validation in each js file we can add them all to app.js for simplicity going forward
 add a function to override cannot be blank for certain tables / fields  
 on adminuser create generate an apisecret key on insert    
 add a build to prod function
