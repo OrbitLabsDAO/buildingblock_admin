@@ -41,7 +41,7 @@ export async function onRequest(context) {
 
     // Check if the email already exists
     const queryResult = await context.env.DB.prepare(
-      "SELECT COUNT(*) as total FROM user WHERE email = ?"
+      "SELECT COUNT(*) as total FROM adminuser WHERE email = ?"
     )
       .bind(email)
       .first();
@@ -59,7 +59,7 @@ export async function onRequest(context) {
 
     // Insert the user into the database
     const info = await context.env.DB.prepare(
-      "INSERT INTO user (username, email, password, apiSecret, confirmed, isBlocked, isAdmin, verifyCode) VALUES (?, ?, ?, ?, 0, 0, 0, ?)"
+      "INSERT INTO adminuser (username, email, password, apiSecret, confirmed, isBlocked, isAdmin, verifyCode) VALUES (?, ?, ?, ?, 0, 0, 0, ?)"
     )
       .bind(username, email, password, apiSecret, verifyCode)
       .run();
@@ -138,12 +138,12 @@ export async function onRequest(context) {
   async function fetchUser(email, password, context) {
     const query = context.env.DB.prepare(`
     SELECT 
-      user.isDeleted, user.isBlocked, user.name, user.username, 
-      user.email, user.phone, user.id, user.isAdmin, 
-      userAccess.foreignId, user.apiSecret 
-    FROM user 
-    LEFT JOIN userAccess ON user.id = userAccess.userId 
-    WHERE user.email = '${email}' AND user.password = '${password}'
+      adminuser.isDeleted, adminuser.isBlocked, adminuser.name, adminuser.username, 
+      adminuser.email, adminuser.phone, adminuser.id, adminuser.isAdmin, 
+      userAccess.foreignId, adminuser.apiSecret 
+    FROM adminuser 
+    LEFT JOIN userAccess ON adminuser.id = userAccess.userId 
+    WHERE adminuser.email = '${email}' AND adminuser.password = '${password}'
   `);
 
     const result = await query.all();

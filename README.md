@@ -16,7 +16,20 @@ create a folder called \_custom \*note \_custom\_ contains some example override
 create a file called .env and copy the contents of \_env into it
 create a file called wrangler.toml and copy the contents of \_wrangler.toml into it
 create a file called .dev.vars and copy the contents of \.dev.vars into it
-run npm install from the command line.
+
+run
+npm install
+
+run
+./build.sh db
+note this will create a database called adminjackstack and give you and id paste this into the wrangler.toml file of if you have created the database already update the id and name. If you change the name make sure to also change it in build.sh script
+
+run
+./build.sh dbimport:local
+to install the database locally
+
+run
+./build.sh start
 
 run one of the following
 
