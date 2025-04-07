@@ -227,16 +227,20 @@ const processCustomLayouts = () => {
   console.log("✅ Processing custom layouts!");
   const layoutPath = path.join(customFolder, "layouts");
 
-  fs.readdirSync(layoutPath)
-    .filter(isTemplateFile)
-    .forEach((file) => {
-      const src = path.join(layoutPath, file);
-      const dest = path.join(coreFolder, file);
-      fs.copyFileSync(src, dest);
-      console.log(`✅ Created custom layout: ${file}`);
-    });
-
-  console.log("✅ Custom layouts processed!");
+  // Check if the directory exists before proceeding
+  if (fs.existsSync(layoutPath)) {
+    fs.readdirSync(layoutPath)
+      .filter(isTemplateFile)
+      .forEach((file) => {
+        const src = path.join(layoutPath, file);
+        const dest = path.join(coreFolder, file);
+        fs.copyFileSync(src, dest);
+        console.log(`✅ Created custom layout: ${file}`);
+      });
+    console.log("✅ Custom layouts processed!");
+  } else {
+    console.error(`❌ Layouts folder does not exist: ${layoutPath}`);
+  }
 };
 
 /**
@@ -245,16 +249,16 @@ const processCustomLayouts = () => {
 const processCustomFunctions = () => {
   console.log("✅ Processing custom functions!");
   const functionPath = path.join(customFolder, "functions");
-
-  fs.readdirSync(functionPath)
-    .filter(isJsFile)
-    .forEach((file) => {
-      const src = path.join(functionPath, file);
-      const dest = path.join("functions/api", file);
-      fs.copyFileSync(src, dest);
-      console.log(`✅ Created custom function: ${file}`);
-    });
-
+  if (fs.existsSync(functionPath)) {
+    fs.readdirSync(functionPath)
+      .filter(isJsFile)
+      .forEach((file) => {
+        const src = path.join(functionPath, file);
+        const dest = path.join("functions/api", file);
+        fs.copyFileSync(src, dest);
+        console.log(`✅ Created custom function: ${file}`);
+      });
+  }
   console.log("✅ Custom functions processed!");
 };
 

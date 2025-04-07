@@ -12,10 +12,10 @@ USAGE
 
 git clone https://github.com/OrbitLabsDAO/adminjamstack.git
 put a sql file in the sql dir (or use the example one)
-create a folder called _custom_ \*note \_custom\_ contains some example override files for you to use
-rename \_env to .env and set the vars
-rename \_wrangler.toml to wrangler.toml
-rename \_.dev.vars to .dev_vars
+create a folder called \_custom \*note \_custom\_ contains some example override files for you to use
+create a file called .env and copy the contents of \_env into it
+create a file called wrangler.toml and copy the contents of \_wrangler.toml into it
+create a file called .dev.vars and copy the contents of \.dev.vars into it
 
 run one of the following
 
