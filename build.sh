@@ -4,6 +4,28 @@
 # delete (node buildit.js ) 
 ACTION="${1:-local}" # Default to "build" if no parameter is passed
 
+
+if [ "$ACTION" = "init" ]; then
+    if [ ! -d "_custom" ]; then
+        mkdir _custom
+    fi
+
+    #copy _env to .env
+    if [ ! -f ".env" ]; then
+        cp _env .env
+    fi
+
+    if [ ! -f ".dev.vars" ]; then
+        cp _.dev.vars .dev.vars
+    fi
+
+    #copy _wrangler.toml to wrangler.toml
+    if [ ! -f "wrangler.toml" ]; then
+        cp _wrangler.toml wrangler.toml
+    fi
+
+    exit   
+fi
 if [ "$ACTION" = "integrity" ]; then
     echo "reseting core files and running integrity check"
     node build_integrity.js
