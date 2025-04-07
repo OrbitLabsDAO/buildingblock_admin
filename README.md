@@ -16,6 +16,7 @@ create a folder called \_custom \*note \_custom\_ contains some example override
 create a file called .env and copy the contents of \_env into it
 create a file called wrangler.toml and copy the contents of \_wrangler.toml into it
 create a file called .dev.vars and copy the contents of \.dev.vars into it
+run npm install from the command line.
 
 run one of the following
 
