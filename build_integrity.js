@@ -1,14 +1,8 @@
-/*
-This function sets the _corenjks and functions file back to the original, it is a utitlity function to help with dev 
-getting it back to the correct baseline stopping rouge files from being commited to the main branch.
-
-It asks for confirmation before any file is deleted so it is safe to use.
-*/
 const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
 
-// Path to the 'functions' and 'corenjks' directories
+// Path to the 'functions' and '_corenjks' directories
 const functionsDir = path.join(__dirname, "functions");
 const corenjksDir = path.join(__dirname, "_corenjks");
 
@@ -31,9 +25,11 @@ const excludeItems = [
   "tableIndex.njk",
   "tableView.njk",
   "api",
+  "api/tables/adminuser.js", // Keep this specific file
   "account-settings.js",
   "account.js",
-]; // Update with the folders or files you want to keep
+];
+
 // Setup readline interface for user input in the CLI
 const rl = readline.createInterface({
   input: process.stdin,
@@ -55,11 +51,9 @@ const cleanDirectory = async (dir, dirName) => {
   // Loop through all the items (files/folders) in the directory
   for (const item of items) {
     const itemPath = path.join(dir, item);
-
-    // Check if the item is a folder or file and if it should be excluded
     const stats = fs.statSync(itemPath); // Using synchronous stat to avoid potential issues
 
-    // If it's a folder, and it's not in the exclude list, ask if we should delete
+    // If it's a folder and it's not in the exclude list, we want to inspect it
     if (stats.isDirectory()) {
       if (!excludeItems.includes(item)) {
         const confirmDeleteFolder = await askQuestion(
@@ -73,9 +67,35 @@ const cleanDirectory = async (dir, dirName) => {
         }
       } else {
         console.log(`Excluded folder ${item} in ${dirName}`);
+        // Handle subdirectory `api/tables` case specifically
+        if (item === "api") {
+          // Check inside api/tables if files are not excluded
+          const apiTablesDir = path.join(itemPath, "tables");
+          if (fs.existsSync(apiTablesDir)) {
+            const tableItems = fs.readdirSync(apiTablesDir);
+            for (const tableItem of tableItems) {
+              const tableItemPath = path.join(apiTablesDir, tableItem);
+              if (!excludeItems.includes(`api/tables/${tableItem}`)) {
+                const confirmDeleteTableFile = await askQuestion(
+                  `Do you want to delete the file "${tableItem}" in "api/tables"? (y/n): `
+                );
+                if (confirmDeleteTableFile.toLowerCase() === "y") {
+                  fs.unlinkSync(tableItemPath);
+                  console.log(`Deleted file ${tableItem} in api/tables`);
+                } else {
+                  console.log(
+                    `Skipped deleting file ${tableItem} in api/tables`
+                  );
+                }
+              } else {
+                console.log(`Excluded file ${tableItem} in api/tables`);
+              }
+            }
+          }
+        }
       }
     }
-    // If it's a file, and it's not in the exclude list, ask if we should delete
+    // If it's a file and it's not in the exclude list, we should delete it
     else if (stats.isFile()) {
       if (!excludeItems.includes(item)) {
         const confirmDeleteFile = await askQuestion(
@@ -99,7 +119,7 @@ const cleanDirectories = async () => {
   // Clean 'functions' directory
   await cleanDirectory(functionsDir, "functions");
 
-  // Clean 'corenjks' directory
+  // Clean '_corenjks' directory
   await cleanDirectory(corenjksDir, "_corenjks");
 
   // Close the readline interface after all operations are done

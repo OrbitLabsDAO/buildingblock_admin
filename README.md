@@ -19,6 +19,9 @@ rename \_.dev.vars to .dev_vars
 
 run one of the following
 
+./build.sh integrity
+resets the core file
+
 ./build.sh kill
 this will kill wrangler
 
@@ -36,6 +39,12 @@ This will generate the site
 
 ./build.sh start
 This will launch a local version of the site
+
+TEST
+
+If you want to run the jest tests run
+
+npm test
 
 Your admin is now in \_site run a http-server there and away you go.
 
