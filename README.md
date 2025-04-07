@@ -29,7 +29,7 @@ AdminJamstack is a backend admin control panel built to run on Cloudflare Pages.
 4. **Initialize the project**
 
     ```bash
-    npm init
+    ./build.sh init
     ```
 
     This will do the following:
