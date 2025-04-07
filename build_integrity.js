@@ -37,11 +37,20 @@ const rl = readline.createInterface({
 });
 
 // Function to ask the user for confirmation
+// It returns a Promise that resolves when the user responds
+/**
+ * @param {string} question - The question to ask the user
+ * @returns {Promise<string>} - A Promise that resolves with the user's response
+ */
 const askQuestion = (question) => {
   return new Promise((resolve) => rl.question(question, resolve));
 };
 
 // Function to clean the given directory
+/**
+ * @param {string} dir - The path to the directory to clean
+ * @param {string} dirName - The name of the directory to clean
+ */
 const cleanDirectory = async (dir, dirName) => {
   console.log(`\nCleaning the "${dirName}" directory...\n`);
 
@@ -55,11 +64,14 @@ const cleanDirectory = async (dir, dirName) => {
 
     // If it's a folder and it's not in the exclude list, we want to inspect it
     if (stats.isDirectory()) {
+      // Exclude folders that are in the excludeItems array
       if (!excludeItems.includes(item)) {
         const confirmDeleteFolder = await askQuestion(
+          // Ask the user if they want to delete the folder
           `Do you want to delete the folder "${item}" in "${dirName}"? (y/n): `
         );
         if (confirmDeleteFolder.toLowerCase() === "y") {
+          // Delete the folder if the user confirmed
           fs.rmdirSync(itemPath, { recursive: true });
           console.log(`Deleted folder ${item} in ${dirName}`);
         } else {
@@ -75,11 +87,14 @@ const cleanDirectory = async (dir, dirName) => {
             const tableItems = fs.readdirSync(apiTablesDir);
             for (const tableItem of tableItems) {
               const tableItemPath = path.join(apiTablesDir, tableItem);
+              // Exclude files that are in the excludeItems array
               if (!excludeItems.includes(`api/tables/${tableItem}`)) {
                 const confirmDeleteTableFile = await askQuestion(
+                  // Ask the user if they want to delete the file
                   `Do you want to delete the file "${tableItem}" in "api/tables"? (y/n): `
                 );
                 if (confirmDeleteTableFile.toLowerCase() === "y") {
+                  // Delete the file if the user confirmed
                   fs.unlinkSync(tableItemPath);
                   console.log(`Deleted file ${tableItem} in api/tables`);
                 } else {
@@ -97,11 +112,14 @@ const cleanDirectory = async (dir, dirName) => {
     }
     // If it's a file and it's not in the exclude list, we should delete it
     else if (stats.isFile()) {
+      // Exclude files that are in the excludeItems array
       if (!excludeItems.includes(item)) {
         const confirmDeleteFile = await askQuestion(
+          // Ask the user if they want to delete the file
           `Do you want to delete the file "${item}" in "${dirName}"? (y/n): `
         );
         if (confirmDeleteFile.toLowerCase() === "y") {
+          // Delete the file if the user confirmed
           fs.unlinkSync(itemPath);
           console.log(`Deleted file ${item} in ${dirName}`);
         } else {
@@ -115,6 +133,11 @@ const cleanDirectory = async (dir, dirName) => {
 };
 
 // Function to clean both directories
+/**
+ * Cleans both the 'functions' and '_corenjks' directories by checking if
+ * files and folders are not in the excludeItems array and asking the user
+ * for confirmation to delete them.
+ */
 const cleanDirectories = async () => {
   // Clean 'functions' directory
   await cleanDirectory(functionsDir, "functions");
