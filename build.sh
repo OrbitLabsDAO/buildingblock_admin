@@ -54,7 +54,7 @@ fi
 
 if [ "$ACTION" = "dbimport:prod" ]; then
     echo "Building database"
-    npx wrangler d1 execute adminjamstack --remote --file=./sql/schema.sql
+    npx wrangler d1 execute adminjamstack --remote --file=./sql/schema.sql 
     exit
 fi
 
