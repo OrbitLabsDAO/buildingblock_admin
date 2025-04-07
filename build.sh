@@ -4,6 +4,12 @@
 # delete (node buildit.js ) 
 ACTION="${1:-local}" # Default to "build" if no parameter is passed
 
+if [ "$ACTION" = "integrity" ]; then
+    echo "reseting core files and running integrity check"
+    node build_integrity.js
+    exit
+fi
+
 if [ "$ACTION" = "kill" ]; then
     echo "killing rouge wrangler"
     kill -9 `lsof -t -i:8789`
