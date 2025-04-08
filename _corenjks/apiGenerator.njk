@@ -1,5 +1,12 @@
 const jwt = require('@tsndr/cloudflare-worker-jwt');
 
+const   headers = {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    }
+
 // Utility: Check if a value is null, undefined, empty, or string "null"/"undefined"
 const isInvalid = (val) =>
   val === null || val === undefined || val === "" || val === "null" || val === "undefined";
@@ -84,7 +91,11 @@ async function handleGet(request, env, params, tableName) {
     Object.fromEntries(Object.entries(item).filter(([key]) => !excludedFields.includes(key)))
   );
 
-  return new Response(JSON.stringify({ data: filteredResults }), { status: 200 });
+
+  return new Response(JSON.stringify({ data: filteredResults }), {
+  status: 200,
+  headers: headers,
+});
 }
 
 async function handlePost(request, env, params, tableName) {
