@@ -23,13 +23,15 @@ export async function onRequest(context) {
   const tableName = "{{tableName}}"; // Replace dynamically or via template engine
 
   // Decode JWT
+  if (method != "GET")
+  {
   const token = await decodeJwt(request.headers, env.SECRET);
-  if (!token) {
-    return new Response(JSON.stringify({ error: "Invalid or missing token" }), {
-      status: 401,
-    });
+    if (!token) {
+      return new Response(JSON.stringify({ error: "Invalid or missing token" }), {
+        status: 401,
+      });
+    }
   }
-
   // Extra check for adminuser table: must include isAdmin = 1 in JWT
   
   //admin debug
