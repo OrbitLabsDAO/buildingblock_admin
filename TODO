@@ -1,4 +1,3 @@
-TODO check custom code section still works andtest custom layouts render correcty
 TODO encrypt password
 TODO add image upload
 TODO make the external calls (GETS) use the apikey we should define an api key to control scopes in the future
@@ -10,6 +9,8 @@ TODO forgot password flow
 TODO register create user
 TODO check email is being sent
 TODO validate email
+
+API
 
 FUTURE
 MAY NOT DO THESE INCLUDES, COULD BE OVERKILL MORE THOUGHT IS REQUIRED.
