@@ -1,4 +1,3 @@
-TODO encrypt password
 TODO add image upload
 TODO make the external calls (GETS) use the apikey we should define an api key to control scopes in the future
 add a function to override cannot be blank for certain tables / fields
@@ -9,6 +8,13 @@ TODO forgot password flow
 TODO register create user
 TODO check email is being sent
 TODO validate email
+
+SCHMEA
+TODO HANDLE MIGRATION
+
+TODO INPUT FIELDS
+TODO image uploader input
+TODO password input
 
 API
 

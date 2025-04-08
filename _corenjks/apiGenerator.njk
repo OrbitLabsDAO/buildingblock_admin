@@ -1,3 +1,4 @@
+const bcrypt = require("bcryptjs");
 const jwt = require('@tsndr/cloudflare-worker-jwt');
 
 const   headers = {
@@ -30,9 +31,9 @@ export async function onRequest(context) {
   const tableName = "{{tableName}}"; // Replace dynamically or via template engine
 
   // Decode JWT
-  if (method != "GET")
-  {
-  const token = await decodeJwt(request.headers, env.SECRET);
+  let token;
+  if (method != "GET" || tableName == "adminuser") {
+   token = await decodeJwt(request.headers, env.SECRET);
     if (!token) {
       return new Response(JSON.stringify({ error: "Invalid or missing token" }), {
         status: 401,
@@ -110,6 +111,15 @@ async function handlePost(request, env, params, tableName) {
         status: 400,
       });
     }
+
+    // Check if the data includes a password field, and hash it if present
+    const passwordIndex = keys.indexOf("password");
+    if (passwordIndex !== -1) {
+      const plainPassword = values[passwordIndex];
+      const hashedPassword = await bcrypt.hash(plainPassword, 10); // Hash the password with 10 salt rounds
+      values[passwordIndex] = hashedPassword; // Replace the plain password with the hashed one
+    }
+
 
     const placeholders = keys.map(() => "?").join(", ");
     const sql = `INSERT INTO ${tableName} (${keys.join(", ")}) VALUES (${placeholders})`;

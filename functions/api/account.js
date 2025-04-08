@@ -1,7 +1,6 @@
+const bcrypt = require("bcryptjs");
 const jwt = require("@tsndr/cloudflare-worker-jwt");
-
-//set the UUID
-var uuid = require("uuid");
+const uuid = require("uuid");
 
 export async function onRequest(context) {
   const { request } = context;
@@ -34,8 +33,7 @@ export async function onRequest(context) {
     const { username, email, password } = body;
     if (!username || !email || !password) {
       return jsonResponse(400, {
-        error:
-          "Username, email, and password are required. Please check your inputs and try again.",
+        error: "Username, email, and password are required.",
       });
     }
 
@@ -47,11 +45,11 @@ export async function onRequest(context) {
       .first();
 
     if (queryResult.total > 0) {
-      return jsonResponse(400, {
-        error:
-          "Email already exists. Please try registering with a different email address.",
-      });
+      return jsonResponse(400, { error: "Email already exists." });
     }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Generate API secret and verification code
     const apiSecret = uuid.v4();
@@ -61,17 +59,15 @@ export async function onRequest(context) {
     const info = await context.env.DB.prepare(
       "INSERT INTO adminuser (username, email, password, apiSecret, confirmed, isBlocked, isAdmin, verifyCode) VALUES (?, ?, ?, ?, 0, 0, 0, ?)"
     )
-      .bind(username, email, password, apiSecret, verifyCode)
+      .bind(username, email, hashedPassword, apiSecret, verifyCode)
       .run();
 
     if (!info.success) {
-      return jsonResponse(400, {
-        error: "Error registering. Please try again later.",
-      });
+      return jsonResponse(400, { error: "Error registering. Try again." });
     }
 
+    // Send verification email if configured...
     if (context.env.EMAILAPIURL) {
-      // Send the verification email
       const data = {
         templateId: context.env.SIGNUPEMAILTEMPLATEID,
         to: email,
@@ -94,6 +90,13 @@ export async function onRequest(context) {
 
     return jsonResponse(200, { status: "ok" });
   }
+
+  /**
+   * Handle the login user endpoint
+   * @param {Object} body The request body
+   * @param {Object} context The context of the request
+   * @return {Promise<Response>}
+   */
   async function handleLogin(body, context) {
     const { email, password } = body;
     if (!email || !password) {
@@ -101,16 +104,25 @@ export async function onRequest(context) {
     }
 
     try {
-      const user = await fetchUser(email, password, context);
-      if (!user) return jsonResponse(400, { message: "User not found" });
-      // Check user status
+      const user = await fetchUserByEmail(email, context);
+      if (!user) return jsonResponse(400, { error: "User not found." });
+
+      // Compare the password hash
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid)
+        return jsonResponse(400, { error: "Invalid password." });
+
       if (user.isBlocked)
-        return jsonResponse(400, { error: "User account is blocked" });
+        return jsonResponse(400, { error: "User is blocked." });
       if (user.isDeleted)
-        return jsonResponse(400, { error: "User does not exist" });
+        return jsonResponse(400, { error: "User does not exist." });
+
       // Generate and verify token
       const token = await createToken(user, context.env.SECRET);
       const isValid = await jwt.verify(token, context.env.SECRET);
+
       if (isValid) {
         return jsonResponse(200, {
           jwt: token,
@@ -134,23 +146,24 @@ export async function onRequest(context) {
     }
   }
 
-  // Fetch User
-  async function fetchUser(email, password, context) {
+  // Fetch User by email
+  async function fetchUserByEmail(email, context) {
     const query = context.env.DB.prepare(`
-    SELECT 
-      adminuser.isDeleted, adminuser.isBlocked, adminuser.name, adminuser.username, 
-      adminuser.email, adminuser.phone, adminuser.id, adminuser.isAdmin, 
-      userAccess.foreignId, adminuser.apiSecret 
-    FROM adminuser 
-    LEFT JOIN userAccess ON adminuser.id = userAccess.userId 
-    WHERE adminuser.email = '${email}' AND adminuser.password = '${password}'
-  `);
+      SELECT 
+        adminuser.isDeleted, adminuser.isBlocked, adminuser.name, adminuser.username, 
+        adminuser.email, adminuser.phone, adminuser.id, adminuser.isAdmin, 
+        adminuser.password, adminuser.apiSecret,
+        userAccess.foreignId 
+      FROM adminuser 
+      LEFT JOIN userAccess ON adminuser.id = userAccess.userId 
+      WHERE adminuser.email = ?
+    `);
 
-    const result = await query.all();
+    const result = await query.bind(email).all();
     return result.results.length > 0 ? result.results[0] : null;
   }
 
-  // Create Token
+  // Create JWT Token
   async function createToken(user, secret) {
     return await jwt.sign(
       {
@@ -168,6 +181,7 @@ export async function onRequest(context) {
     return new Response(JSON.stringify(body), { status });
   }
 
+  // Handle unknown actions
   async function handleUnknownAction(action) {
     return jsonResponse(400, { error: `Unknown action: ${action}` });
   }
