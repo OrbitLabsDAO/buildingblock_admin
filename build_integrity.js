@@ -81,6 +81,8 @@ const cleanDirectory = async (dir, dirName) => {
         console.log(`Excluded folder ${item} in ${dirName}`);
         // Handle subdirectory `api/tables` case specifically
         if (item === "api") {
+          //TODO we have files in the root that have to be deleted such as crowndfund.js
+
           // Check inside api/tables if files are not excluded
           const apiTablesDir = path.join(itemPath, "tables");
           if (fs.existsSync(apiTablesDir)) {
