@@ -6,8 +6,9 @@ if [ "$ACTION" = "origin" ]; then
     echo "Resetting core files and running integrity check"
     node build_integrity.js
 
-    # Move contents of _source into _site
-    mv _source/* _site/tmp/
+    # Move entire _source into _site/tmp to preserve structure
+    mkdir -p _site/tmp
+    mv _source _site/tmp/
 
     # Ask user for commit message
     read -p "Enter commit message: " COMMITMESSAGE
@@ -18,13 +19,13 @@ if [ "$ACTION" = "origin" ]; then
     git commit -m "$COMMITMESSAGE"
     git push "$ACTION" "$BRANCH"
 
-    # Restore _source from _site/_source
-    mkdir -p _source
-    mv _site/tmp/* _source/
-    rmdir _site/tmp/ 2>/dev/null  # Optional cleanup if empty
+    # Restore _source from _site/tmp/_source
+    mv _site/tmp/_source ./_source
+    rmdir _site/tmp 2>/dev/null  # Optional cleanup if empty
 
     exit
 fi
+
 
 
 if [ "$ACTION" = "github" ]; then
