@@ -7,7 +7,7 @@ if [ "$ACTION" = "origin" ]; then
     node build_integrity.js
 
     # Move contents of _source into _site
-    mv _source/* _aite/
+    mv _source/* _site/
 
     # Ask user for commit message
     read -p "Enter commit message: " COMMITMESSAGE
