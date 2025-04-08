@@ -12,35 +12,6 @@ TODO validate email
 
 API
 
-SOURCE ISSUE
-
-TODO When we commit we have the issue of the \_source file existing and having all the custom code it in to fix this we should use
-a bash script called delpoy.sh the usage will be
-
-     deploy.sh origin
-     deploy.sh github   (could be a better name now)
-
-     if origin is passed it
-
-        runs buildintegrity.sh (we could merge it)
-        moved _source to _custom
-        git add
-        askes for a commit message
-        git commit
-        asks for a branch * may not be required as it could just push the branch you are on
-        git push origin **branch**
-        moves the _source file back to _custom
-
-    if github
-
-        git add
-        askes for a commit message
-        git commit
-        asks for a branch * may not be required as it could just push the branch you are on
-        git push origin **branch**
-
-Make it
-
 FUTURE
 MAY NOT DO THESE INCLUDES, COULD BE OVERKILL MORE THOUGHT IS REQUIRED.
 includes
