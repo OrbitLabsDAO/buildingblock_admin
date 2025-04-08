@@ -20,8 +20,8 @@ if [ "$ACTION" = "origin" ]; then
 
     # Restore _source from _site/_source
     mkdir -p _source
-    mv _site/tmp/_source/* _source/
-    rmdir _site/tmp/_source 2>/dev/null  # Optional cleanup if empty
+    mv _site/tmp/* _source/
+    rmdir _site/tmp/ 2>/dev/null  # Optional cleanup if empty
 
     exit
 fi
