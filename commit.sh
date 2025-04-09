@@ -21,6 +21,11 @@ if [ "$ACTION" = "origin" ]; then
     mkdir -p _site/tmp
     mv _source _site/tmp/
 
+
+    # Move entire _custome into _site/tmp2 to preserve structure
+    mkdir -p _site/tmp2
+    mv _custom _site/tmp2/
+
     # Git operations
     read -p "Enter commit message: " COMMITMESSAGE
     git add .
@@ -30,6 +35,10 @@ if [ "$ACTION" = "origin" ]; then
     # Restore _source
     mv _site/tmp/_source ./_source
     rmdir _site/tmp 2>/dev/null  # Clean up if empty
+
+    mv _site/tmp2/_custom ./_custom
+    rmdir _site/tmp2 2>/dev/null  # Optional cleanup if empty
+    
 
 
     exit
