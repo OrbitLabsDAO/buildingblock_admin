@@ -6,9 +6,14 @@ if [ "$ACTION" = "origin" ]; then
     echo "Resetting core files and running integrity check"
     node build_integrity.js
 
+    echo "Moving files to keep them safe"
     # Move entire _source into _site/tmp to preserve structure
     mkdir -p _site/tmp
     mv _source _site/tmp/
+
+    # Move entire _custome into _site/tmp2 to preserve structure
+    mkdir -p _custom/tmp2
+    mv _custom _site/tmp2/
 
     # Ask user for commit message
     read -p "Enter commit message: " COMMITMESSAGE
@@ -23,6 +28,9 @@ if [ "$ACTION" = "origin" ]; then
     mv _site/tmp/_source ./_source
     rmdir _site/tmp 2>/dev/null  # Optional cleanup if empty
 
+    mv _site/tmp2/_custom ./_custom
+    rmdir _site/tmp2 2>/dev/null  # Optional cleanup if empty
+    
     exit
 fi
 
