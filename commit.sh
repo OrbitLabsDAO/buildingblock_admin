@@ -12,7 +12,7 @@ if [ "$ACTION" = "origin" ]; then
     mv _source _site/tmp/
 
     # Move entire _custome into _site/tmp2 to preserve structure
-    mkdir -p _custom/tmp2
+    mkdir -p _site/tmp2
     mv _custom _site/tmp2/
 
     # Ask user for commit message
