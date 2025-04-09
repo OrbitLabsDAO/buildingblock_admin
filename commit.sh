@@ -6,6 +6,7 @@ if [ "$ACTION" = "origin" ]; then
     echo "Resetting core files and running integrity check"
     node build_integrity.js
 
+    #TODO check that the file does not already exist and delete it if it does.
     echo "Moving files to keep them safe"
     # Move entire _source into _site/tmp to preserve structure
     mkdir -p _site/tmp
