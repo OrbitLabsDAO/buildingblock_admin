@@ -15,10 +15,13 @@ layout: layout.njk
 
     <div id="formInputs">
      <form action="/add_{{ tableName }}" method="post">
+     
     {% set disabled = false %} 
     {% set defaultInteger = 0 %}
      {% for field in fields %}
+       
         {% if field.name != "" and field.name != null %}
+         {{field.foreignTable}}dd
             <div class="form-group">
                 <label>{{ field.label }} </label>
                 {% if field.datatype.variant == "integer" %}

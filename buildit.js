@@ -140,26 +140,22 @@ const generateApiFunctions = (tableNames) => {
   });
   console.log("✅ API files Processed!");
 };
-/**
- * Generates the table pages for the given table name and fields.
- * @param {string} tableName - The name of the table to generate pages for.
- * @param {Object[]} fields - The fields of the table to generate pages for.
- * @param {string[]} tableNames - The names of all tables.
- */
+
 const generateTablePages = (tableName, fields, tableNames) => {
   const pageDir = path.join(siteDir, `tables/${tableName}`);
   fs.mkdirSync(pageDir, { recursive: true });
 
-  // Check for NOT NULL constraint and add a validation field
+  // Process each field to extract constraints
   const validatedFields = fields.map((field) => {
-    //console.log(field);
     const isRequired =
       field.definition &&
       field.definition.some(
         (def) => def.type === "constraint" && def.variant === "not null"
       );
+
+    // Return the updated field object with all necessary properties
     return {
-      ...field,
+      ...field, // Preserve all existing properties
       isRequired,
     };
   });
@@ -170,13 +166,11 @@ const generateTablePages = (tableName, fields, tableNames) => {
     const filePath = path.join(pageDir, `${type.toLowerCase()}.html`);
     const inner = nunjucks.renderString(data.content, {
       tableName,
-      fields: validatedFields, // Pass validated fields to the template
+      fields: validatedFields, // Now includes isRequired, foreignTable, foreignId
       tableNames,
       env,
     });
-    if (tableName == "property") console.log(validatedFields);
 
-    // Render the layout if it exists
     const content = data.layout
       ? renderTemplateWithLayout(data.layout, {
           tableName,
@@ -187,7 +181,6 @@ const generateTablePages = (tableName, fields, tableNames) => {
         })
       : inner;
 
-    // Write the rendered page to disk
     fs.writeFileSync(filePath, content);
     console.log(`✅ Created page ${tableName}/${type}.html`);
   });
@@ -346,7 +339,6 @@ if (fs.existsSync(functionsFolder))
 
 // === PARSE TABLES FROM SCHEMA ===
 let tableNames = [];
-
 // === Collect all valid table names (after exclusions) ===
 if (Array.isArray(parsedSchema.statement)) {
   tableNames = parsedSchema.statement
@@ -374,14 +366,35 @@ if (Array.isArray(parsedSchema.statement)) {
     ) {
       const tableName = stmt.name.name;
       const fields = stmt.definition;
-
       // Generate human-readable field labels
+      // Loop through each field
       fields.forEach((field) => {
+        // Check if the field has a name and generate a human-readable label
         if (field.name) {
           field.label = field.name
             .replace(/_/g, " ")
             .replace(/([a-z])([A-Z])/g, "$1 $2")
             .replace(/\b\w/g, (c) => c.toUpperCase());
+        }
+
+        // Check if this field has a foreign key constraint
+        if (
+          field.definition &&
+          field.definition[0] &&
+          field.definition[0].variant === "foreign key"
+        ) {
+          const foreignTable = field.definition[0].references.name; // The table this field references
+          const foreignId = field.definition[0].references.columns[0].name; // The field it references
+          const primaryId = field.columns[0].name; // The primary key field name (the current field)
+          //console.log(tableName, primaryId, foreignTable, foreignId);
+
+          // Now loop through fields again to add foreign table and foreign id to the field that matches the primary field
+          fields.forEach((compareField) => {
+            if (compareField.name === primaryId) {
+              compareField.foreignTable = foreignTable;
+              compareField.foreignId = foreignId;
+            }
+          });
         }
       });
 
@@ -389,7 +402,6 @@ if (Array.isArray(parsedSchema.statement)) {
       const sanitizedFields = fields.filter(
         (f) => !env.EXCLUDEDFIELDS.includes(f.name)
       );
-
       // Generate table pages
       if (!env.EXCLUDETABLES.includes(tableName)) {
         generateTablePages(tableName, sanitizedFields, tableNames);
