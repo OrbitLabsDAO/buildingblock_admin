@@ -26,6 +26,7 @@ if [ "$ACTION" = "init" ]; then
 
     exit   
 fi
+
 if [ "$ACTION" = "integrity" ]; then
     echo "reseting core files and running integrity check"
     node build_integrity.js
@@ -39,7 +40,7 @@ if [ "$ACTION" = "kill" ]; then
  fi
 
 
-echo "$ACTION" 
+
 if [ "$ACTION" = "db" ]; then
     echo "Creating database"
     npx wrangler d1 create adminjamstack

@@ -123,7 +123,7 @@ const generateApiFunctions = (tableNames) => {
     return console.error("❌ apiGenerator.njk not found");
 
   const apiContent = fs.readFileSync(templatePath, "utf-8");
-  const allTables = [...tableNames, "adminuser"];
+  const allTables = [...tableNames, "_user"];
 
   // Loop through all tables
   allTables.forEach((tableName) => {

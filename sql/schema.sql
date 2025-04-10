@@ -2,13 +2,15 @@ DROP TABLE IF EXISTS property;
 DROP TABLE IF EXISTS property_amenities;
 DROP TABLE IF EXISTS property_images;
 DROP TABLE IF EXISTS userAccess;
-DROP TABLE IF EXISTS adminuser;
+DROP TABLE IF EXISTS _user;
 
 /*
 THESE ARE THE CORE TABLES 
 */
 
-CREATE TABLE "adminuser" (
+
+
+CREATE TABLE "_user" (
 	"id"	INTEGER,
 	"name"	TEXT,
 	"email" TEXT,
@@ -21,9 +23,8 @@ CREATE TABLE "adminuser" (
 	"verifyCode" TEXT,
 	"isVerified" INTEGER DEFAULT 0,
 	"isBlocked" INTEGER DEFAULT 0,
-	"isAdmin" INTEGER DEFAULT 0,
 	"resetPassword" INTEGER DEFAULT 0,
-	"adminId" INTEGER,
+	"isAdmin" INTEGER DEFAULT 0,
 	"isDeleted" INTEGER DEFAULT 0,
 	"createdAt" TEXT DEFAULT CURRENT_TIMESTAMP,
 	"updatedAt" TEXT,
@@ -46,16 +47,20 @@ CREATE TABLE "userAccess" (
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 
-INSERT INTO "adminuser" ("name","email","phone","cryptoAddress","username","password","apiSecret","confirmed","isBlocked","isAdmin","isDeleted","adminId")
-VALUES ('cryptoskillz', 'test@orbitlabs.xyz', '123456789', '0x1521a6B56fFF63c9e97b9adA59716efF9D3A60eB', 'cryptoskillz', '$2b$10$xxNOWWE4B7p3QkLMRoMBhOGA7VGOMndeZBgmY7gLkuNoQKPu8.u16', 'a7fd098f-79cf-4c37-a527-2c9079a6e6a1', 1, 0, 1, 0, 0);INSERT INTO "userAccess" ("userId","foreignId") VALUES (1,1);
+INSERT INTO "_user" ("name","email","phone","cryptoAddress","username","password","apiSecret","confirmed","isBlocked","isAdmin","isDeleted")
+VALUES ('cryptoskillz', 'test@orbitlabs.xyz', '123456789', '0x1521a6B56fFF63c9e97b9adA59716efF9D3A60eB', 'cryptoskillz', '$2b$10$xxNOWWE4B7p3QkLMRoMBhOGA7VGOMndeZBgmY7gLkuNoQKPu8.u16', 'a7fd098f-79cf-4c37-a527-2c9079a6e6a1', 1, 0, 1, 0);
+INSERT INTO "userAccess" ("userId","foreignId") VALUES (1,1);
 
 
 /*
 PUT YOUR CUSTOM TABLES HERE
 */
 
+
+
 CREATE TABLE "property" (
 	"id"	INTEGER,
+	"adminId"	INTEGER,
 	"name"	VARCHAR(255) NOT NULL,
 	"paymentAddress" TEXT,
 	"address_1"	TEXT,
@@ -82,7 +87,6 @@ CREATE TABLE "property" (
 	"internationalCost" REAL,
 	"localCost" REAL,
 	"currentlyRented" INTEGER,
-	"adminId" INTEGER DEFAULT 1,
 	"state" INTEGER DEFAULT 0,
 	"tranchePrice" REAL NOT NULL,
 	"tranches" INTEGER DEFAULT 0,
@@ -93,6 +97,7 @@ CREATE TABLE "property" (
 	"publishedAt" TEXT DEFAULT CURRENT_TIMESTAMP,
 	"deletedAt" TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
+	CONSTRAINT "fk_adminId" FOREIGN KEY ("adminId") REFERENCES "_user"("id")
 );
 
 
