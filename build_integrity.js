@@ -22,7 +22,7 @@ const excludeItems = [
   "_corenjks/js/tableView.js",
   "functions/api",
   "functions/api/tables",
-  "functions/api/tables/adminuser.js",
+  "functions/api/tables/_user.js",
   "functions/api/account-settings.js",
   "functions/api/account.js",
   "_corenjks/htmlinputs",
