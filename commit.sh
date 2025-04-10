@@ -1,8 +1,6 @@
 ACTION="${1:-github}" # Default to "build" if no parameter is passed
-BRANCH="${2:-main}"
+BRANCH="${2}"
 
-ACTION="${1:-github}" # Default to "build" if no parameter is passed
-BRANCH="${2:}"
 
 if [ "$ACTION" = "origin" ]; then
 
