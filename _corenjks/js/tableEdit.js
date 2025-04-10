@@ -27,11 +27,11 @@ document
 
       // Get the field element
       const field = document.getElementById("inp-" + cleanedKey);
-
-      // Basic validation for non-empty fields
-      if (value.trim() === "") {
+      //TODO move the field checking to app.js so it is reusable
+      // Check if the field is required (based on 'required' attribute)
+      if (field && field.hasAttribute("required") && value.trim() === "") {
         isValid = false;
-        showFieldError(cleanedKey, "This field cannot be blank.");
+        showFieldError(cleanedKey, "This field is required.");
       } else {
         hideFieldError(cleanedKey);
       }
