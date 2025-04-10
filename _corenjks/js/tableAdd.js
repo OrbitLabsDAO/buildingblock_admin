@@ -21,21 +21,22 @@ document
       // Get the field element
       const field = document.getElementById("inp-" + cleanedKey);
 
-      // Basic validation for non-empty fields
-      if (value.trim() === "") {
+      // Check if the field is required (based on 'required' attribute)
+      if (field && field.hasAttribute("required") && value.trim() === "") {
         isValid = false;
-        showFieldError(cleanedKey, "This field cannot be blank.");
+        showFieldError(cleanedKey, "This field is required.");
       } else {
         hideFieldError(cleanedKey);
       }
 
       // Email validation (if the field name contains "email")
-      //console.log
       if (cleanedKey.toLowerCase().includes("email")) {
         if (validateEmail(value) == false) {
           isValid = false;
           showFieldError(cleanedKey, "Please enter a valid email address.");
-        } else hideFieldError(cleanedKey);
+        } else {
+          hideFieldError(cleanedKey);
+        }
       }
 
       // Basic integer validation

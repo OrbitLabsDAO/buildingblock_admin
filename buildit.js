@@ -140,7 +140,6 @@ const generateApiFunctions = (tableNames) => {
   });
   console.log("✅ API files Processed!");
 };
-
 /**
  * Generates the table pages for the given table name and fields.
  * @param {string} tableName - The name of the table to generate pages for.
@@ -151,22 +150,37 @@ const generateTablePages = (tableName, fields, tableNames) => {
   const pageDir = path.join(siteDir, `tables/${tableName}`);
   fs.mkdirSync(pageDir, { recursive: true });
 
+  // Check for NOT NULL constraint and add a validation field
+  const validatedFields = fields.map((field) => {
+    //console.log(field);
+    const isRequired =
+      field.definition &&
+      field.definition.some(
+        (def) => def.type === "constraint" && def.variant === "not null"
+      );
+    return {
+      ...field,
+      isRequired,
+    };
+  });
+
   // Generate the table pages
   ["Index", "View", "Add", "Edit"].forEach((type) => {
     const data = processFile(`table${type}.njk`, "_corenjks") || {};
     const filePath = path.join(pageDir, `${type.toLowerCase()}.html`);
     const inner = nunjucks.renderString(data.content, {
       tableName,
-      fields,
+      fields: validatedFields, // Pass validated fields to the template
       tableNames,
       env,
     });
+    if (tableName == "property") console.log(validatedFields);
 
     // Render the layout if it exists
     const content = data.layout
       ? renderTemplateWithLayout(data.layout, {
           tableName,
-          fields,
+          fields: validatedFields,
           content: inner,
           tableNames,
           env,

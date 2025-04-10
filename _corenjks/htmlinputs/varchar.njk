@@ -1,4 +1,7 @@
 <input type="text" data-type="varchar" class="form-control form-control-user" 
        name="inp-{{ field.name }}" id="inp-{{ field.name }}" 
-       aria-describedby="{{ field.name }}" value="" {% if disabled %}disabled{% endif %}>
+       aria-describedby="{{ field.name }}" value="" {% if disabled %}disabled{% endif %}
+       {% if field.isRequired %}required{% endif %}
+       >
 <span class="text-danger d-none" id="error-{{field.name}}"></span>  
+{{field.isRequired}}
