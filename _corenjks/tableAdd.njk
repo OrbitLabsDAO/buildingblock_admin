@@ -21,7 +21,6 @@ layout: layout.njk
      {% for field in fields %}
        
         {% if field.name != "" and field.name != null %}
-         {{field.foreignTable}}dd
             <div class="form-group">
                 <label>{{ field.label }} </label>
                 {% if field.datatype.variant == "integer" %}

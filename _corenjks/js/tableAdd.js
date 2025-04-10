@@ -89,6 +89,50 @@ let whenDocumentReady = (f) => {
 
 whenDocumentReady(
   (isReady = () => {
+    //check the fields for data_foreigntable
+    const looksUps = Array.from(
+      document.querySelectorAll("[data-foreigntable], [data-foreignid]")
+    )
+      .map((field) => {
+        const foreignTable = field.getAttribute("data-foreigntable") || "";
+        const foreignId = field.getAttribute("data-foreignid") || "";
+        const fieldName = field.name || "";
+        return { foreignTable, foreignId, fieldName };
+      })
+      .filter(
+        ({ foreignTable, foreignId, fieldName }) =>
+          foreignTable && foreignId && fieldName
+      ); // Only include fields with both attributes
+
+    if (looksUps.length > 0) {
+      // Convert the looksUps array to a JSON string
+
+      //debug for testing more than one dropdown
+      looksUps.push({
+        foreignTable: "property",
+        foreignId: "id",
+        fieldName: "inp-name",
+      });
+      const bodyobjectjson = JSON.stringify(looksUps);
+      //console.log(bodyobjectjson);
+      xhrcall(
+        0,
+        apiUrl + "lookups",
+        bodyobjectjson,
+        "json",
+        "",
+        checkForeignDone
+      );
+    }
+
+    function checkForeignDone(response) {
+      response = JSON.parse(response);
+      //console.log(response);
+      response.data.forEach((data) => {
+        console.log(data);
+        document.getElementById(data.fieldName).value = data.name;
+      });
+    }
     // Show the table
     document.getElementById("showBody").classList.remove("d-none");
   })
