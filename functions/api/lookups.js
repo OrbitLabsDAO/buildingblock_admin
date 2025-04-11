@@ -23,17 +23,28 @@ export async function onRequestPost(context) {
   for (const lookUp of body) {
     //we are going to assume a look up always have a name field, could be bad
     const query = `SELECT ${lookUp.foreignId},name FROM ${lookUp.foreignTable}`;
-    //console.log(query);
     const data = context.env.DB.prepare(query);
     const tmp = await data.all();
     tmp.results.forEach((result) => {
-      console.log(lookUp.fieldName);
       result.fieldName = lookUp.fieldName;
     });
     dataResults.push(tmp.results);
   }
-  const flatResults = dataResults.flat();
-  return new Response(JSON.stringify({ data: flatResults }), {
+
+  const groupedResults = {};
+
+  dataResults.flat().forEach((item) => {
+    if (!groupedResults[item.fieldName]) {
+      groupedResults[item.fieldName] = [];
+    }
+    groupedResults[item.fieldName].push({
+      id: item.id,
+      name: item.name,
+    });
+  });
+  //console.log(groupedResults);
+
+  return new Response(JSON.stringify({ data: groupedResults }), {
     status: 200,
     headers: {
       "Access-Control-Allow-Origin": "*",

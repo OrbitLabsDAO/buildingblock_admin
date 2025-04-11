@@ -1,106 +1,127 @@
+//TODO change the label of selects so it renders the new name (admin not adminId)
+//TODO render the view so it shows the lookups
 const url = new URL(window.location.href);
 let parts = url.pathname.split("/").filter(Boolean);
 let tableName = parts.length > 1 ? parts[parts.length - 2] : null;
 let id = url.searchParams.get("id");
+let editData = "";
+let foreignData = "";
 
-let whenDocumentReady = (f) => {
-  /in/.test(document.readyState)
-    ? setTimeout("whenDocumentReady(" + f + ")", 9)
-    : f();
-};
+function getData(callback) {
+  let getTableDone = (response) => {
+    response = JSON.parse(response);
+    if (response.data.length > 0) {
+      editData = response.data[0];
+    }
+    if (typeof callback === "function") callback();
+  };
 
-document
-  .getElementById("btn-update")
-  .addEventListener("click", function (event) {
-    event.preventDefault(); // Prevent form submission
+  let theUrl = apiUrl + `tables/${tableName}`;
+  if (id != null) theUrl += `?id=${id}`;
+  xhrcall(1, theUrl, "", "json", "", getTableDone);
+}
 
-    const formData = new FormData(document.querySelector("form"));
+function checkForeign(callback) {
+  const looksUps = Array.from(
+    document.querySelectorAll("[data-foreigntable], [data-foreignid]")
+  )
+    .map((field) => {
+      const foreignTable = field.getAttribute("data-foreigntable") || "";
+      const foreignId = field.getAttribute("data-foreignid") || "";
+      const fieldName = field.name || "";
+      return { foreignTable, foreignId, fieldName };
+    })
+    .filter(
+      ({ foreignTable, foreignId, fieldName }) =>
+        foreignTable && foreignId && fieldName
+    );
 
-    // Create a plain object from FormData and remove the 'inp-' prefix
-    const formDataObject = {};
-    let isValid = true;
-
-    formData.forEach((value, key) => {
-      // Remove 'inp-' from the field name
-      const cleanedKey = key.replace(/^inp-/, "");
-      formDataObject[cleanedKey] = value.trim();
-
-      // Get the field element
-      const field = document.getElementById("inp-" + cleanedKey);
-      //TODO move the field checking to app.js so it is reusable
-      // Check if the field is required (based on 'required' attribute)
-      if (field && field.hasAttribute("required") && value.trim() === "") {
-        isValid = false;
-        showFieldError(cleanedKey, "This field is required.");
-      } else {
-        hideFieldError(cleanedKey);
-      }
-
-      // Email validation (if the field name contains "email")
-      //console.log
-      if (cleanedKey.toLowerCase().includes("email")) {
-        if (validateEmail(value) == false) {
-          isValid = false;
-          showFieldError(cleanedKey, "Please enter a valid email address.");
-        } else hideFieldError(cleanedKey);
-      }
-
-      // Basic integer validation (if it's a number field)
-      if (field && field.type === "number") {
-        if (isNaN(value) || value.trim() === "") {
-          isValid = false;
-          showFieldError(cleanedKey, "Please enter a valid integer.");
-        } else {
-          hideFieldError(cleanedKey);
-        }
-      }
-    });
-
-    // Proceed if all validations pass
-    if (isValid) {
-      let getEditDone = (response) => {
+  if (looksUps.length > 0) {
+    const bodyobjectjson = JSON.stringify(looksUps);
+    xhrcall(
+      0,
+      apiUrl + "lookups",
+      bodyobjectjson,
+      "json",
+      "",
+      function checkForeignDone(response) {
         response = JSON.parse(response);
-        console.log(response);
-        if (response.status == "ok") {
-          showAlert("Record Updated", 1);
-        } else {
-          showAlert("Error updating record, please try again", 2);
+        foreignData = response.data;
+
+        Object.keys(foreignData).forEach((fieldName) => {
+          const selectEl = document.getElementById(fieldName);
+          if (!selectEl) return;
+
+          selectEl.innerHTML = "";
+          const defaultOption = document.createElement("option");
+          defaultOption.value = "";
+          defaultOption.textContent = "Please Select";
+          selectEl.appendChild(defaultOption);
+
+          foreignData[fieldName].forEach((item) => {
+            const option = document.createElement("option");
+            option.value = item.id;
+            option.textContent = item.name;
+            selectEl.appendChild(option);
+          });
+        });
+
+        if (typeof callback === "function") callback();
+      }
+    );
+  } else {
+    if (typeof callback === "function") callback(); // still run if no lookups
+  }
+}
+function applyFormValues() {
+  if (!editData || !foreignData) return;
+
+  document.querySelectorAll("input, select, textarea").forEach((field) => {
+    const rawName = field.name; // e.g. inp-adminId
+    const baseName = rawName.replace(/^inp-/, ""); // adminId
+    const relatedKey = baseName.endsWith("Id")
+      ? baseName.slice(0, -2) // remove trailing 'Id' => 'admin'
+      : baseName;
+
+    // Apply normal values from editData
+    if (editData.hasOwnProperty(baseName)) {
+      field.value = editData[baseName];
+    }
+
+    // Handle select inputs with foreign data
+    if (field.tagName === "SELECT") {
+      const targetValue = editData[relatedKey];
+      const optionsList = foreignData[rawName]; // still using full raw field name here (e.g., inp-adminId)
+
+      if (Array.isArray(optionsList)) {
+        const matchedOptionIndex = Array.from(field.options).findIndex(
+          (option) =>
+            optionsList.find((item) => item.name == targetValue)?.id ==
+            option.value
+        );
+        if (matchedOptionIndex !== -1) {
+          field.selectedIndex = matchedOptionIndex;
         }
-      };
-
-      // Add the ID for the update request
-      formDataObject.id = id;
-
-      // Convert the object to JSON
-      const requestBody = JSON.stringify(formDataObject);
-
-      // Call the table endpoint
-      let theUrl = apiUrl + `tables/${tableName}`;
-      xhrcall(4, theUrl, requestBody, "json", "", getEditDone);
+      }
     }
   });
 
-whenDocumentReady(
-  (isReady = () => {
-    let getTableDone = (response) => {
-      response = JSON.parse(response);
+  document.getElementById("showBody").classList.remove("d-none");
+}
 
-      if (response.data.length > 0) {
-        const data = response.data[0];
-        // Loop through the returned data and populate the form fields
-        Object.keys(data).forEach((key) => {
-          let field = document.getElementById("inp-" + key);
-          if (field) {
-            field.value = data[key]; // Set the value of the field
-          }
-        });
-      }
+function whenDocumentReady(f) {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", f);
+  } else {
+    f();
+  }
+}
 
-      document.getElementById("showBody").classList.remove("d-none");
-    };
-    // Show the table
-    let theUrl = apiUrl + `tables/${tableName}`;
-    if (id != null) theUrl += `?id=${id}`;
-    xhrcall(1, theUrl, "", "json", "", getTableDone);
-  })
-);
+// Make sure the page is ready before starting the data retrieval and form population
+whenDocumentReady(() => {
+  getData(() => {
+    checkForeign(() => {
+      applyFormValues();
+    });
+  });
+});

@@ -2,6 +2,75 @@ const url = new URL(window.location.href);
 let parts = url.pathname.split("/").filter(Boolean);
 let tableName = parts.length > 1 ? parts[parts.length - 2] : null;
 
+function checkForeign() {
+  const looksUps = Array.from(
+    document.querySelectorAll("[data-foreigntable], [data-foreignid]")
+  )
+    .map((field) => {
+      const foreignTable = field.getAttribute("data-foreigntable") || "";
+      const foreignId = field.getAttribute("data-foreignid") || "";
+      const fieldName = field.name || "";
+      return { foreignTable, foreignId, fieldName };
+    })
+    .filter(
+      ({ foreignTable, foreignId, fieldName }) =>
+        foreignTable && foreignId && fieldName
+    ); // Only include fields with both attributes
+
+  if (looksUps.length > 0) {
+    // Convert the looksUps array to a JSON string
+
+    //debug for testing more than one dropdown
+    //looksUps.push({
+    //  foreignTable: "property",
+    //  foreignId: "id",
+    //  fieldName: "inp-name",
+    // });
+    const bodyobjectjson = JSON.stringify(looksUps);
+    //console.log(bodyobjectjson);
+    xhrcall(
+      0,
+      apiUrl + "lookups",
+      bodyobjectjson,
+      "json",
+      "",
+      checkForeignDone
+    );
+  }
+
+  function checkForeignDone(response) {
+    response = JSON.parse(response);
+    const data = response.data;
+    console.log(data);
+    Object.keys(data).forEach((fieldName) => {
+      const selectEl = document.getElementById(fieldName);
+      if (!selectEl) return;
+
+      const firstOption = document.createElement("option");
+      firstOption.value = "";
+      firstOption.textContent = "Please Select";
+      selectEl.innerHTML = "";
+      selectEl.appendChild(firstOption);
+
+      data[fieldName].forEach((item) => {
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.textContent = item.name;
+        selectEl.appendChild(option);
+      });
+
+      // Restore selected value if we have editData
+      const cleanName = fieldName.replace(/^inp-/, "");
+
+      if (editData && editData[cleanName] !== undefined) {
+        selectEl.value = editData[cleanName];
+      } else {
+        selectEl.selectedIndex = 0;
+      }
+    });
+  }
+}
+
 document
   .getElementById("btn-create")
   .addEventListener("click", function (event) {
@@ -20,51 +89,7 @@ document
 
       // Get the field element
       const field = document.getElementById("inp-" + cleanedKey);
-
-      // Check if the field is required (based on 'required' attribute)
-      if (field) {
-        if (
-          (field.tagName === "SELECT" &&
-            (field.selectedIndex === 0 || value === "")) ||
-          (field.tagName !== "SELECT" && value.trim() === "")
-        ) {
-          isValid = false;
-          showFieldError(cleanedKey, "This field is required.");
-        } else {
-          hideFieldError(cleanedKey);
-        }
-      }
-
-      // Email validation (if the field name contains "email")
-      if (cleanedKey.toLowerCase().includes("email")) {
-        if (validateEmail(value) == false) {
-          isValid = false;
-          showFieldError(cleanedKey, "Please enter a valid email address.");
-        } else {
-          hideFieldError(cleanedKey);
-        }
-      }
-
-      // Basic integer validation
-      if (field && field.type === "number") {
-        if (isNaN(value) || value.trim() === "") {
-          isValid = false;
-          showFieldError(cleanedKey, "Please enter a valid integer.");
-        } else {
-          hideFieldError(cleanedKey);
-        }
-      }
-
-      // Email validation (if the field name contains "email")
-      if (cleanedKey.toLowerCase().includes("email")) {
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email regex
-        if (!emailPattern.test(value)) {
-          isValid = false;
-          showFieldError(cleanedKey, "Please enter a valid email address.");
-        } else {
-          hideFieldError(cleanedKey);
-        }
-      }
+      isValid = checkField(field, cleanedKey, value);
     });
 
     // Proceed if all validations pass
@@ -96,59 +121,7 @@ let whenDocumentReady = (f) => {
 whenDocumentReady(
   (isReady = () => {
     //check the fields for data_foreigntable
-    const looksUps = Array.from(
-      document.querySelectorAll("[data-foreigntable], [data-foreignid]")
-    )
-      .map((field) => {
-        const foreignTable = field.getAttribute("data-foreigntable") || "";
-        const foreignId = field.getAttribute("data-foreignid") || "";
-        const fieldName = field.name || "";
-        return { foreignTable, foreignId, fieldName };
-      })
-      .filter(
-        ({ foreignTable, foreignId, fieldName }) =>
-          foreignTable && foreignId && fieldName
-      ); // Only include fields with both attributes
-
-    if (looksUps.length > 0) {
-      // Convert the looksUps array to a JSON string
-
-      //debug for testing more than one dropdown
-      //looksUps.push({
-      //  foreignTable: "property",
-      //  foreignId: "id",
-      //  fieldName: "inp-name",
-      // });
-      const bodyobjectjson = JSON.stringify(looksUps);
-      //console.log(bodyobjectjson);
-      xhrcall(
-        0,
-        apiUrl + "lookups",
-        bodyobjectjson,
-        "json",
-        "",
-        checkForeignDone
-      );
-    }
-
-    function checkForeignDone(response) {
-      response = JSON.parse(response);
-      //TODO restructure the object so it all the data for the field name to make it easier to render
-      //TODO on the edit view make it set the default value when the select is populated.
-      //TODO update the error
-      //console.log(response.data);
-      response.data.forEach((data) => {
-        const selectEl = document.getElementById(data.fieldName);
-        const option = document.createElement("option");
-        option.value = data.id;
-        option.textContent = data.name;
-        // Append the option to the select element
-        selectEl.appendChild(option);
-        // Set it as selected (if needed)
-        selectEl.value = data.id;
-        document.getElementById(data.fieldName).selectedIndex = 0;
-      });
-    }
+    checkForeign();
     // Show the table
     document.getElementById("showBody").classList.remove("d-none");
   })
