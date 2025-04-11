@@ -13,7 +13,7 @@ const excludeItems = [
   "_corenjks/htmlinputs/real.njk",
   "_corenjks/htmlinputs/text.njk",
   "_corenjks/htmlinputs/varchar.njk",
-  "corenjks/htmlinputs/select.njk",
+  "_corenjks/htmlinputs/select.njk",
   "_corenjks/js/account-dashboard.js",
   "_corenjks/js/account-settings.js",
   "_corenjks/js/account.js",
