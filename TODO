@@ -11,11 +11,9 @@ TODO validate email
 SCHMEA
 TODO HANDLE MIGRATION
 
-TODO INPUT FIELDS
+INPUT FIELDS
 TODO image uploader input
 TODO password input
-
-API
 
 FUTURE
 MAY NOT DO THESE INCLUDES, COULD BE OVERKILL MORE THOUGHT IS REQUIRED.
@@ -45,14 +43,6 @@ way to do this. Maybe you just replace the whole thing and dont have includes at
 login test isDeleted
 login test isBlocked
 login test isAdmin
-add nice edit inputs for edit pages
 clean up account.js break it down to sepeate account file for each page
 on adminuser create generate an apisecret key on insert  
 add a build to prod function
-
-INPUTS
-think about look ups?
-how we do required fields
-
-how do we handle joins etc maybe look at how orms do it (the backwards way is neat)
-copy across the custom assets folder (custom js etc) do we want to do this, if so how does the person dev how is this easy to do.

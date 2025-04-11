@@ -23,7 +23,6 @@ if [ "$ACTION" = "origin" ]; then
     read -p "Enter commit message: " COMMITMESSAGE
 
 
-    # TODO: check that the file does not already exist and delete it if it does.
     echo "Moving files to keep them safe"
     mkdir -p _site/tmp
     mv _source _site/tmp/
