@@ -1,5 +1,3 @@
-//TODO change the label of selects so it renders the new name (admin not adminId)
-//TODO render the view so it shows the lookups
 const url = new URL(window.location.href);
 let parts = url.pathname.split("/").filter(Boolean);
 let tableName = parts.length > 1 ? parts[parts.length - 2] : null;

@@ -20,6 +20,14 @@ whenDocumentReady(
           let field = document.getElementById("inp-" + key);
           if (field) {
             field.value = data[key]; // Set the value of the field
+          } else {
+            //we didnt find it so lets look again with id
+            let field2 = document.getElementById("inp-" + key + "Id");
+            if (field2) {
+              console.log("dd");
+              field2.type == "text";
+              field2.value = data[key];
+            }
           }
         });
       }

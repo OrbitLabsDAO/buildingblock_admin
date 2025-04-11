@@ -18,6 +18,11 @@ if [ "$ACTION" = "origin" ]; then
         echo "⚠️  No branch provided — skipping checkout."
     fi
 
+
+
+    read -p "Enter commit message: " COMMITMESSAGE
+
+
     # TODO: check that the file does not already exist and delete it if it does.
     echo "Moving files to keep them safe"
     mkdir -p _site/tmp
@@ -28,7 +33,7 @@ if [ "$ACTION" = "origin" ]; then
     mkdir -p _site/tmp2
     mv _custom _site/tmp2/
 
-    read -p "Enter commit message: " COMMITMESSAGE
+
     git add .
     git commit -m "$COMMITMESSAGE"
 

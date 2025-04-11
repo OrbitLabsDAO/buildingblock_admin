@@ -1,4 +1,4 @@
-<!-- this is a select so we can assume it is a foreing look up and we have some rules for these, to make it look neater we remove the  trailing id -->
+<!-- this is a select so we can assume it is a foreign look up and we have some rules for these, to make it look neater we remove the  trailing id -->
 {% set labelLength = field.label | length %}
 {% set lastThree = field.label[labelLength - 3] ~ field.label[labelLength - 2] ~ field.label[labelLength - 1] %}
 {% if lastThree == ' Id' %}

@@ -14,11 +14,9 @@ layout: layout.njk
 </p>
 
     <div id="formInputs">
-     <form action="/add_{{ tableName }}" method="post">
+    <form action="/add_{{ tableName }}" method="post">
     {% set disabled = false %} 
-   
      {% for field in fields %}
-        
         {% if field.name != "" and field.name != null %}
             <div class="form-group">
                
@@ -40,7 +38,6 @@ layout: layout.njk
             </div>
         {% endif %}
     {% endfor %}
-
     </form>
     </div>
      <input type="hidden" id="formTableName" name="formTableName" value="">
