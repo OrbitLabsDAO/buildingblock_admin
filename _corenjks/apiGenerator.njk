@@ -70,34 +70,66 @@ async function handleGet(request, env, params, tableName) {
   const url = new URL(request.url);
   const id = url.searchParams.get("id");
 
-  const schemaQuery = env.DB.prepare(`PRAGMA table_info(${tableName})`);
-  const schema = await schemaQuery.all();
+  const schema = await env.DB.prepare(`PRAGMA table_info(${tableName})`).all();
+  const fks = await env.DB.prepare(`PRAGMA foreign_key_list(${tableName})`).all();
+
   const hasIsDeleted = schema.results.some((col) => col.name === "isDeleted");
 
-  let queryStr = "";
-  if (!isInvalid(id)) {
-    queryStr = `SELECT * FROM ${tableName} WHERE "id" = ${id}`;
-    if (hasIsDeleted) queryStr += ` AND isDeleted = 0`;
-  } else {
-    queryStr = `SELECT * FROM ${tableName}`;
-    if (hasIsDeleted) queryStr += ` WHERE isDeleted = 0`;
+  const selectFields = [];
+  const joins = [];
+  const renamedColumns = {}; // keep track of fk replacements
+
+  for (const col of schema.results) {
+    const fk = fks.results.find((fk) => fk.from === col.name);
+    if (fk) {
+      const readableCol = col.name.replace(/Id$/, ''); // remove 'Id' suffix
+      const alias = readableCol; // e.g. adminId => admin
+      selectFields.push(`${fk.table}.name AS ${alias}`);
+      joins.push(
+        `LEFT JOIN ${fk.table} ON ${tableName}.${col.name} = ${fk.table}.${fk.to}`
+      );
+      renamedColumns[col.name] = alias;
+    } else {
+      selectFields.push(`${tableName}."${col.name}"`);
+    }
   }
 
-  const result = await env.DB.prepare(queryStr).bind().run();
+  let queryStr = `SELECT ${selectFields.join(", ")} FROM ${tableName}`;
+  if (joins.length) queryStr += " " + joins.join(" ");
+
+  if (!isInvalid(id)) {
+    queryStr += ` WHERE ${tableName}."id" = ${id}`;
+    if (hasIsDeleted) queryStr += ` AND ${tableName}.isDeleted = 0`;
+  } else {
+    if (hasIsDeleted) queryStr += ` WHERE ${tableName}.isDeleted = 0`;
+  }
+
+  const result = await env.DB.prepare(queryStr).bind().all();
 
   const excludedFields = ["isDeleted", "createdAt", "updatedAt", "publishedAt", "deletedAt"];
   const resultArray = Array.isArray(result.results) ? result.results : [result];
 
-  const filteredResults = resultArray.map((item) =>
-    Object.fromEntries(Object.entries(item).filter(([key]) => !excludedFields.includes(key)))
-  );
-
+  const filteredResults = resultArray.map((item) => {
+    const cleaned = {};
+    for (const [key, value] of Object.entries(item)) {
+      if (excludedFields.includes(key)) continue;
+      if (Object.values(renamedColumns).includes(key)) {
+        cleaned[key] = value; // e.g. "admin": "cryptoskillz"
+      } else if (!Object.keys(renamedColumns).includes(key)) {
+        cleaned[key] = value; // keep only if it's not the original FK field
+      }
+    }
+    return cleaned;
+  });
 
   return new Response(JSON.stringify({ data: filteredResults }), {
-  status: 200,
-  headers: headers,
-});
+    status: 200,
+    headers: headers,
+  });
 }
+
+
+
 
 async function handlePost(request, env, params, tableName) {
   try {

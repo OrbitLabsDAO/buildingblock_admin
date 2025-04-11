@@ -1,6 +1,5 @@
 TODO add image upload
 TODO make the external calls (GETS) use the apikey we should define an api key to control scopes in the future
-add a function to override cannot be blank for certain tables / fields
 
 SIGN UP
 
