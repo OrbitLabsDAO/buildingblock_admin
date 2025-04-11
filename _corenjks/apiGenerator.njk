@@ -105,10 +105,10 @@ async function handleGet(request, env, params, tableName) {
   }
 
   const result = await env.DB.prepare(queryStr).bind().all();
-
-  const excludedFields = ["isDeleted", "createdAt", "updatedAt", "publishedAt", "deletedAt"];
+  //get the excluded fields
+  const excludedFields = {{ env.EXCLUDEDFIELDS | dump | safe }};
   const resultArray = Array.isArray(result.results) ? result.results : [result];
-
+  console.log(excludedFields)
   const filteredResults = resultArray.map((item) => {
     const cleaned = {};
     for (const [key, value] of Object.entries(item)) {

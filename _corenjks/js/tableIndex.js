@@ -10,7 +10,7 @@ let whenDocumentReady = (f) => {
 
 let deleteItemDone = (response) => {
   response = JSON.parse(response);
-  console.log(response.id);
+  //we have to remove the exculded fields
   if (response.id > 0) {
     const itemId = response.status; // or get it from the event if needed
     // Initialize DataTable
