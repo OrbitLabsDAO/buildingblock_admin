@@ -1,10 +1,13 @@
-<label>
-  {{
-    field.label.endsWith('Id') 
-      ? field.label.slice(0, -2) 
-      : field.label
-  }}
-</label><select
+<!-- this is a select so we can assume it is a foreing look up and we have some rules for these, to make it look neater we remove the  trailing id -->
+{% set labelLength = field.label | length %}
+{% set lastThree = field.label[labelLength - 3] ~ field.label[labelLength - 2] ~ field.label[labelLength - 1] %}
+{% if lastThree == ' Id' %}
+  {% set cleanLabel = field.label | truncate(labelLength - 3, true, '') %}
+{% else %}
+  {% set cleanLabel = field.label %}
+{% endif %}
+<label>{{ cleanLabel }}</label>
+<select
 class="form-control form-control-user" 
  name="inp-{{ field.name }}" id="inp-{{ field.name }}"
  data-foreigntable="{{ field.foreignTable }}"

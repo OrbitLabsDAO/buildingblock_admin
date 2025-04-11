@@ -22,7 +22,6 @@ layout: layout.njk
        
         {% if field.name != "" and field.name != null %}
             <div class="form-group">
-                
                 {% if field.foreignTable %}
                     {% include "htmlinputs/select.njk"  %}
                 {% else %}
