@@ -101,6 +101,52 @@ CREATE TABLE "property" (
 );
 
 
+INSERT INTO "property" (
+  "name",
+  "paymentAddress",
+  "address_1",
+  "bathrooms",
+  "bedrooms",
+  "localCurrency",
+  "internationalCurrency",
+  "localCost",
+  "internationalCost",
+  "LocalTaxesCost",
+  "internationalTaxesCost",
+  "adminId",
+  "localSuggestedRentalPrice",
+  "internationalSuggestedRentalPrice",
+  "currentlyRented",
+  "description",
+  "area",
+  "location",
+  "tranchePrice",
+  "tranches"
+) 
+VALUES (
+  'DCONDO',
+  '0x960f470cE20Bfb519facA30b770474BBCdF78ef8',
+  'Fa Ham, Thailand',
+  1,
+  2,
+  '฿',
+  '$',
+  1800000,
+  52087,
+  40000,
+  1157,
+  1,
+  8000,
+  231,
+  1,
+  'Situated on the first floor is this well laid out 30 square metre studio apartment at Dcondo Sign, Chiang Mai. Rent: 9,000 THB/Month.<br>Property description:30 square metres of living space set on the first floor<br>Studio apartment with sliding doors to separate living space from sleeping if desired<br>Separate kitchen with fridge and microwave<br>Modern bathroom with screened walk-in shower<br>Fully furnished and equipped<br>Air-con (1 unit)<br>Dcondo Sign residents have the full use of the amazing swimming pool, fitness room, gardens, etc., and only a few minutes walk to Central Festival Shopping Mall.',
+  33040,
+  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3776.764847935789!2d99.01166282449663!3d18.8086301464348!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30da3a61db5fb68b%3A0xbd73456383721335!2sdcondo%20sign!5e0!3m2!1sen!2sth!4v1673361006602!5m2!1sen!2sth',
+  1000,
+  10
+);
+
+
 
 
 CREATE TABLE "property_amenities" (

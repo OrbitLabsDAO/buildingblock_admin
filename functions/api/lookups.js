@@ -33,7 +33,6 @@ export async function onRequestPost(context) {
     dataResults.push(tmp.results);
   }
   const flatResults = dataResults.flat();
-  //console.log(propertyResult)
   return new Response(JSON.stringify({ data: flatResults }), {
     status: 200,
     headers: {

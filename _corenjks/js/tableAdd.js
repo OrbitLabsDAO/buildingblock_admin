@@ -108,11 +108,11 @@ whenDocumentReady(
       // Convert the looksUps array to a JSON string
 
       //debug for testing more than one dropdown
-      looksUps.push({
-        foreignTable: "property",
-        foreignId: "id",
-        fieldName: "inp-name",
-      });
+      //looksUps.push({
+      //  foreignTable: "property",
+      //  foreignId: "id",
+      //  fieldName: "inp-name",
+      // });
       const bodyobjectjson = JSON.stringify(looksUps);
       //console.log(bodyobjectjson);
       xhrcall(
@@ -127,10 +127,19 @@ whenDocumentReady(
 
     function checkForeignDone(response) {
       response = JSON.parse(response);
-      //console.log(response);
+      //TODO restructure the object so it all the data for the field name to make it easier to render
+      //TODO on the edit view make it set the default value when the select is populated.
+      //console.log(response.data);
       response.data.forEach((data) => {
-        console.log(data);
-        document.getElementById(data.fieldName).value = data.name;
+        const selectEl = document.getElementById(data.fieldName);
+        const option = document.createElement("option");
+        option.value = data.id;
+        option.textContent = data.name;
+        // Append the option to the select element
+        selectEl.appendChild(option);
+        // Set it as selected (if needed)
+        selectEl.value = data.id;
+        document.getElementById(data.fieldName).selectedIndex = 0;
       });
     }
     // Show the table

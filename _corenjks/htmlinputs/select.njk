@@ -1,0 +1,10 @@
+<select
+class="form-control form-control-user" 
+ name="inp-{{ field.name }}" id="inp-{{ field.name }}"
+ data-foreigntable="{{ field.foreignTable }}"
+ data-foreignId="{{ field.foreignId }}"
+ {% if disabled %}disabled{% endif %}
+ {% if field.isRequired %}required{% endif %}      >
+  <option value="" selected="">Please Select</option>
+</select>
+<span class="text-danger d-none" id="error-{{field.name}}"></span>  
