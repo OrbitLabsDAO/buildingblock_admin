@@ -22,11 +22,17 @@ document
       const field = document.getElementById("inp-" + cleanedKey);
 
       // Check if the field is required (based on 'required' attribute)
-      if (field && field.hasAttribute("required") && value.trim() === "") {
-        isValid = false;
-        showFieldError(cleanedKey, "This field is required.");
-      } else {
-        hideFieldError(cleanedKey);
+      if (field) {
+        if (
+          (field.tagName === "SELECT" &&
+            (field.selectedIndex === 0 || value === "")) ||
+          (field.tagName !== "SELECT" && value.trim() === "")
+        ) {
+          isValid = false;
+          showFieldError(cleanedKey, "This field is required.");
+        } else {
+          hideFieldError(cleanedKey);
+        }
       }
 
       // Email validation (if the field name contains "email")
@@ -129,6 +135,7 @@ whenDocumentReady(
       response = JSON.parse(response);
       //TODO restructure the object so it all the data for the field name to make it easier to render
       //TODO on the edit view make it set the default value when the select is populated.
+      //TODO update the error
       //console.log(response.data);
       response.data.forEach((data) => {
         const selectEl = document.getElementById(data.fieldName);
