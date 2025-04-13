@@ -180,7 +180,7 @@ const generateTablePages = (tableName, fields, tableNames) => {
           env,
         })
       : inner;
-
+    //console.log(validatedFields);
     fs.writeFileSync(filePath, content);
     console.log(`✅ Created page ${tableName}/${type}.html`);
   });

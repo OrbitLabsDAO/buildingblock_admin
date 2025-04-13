@@ -1,5 +1,6 @@
-<label>{{ field.label }}</label>
-<input type="number"  data-type="integer"  class="form-control form-control-user" 
+
+<label  {% if field.name == "id"  %} class="d-none"  {% endif %}> {{ field.label }}</label>
+<input type="number"  data-type="integer"  class="form-control form-control-user {% if field.name == "id"  %} d-none {% endif %}" 
        name="inp-{{ field.name }}" 
        id="inp-{{ field.name }}" 
        data-foreigntable="{{ field.foreignTable }}"

@@ -1,3 +1,5 @@
+//TODO add the btn update code back
+//TODO check check fields part still works
 const url = new URL(window.location.href);
 let parts = url.pathname.split("/").filter(Boolean);
 let tableName = parts.length > 1 ? parts[parts.length - 2] : null;

@@ -6,13 +6,13 @@
 {% else %}
   {% set cleanLabel = field.label %}
 {% endif %}
-<label>{{ cleanLabel }}</label>
+<label  {% if field.name == "id"  %} class="d-none"  {% endif %}>{{ cleanLabel }}</label>
 <select
-class="form-control form-control-user" 
+class="form-control form-control-user  {% if field.name == "id"  %} d-none  {% endif %}" 
  name="inp-{{ field.name }}" id="inp-{{ field.name }}"
  data-foreigntable="{{ field.foreignTable }}"
  data-foreignId="{{ field.foreignId }}"
  {% if disabled %}disabled{% endif %}
- {% if field.isRequired %}required{% endif %}      >
+ {% if field.isRequired %}required{% endif %}>
 </select>
 <span class="text-danger d-none" id="error-{{field.name}}"></span>  

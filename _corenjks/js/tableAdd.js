@@ -41,7 +41,6 @@ function checkForeign() {
   function checkForeignDone(response) {
     response = JSON.parse(response);
     const data = response.data;
-    console.log(data);
     Object.keys(data).forEach((fieldName) => {
       const selectEl = document.getElementById(fieldName);
       if (!selectEl) return;
@@ -61,12 +60,6 @@ function checkForeign() {
 
       // Restore selected value if we have editData
       const cleanName = fieldName.replace(/^inp-/, "");
-
-      if (editData && editData[cleanName] !== undefined) {
-        selectEl.value = editData[cleanName];
-      } else {
-        selectEl.selectedIndex = 0;
-      }
     });
   }
 }
@@ -76,24 +69,36 @@ document
   .addEventListener("click", function (event) {
     event.preventDefault(); // Prevent form submission
 
+    //check for a one time URL
+    const imageTrueEl = document.getElementById("imageTrue");
+
+    //TODO add the fetch one time url code and move the form submit to a seperate function (use await to get away from the dones maybe)
+    //TODO remove the hidden var from the form object so it is not sent to the server causing error
+    if (imageTrueEl && imageTrueEl.value === "true") {
+      alert("fetch one-time URL");
+    }
+
     const formData = new FormData(document.querySelector("form"));
 
     // Create a plain object from FormData and remove the 'inp-' prefix
     const formDataObject = {};
-    let isValid = true;
+    let submitIt = true;
 
     formData.forEach((value, key) => {
       // Remove 'inp-' from the field name
+
       const cleanedKey = key.replace(/^inp-/, "");
       formDataObject[cleanedKey] = value.trim();
 
       // Get the field element
       const field = document.getElementById("inp-" + cleanedKey);
-      isValid = checkField(field, cleanedKey, value);
+
+      let isValid = checkField(field, cleanedKey, value);
+      if (isValid == false) submitIt = false;
     });
 
     // Proceed if all validations pass
-    if (isValid) {
+    if (submitIt == true) {
       // Convert the object to JSON
       const requestBody = JSON.stringify(formDataObject);
       // Call the table endpoint

@@ -15,7 +15,6 @@ module.exports = {
   COMPLEXPASSWORD: process.env.COMPLEXPASSWORD,
   RESETPASSWORD: process.env.RESETPASSWORD,
   EXCLUDEDFIELDS: [
-    "id",
     "password",
     "resetPassword",
     "isDeleted",

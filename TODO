@@ -1,4 +1,13 @@
-TODO add image upload
+Image upload
+TODO one time token endpoint
+TODO hmtl image input for add, edit
+TODO image preview on view
+TODO image preview on index
+TODO add the js to call the one time token endpoint
+TODO add the js to do the file upload
+TODO update the table post endpoint to handle the image upload (or have it in its own endpoint)
+TODO look into using a file uploader such as filepond
+
 TODO make the external calls (GETS) use the apikey we should define an api key to control scopes in the future
 
 SIGN UP
