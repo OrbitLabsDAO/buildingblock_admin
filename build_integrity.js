@@ -14,6 +14,7 @@ const excludeItems = [
   "_corenjks/htmlinputs/text.njk",
   "_corenjks/htmlinputs/varchar.njk",
   "_corenjks/htmlinputs/select.njk",
+  "_corenjks/htmlinputs/image.njk",
   "_corenjks/js/account-dashboard.js",
   "_corenjks/js/account-settings.js",
   "_corenjks/js/account.js",
@@ -43,6 +44,10 @@ const excludeItems = [
   "_corenjks/tableEdit.njk",
   "_corenjks/tableIndex.njk",
   "_corenjks/tableView.njk",
+  "functions/api/property.js", //you can remove this, this is the demo script
+  "functions/api/property_amenities.js", //you can remove this, this is the demo script
+  "functions/api/property_images.js", //you can remove this, this is the demo script
+  "functions/api/crowdfund.js", //you can remove this, this is the demo script
 ];
 
 // Setup readline interface for CLI interaction
