@@ -44,9 +44,9 @@ const excludeItems = [
   "_corenjks/tableEdit.njk",
   "_corenjks/tableIndex.njk",
   "_corenjks/tableView.njk",
-  "functions/api/property.js",
-  "functions/api/property_amenities.js", //you can remove this, this is the demo script
-  "functions/api/property_images.js", //you can remove this, this is the demo script
+  "functions/api/tables/property.js", //you can remove this, this is the demo script
+  "functions/api/tables/property_amenities.js", //you can remove this, this is the demo script
+  "functions/api/tables/property_images.js", //you can remove this, this is the demo script
   "functions/api/crowdfund.js", //you can remove this, this is the demo script
 ];
 
