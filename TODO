@@ -1,6 +1,5 @@
 Image upload
-TODO change image on edit
-TODO disable the edit / button if the image is being uploaded
+TODO disable the edit button if the image is being uploaded
 TODO look into using a file uploader such as filepond
 TODO use the santiszed fields to hide the input element
 TODO Turns out we require the source folder so look to move these files that we use to the core directory so they are firther seperated
@@ -17,11 +16,11 @@ SCHMEA
 TODO HANDLE MIGRATION
 
 INPUT FIELDS
-TODO image uploader input
 TODO password input
 
 FUTURE
 
+TODO change all the xhrcall to use use promises (xhrcall2) and depericate XHRCALL
 TODO replace with await
 const res = await fetch('/getUploadUrl');
 const { uploadURL } = await res.json();
