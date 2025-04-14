@@ -94,9 +94,7 @@ document
       formDataObject.cfImageUrl = cfImageDetails.variants[0];
       formDataObject.isCfImageDraft = 0;
     }
-    //console.log(cfImageDetails);
-    console.log(formDataObject);
-    submit = false;
+
     // Proceed if all validations pass
     if (submitIt == true) {
       // Convert the object to JSON
@@ -129,10 +127,6 @@ whenDocumentReady(
     checkForeign();
     //check for a one time URL
     const imageTrueEl = document.getElementById("imageTrue");
-
-    let doAdd = (oneTimeUrl) => {
-      alert(oneTimeUrl);
-    };
 
     //get a one time URL. is it wise to call this everytime?
     if (imageTrueEl && imageTrueEl.value === "true") {

@@ -159,7 +159,12 @@ let uploadImage = (elm) => {
   let imageUploadDone = (response) => {
     response = JSON.parse(response);
     if (response.success == true) {
-      document.getElementById("btn-create").disabled = false;
+      document.getElementById("image-preview").classList.remove("d-none");
+      if (checkElement(document.getElementById("btn-create")))
+        document.getElementById("btn-create").disabled = false;
+      if (checkElement(document.getElementById("btn-update")))
+        document.getElementById("btn-update").disabled = false;
+
       //stop the interval
       clearInterval(interval);
       document.getElementById("image-uploading-text").innerText =
@@ -178,12 +183,12 @@ let uploadImage = (elm) => {
     //disable the create button
     if (checkElement("btn-create"))
       document.getElementById("btn-create").disabled = true;
-    if (checkElement("btn-update"))
-      document.getElementById("btn-update").disabled = true;
   } else {
-    document.getElementById("image-div").classList.add("d-none");
+    if (checkElement(document.getElementById("btn-update")))
+      document.getElementById("image-div").classList.add("d-none");
     document.getElementById("upload-image-div").classList.add("d-none");
     document.getElementById("image-preview-div").classList.remove("d-none");
+    document.getElementById("image-preview").classList.add("d-none");
     let dots = 3;
     interval = setInterval(() => {
       dots = (dots + 1) % 4;
@@ -196,6 +201,7 @@ let uploadImage = (elm) => {
     const file = fileInput.files[0];
     const formData = new FormData();
     formData.append("file", file);
+
     xhrcall(0, oneTimeUrl, formData, "", "", imageUploadDone, "");
   }
 };
@@ -427,6 +433,78 @@ let getUrlParamater = (param) => {
 
 //this function makes the XHR calls.
 
+let xhrcall2 = (
+  type = 1,
+  method,
+  bodyObj = "",
+  setHeader = "",
+  redirectUrl = "",
+  callback = ""
+) => {
+  return new Promise((resolve, reject) => {
+    const auth = getToken();
+
+    if (checkElement("spinner") == true) {
+      document.getElementById("spinner").classList.remove("d-none");
+    }
+
+    let url = method;
+    if (!method.includes("http")) url = apiUrl + method;
+
+    let xhrtype = ["POST", "GET", "PATCH", "DELETE", "PUT"][type] || "GET";
+
+    const xhr = new XMLHttpRequest();
+    xhr.open(xhrtype, url);
+
+    if (setHeader === "json")
+      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    if (auth != "") xhr.setRequestHeader("Authorization", "Bearer " + auth);
+
+    xhr.onerror = function () {
+      if (xhr.status === 0)
+        document.getElementById("spinner").classList.add("d-none");
+      reject(new Error("Network error"));
+    };
+
+    xhr.onload = function () {
+      document.getElementById("spinner").classList.add("d-none");
+
+      let res = xhr.response;
+      let errorMessage = "";
+
+      try {
+        res = JSON.parse(res);
+      } catch (e) {
+        // leave as-is if not JSON
+      }
+
+      if ([400, 403, 500, 401, 405, 205].includes(xhr.status)) {
+        errorMessage = res?.error || "Server Error";
+        showAlert(errorMessage, 2);
+        reject(errorMessage);
+        return;
+      }
+
+      if ([200, 201].includes(xhr.status)) {
+        if (callback === "") {
+          resolve(res); // ✅ this is what gets awaited
+        } else {
+          eval(callback(res));
+          resolve(res); // still resolve so await continues
+        }
+
+        if (redirectUrl !== "") {
+          window.location = redirectUrl;
+        }
+      } else {
+        reject(res);
+      }
+    };
+
+    xhr.send(bodyObj !== "" ? bodyObj : null);
+  });
+};
+
 let xhrcall = async (
   type = 1,
   method,
@@ -528,6 +606,10 @@ let xhrcall = async (
 
     //check if it was ok.
     if (xhr.status == 200 || xhr.status == 201) {
+      if (callback == "") {
+        console.log(res);
+        return res;
+      }
       //check if a redirecr url as passed.
       if (redirectUrl != "") {
         window.location = redirectUrl;
