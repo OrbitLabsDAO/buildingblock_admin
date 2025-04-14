@@ -104,6 +104,10 @@ let getAddDone = (response) => {
   else showAlert(response.error, 2);
 };
 
+let uploadIt = () => {
+  alert("upload");
+};
+
 /**
  * Show an error message for a field
  */
@@ -125,17 +129,14 @@ whenDocumentReady(
       alert(oneTimeUrl);
     };
 
-    //TODO add the fetch one time url code and move the form submit to a seperate function (use await to get away from the dones maybe)
-    //TODO remove the hidden var from the form object so it is not sent to the server causing error
+    //get a one time URL. is it wise to call this everytime?
     if (imageTrueEl && imageTrueEl.value === "true") {
       let getOnTimeTokenDone = (response) => {
-        //console.log(response);
         response = JSON.parse(response);
-        console.log(response);
         if (response.url != "") {
-          //delete the element
+          //store the URL
           oneTimeUrl = response.url;
-          alert(oneTimeUrl);
+          //delete the element
           imageTrueEl.remove();
         }
       };

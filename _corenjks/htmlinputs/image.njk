@@ -9,7 +9,20 @@ to make it look neater we remove the  trailing id
 {% else %}
   {% set cleanLabel = field.label %}
 {% endif %}
-<label  {% if field.name == "id"  %} class="d-none"  {% endif %}>{{ cleanLabel }}</label>
+
+       
+<label>Chose an image</label>
+    <input type="file" class="" id="file-input"> 
+    <a href="javascript:uploadIt()">Upload</a>
+</div>
+<div class="form-group d-none"  id="image-preview-div">
+    <div>Image Preview</div>
+    <div>
+      <img src=""  id="image-preview"/>
+      </div>
+</div>          
+    
+
 <input type="text" data-type="varchar" class="form-control form-control-user  {% if field.name == "id"  %} d-none  {% endif %}>" 
        name="inp-{{ field.name }}" id="inp-{{ field.name }}" 
        aria-describedby="{{ field.name }}" 
