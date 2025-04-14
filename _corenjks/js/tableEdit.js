@@ -1,5 +1,4 @@
-//TODO add the btn update code back
-//TODO check check fields part still works
+//TODO change image on edit
 const url = new URL(window.location.href);
 let parts = url.pathname.split("/").filter(Boolean);
 let tableName = parts.length > 1 ? parts[parts.length - 2] : null;
@@ -108,6 +107,53 @@ function applyFormValues() {
 
   document.getElementById("showBody").classList.remove("d-none");
 }
+
+document
+  .getElementById("btn-update")
+  .addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent form submission
+
+    const formData = new FormData(document.querySelector("form"));
+
+    // Create a plain object from FormData and remove the 'inp-' prefix
+    const formDataObject = {};
+    let submitIt = true;
+
+    formData.forEach((value, key) => {
+      // Remove 'inp-' from the field name
+      const cleanedKey = key.replace(/^inp-/, "");
+      formDataObject[cleanedKey] = value.trim();
+
+      // Get the field element
+      const field = document.getElementById("inp-" + cleanedKey);
+
+      let isValid = checkField(field, cleanedKey, value);
+      if (isValid == false) submitIt = false;
+    });
+
+    // Proceed if all validations pass
+    if (submitIt == true) {
+      let getEditDone = (response) => {
+        response = JSON.parse(response);
+        console.log(response);
+        if (response.status == "ok") {
+          showAlert("Record Updated", 1);
+        } else {
+          showAlert("Error updating record, please try again", 2);
+        }
+      };
+
+      // Add the ID for the update request
+      formDataObject.id = id;
+
+      // Convert the object to JSON
+      const requestBody = JSON.stringify(formDataObject);
+
+      // Call the table endpoint
+      let theUrl = apiUrl + `tables/${tableName}`;
+      xhrcall(4, theUrl, requestBody, "json", "", getEditDone);
+    }
+  });
 
 function whenDocumentReady(f) {
   if (document.readyState === "loading") {
