@@ -123,16 +123,84 @@ let showPassword = (elementName, eyeNumber) => {
   }
 };
 
+//check for a file to be selected
+
+const fileInput = document.getElementById("inp-image");
+
+fileInput.addEventListener("change", function (event) {
+  if (fileInput.files.length > 0) {
+    //console.log("File selected:", fileInput.files[0].name);
+    document.getElementById("image-div").classList.add("d-none");
+    document.getElementById("upload-image-div").classList.remove("d-none");
+    document.getElementById("upload-image-text").innerText =
+      fileInput.files[0].name;
+  } else {
+    //console.log("No file selected.");
+    document.getElementById("image-div").classList.remove("d-none");
+    document.getElementById("upload-image-div").classList.add("d-none");
+    document.getElementById("upload-image-text").innerText = "";
+  }
+});
+
+let removeImage = () => {
+  fileInput.value = "";
+  document.getElementById("image-div").classList.remove("d-none");
+  document.getElementById("upload-image-div").classList.add("d-none");
+  document.getElementById("upload-image-text").innerText = "";
+};
+
+//TODO can this be moved into checkField ?
+let uploadImage = (elm) => {
+  //check that an image has been selected
+
+  if (document.getElementById("inp-" + elm).files.length == 0) {
+    //show error message
+    showFieldError(elm, "An Image is required.");
+    //disable the create button
+    if (checkElement("btn-create"))
+      document.getElementById("btn-create").disabled = true;
+    if (checkElement("btn-update"))
+      document.getElementById("btn-update").disabled = true;
+  } else {
+    document.getElementById("image-div").classList.add("d-none");
+    document.getElementById("upload-image-div").classList.add("d-none");
+    document.getElementById("image-preview-div").classList.remove("d-none");
+    let dots = 3;
+    let interval = setInterval(() => {
+      dots = (dots + 1) % 4;
+      document.getElementById("image-uploading-text").innerText =
+        "Image uploading" + Array(dots).fill(".").join("");
+    }, 1000);
+    //TODO move thos to the done
+    //document.getElementById("btn-create").disabled = false;
+    hideFieldError(elm);
+    //upload the image
+    // xhrcall(1, apiUrl + "admin/image/", "", "", "", imageUploadDone, token);
+  }
+};
+
 function checkField(field, cleanedKey, value) {
   let isValid = true;
 
   // Check if the field is required (based on 'required' attribute)
   if (field) {
+    //TODO make sure this uses the correct image input and not hardcode as this will not work with multipile images
+    if (field.name == "inp-image") {
+      if (field.files.length == 0) {
+        //show error message
+        showFieldError(cleanedKey, "An Image is required.");
+      } else {
+        hideFieldError(cleanedKey);
+      }
+      return isValid;
+    }
+
     if (field.tagName === "SELECT") {
       if (field.selectedIndex === 0) {
         isValid = false;
         showFieldError(cleanedKey, "This field is required.");
       } else hideFieldError(cleanedKey);
+      return isValid;
     } else {
       if (
         field.required == true &&
@@ -140,6 +208,7 @@ function checkField(field, cleanedKey, value) {
         field.tagName != "SELECT"
       ) {
         isValid = false;
+        return isValid;
         showFieldError(cleanedKey, "This field is required.");
       } else {
         hideFieldError(cleanedKey);
@@ -153,6 +222,7 @@ function checkField(field, cleanedKey, value) {
       } else {
         hideFieldError(cleanedKey);
       }
+      return isValid;
     }
 
     // Basic integer validation
@@ -163,6 +233,7 @@ function checkField(field, cleanedKey, value) {
       } else {
         hideFieldError(cleanedKey);
       }
+      return isValid;
     }
 
     // Email validation (if the field name contains "email")
@@ -174,13 +245,13 @@ function checkField(field, cleanedKey, value) {
       } else {
         hideFieldError(cleanedKey);
       }
+      return isValid;
     }
     return isValid;
   }
 }
 
 function showFieldError(fieldName, message) {
-  console.log("aaa", fieldName, message);
   const errorElement = document.getElementById("error-" + fieldName);
   const fieldElement = document.getElementById("inp-" + fieldName);
   if (errorElement) {
@@ -195,7 +266,6 @@ function showFieldError(fieldName, message) {
  * Hide the error message for a field
  */
 function hideFieldError(fieldName) {
-  console.log("bbb", fieldName);
   const errorElement = document.getElementById("error-" + fieldName);
   if (errorElement) {
     errorElement.classList.add("d-none");

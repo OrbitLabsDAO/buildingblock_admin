@@ -168,10 +168,10 @@ INSERT INTO "property_amenities" ("propertyId","name") VALUES(1, 'Deck');
 CREATE TABLE "property_images" (
 	"id"	INTEGER,
 	"propertyId" INTEGER,
-	"cfid"	INTEGER,
+	"cfId"	INTEGER,
 	"image"	TEXT,
-	"url" TEXT,
-	"draft" INTEGER DEFAULT 1,
+	"cfImageUrl" TEXT,
+	"isCfImageDraft" INTEGER DEFAULT 1,
 	"isDeleted" INTEGER DEFAULT 0,
 	"deletedAt" TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT),
@@ -228,12 +228,12 @@ VALUES (
 
 
 
-INSERT INTO "property_images" ("propertyId","cfid","image","url") VALUES(1, '99ad01ac-062d-44f1-3c9d-69e1bf815700','Dcondo-Sign-Chiang-Mai-rental-condos-1.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/99ad01ac-062d-44f1-3c9d-69e1bf815700/public');
-INSERT INTO "property_images" ("propertyId","cfid","image","url") VALUES(1, '5533613e-0a07-49eb-3473-620816344100','Dcondo-Sign-Chiang-Mai-rental-condos-2.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/5533613e-0a07-49eb-3473-620816344100/public');
-INSERT INTO "property_images" ("propertyId","cfid","image","url") VALUES(1, 'abcb400b-4251-446e-5620-0f3116b61900','Dcondo-Sign-Chiang-Mai-rental-condos-3.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/abcb400b-4251-446e-5620-0f3116b61900/public');
-INSERT INTO "property_images" ("propertyId","cfid","image","url") VALUES(1, '12f4701b-5405-4bf6-8229-85014d90d900','Dcondo-Sign-Chiang-Mai-rental-condos-4.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/12f4701b-5405-4bf6-8229-85014d90d900/public');
-INSERT INTO "property_images" ("propertyId","cfid","image","url") VALUES(1, 'f85925a6-a125-4a2b-d06a-2d5190e64100','Dcondo-Sign-Chiang-Mai-rental-condos-5.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/f85925a6-a125-4a2b-d06a-2d5190e64100/public');
-INSERT INTO "property_images" ("propertyId","cfid","image","url") VALUES(1, '3715cd29-2f97-4a67-d13b-a23e19b1fe00','Dcondo-Sign-Chiang-Mai-rental-condos-6.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/3715cd29-2f97-4a67-d13b-a23e19b1fe00/public');
-INSERT INTO "property_images" ("propertyId","cfid","image","url") VALUES(1, '4841458b-8665-4ca9-1c50-4089c47ee300','Dcondo-Sign-Chiang-Mai-rental-condos-7.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/4841458b-8665-4ca9-1c50-4089c47ee300/public');
+INSERT INTO "property_images" ("propertyId","cfId","image","cfImageUrl") VALUES(1, '99ad01ac-062d-44f1-3c9d-69e1bf815700','Dcondo-Sign-Chiang-Mai-rental-condos-1.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/99ad01ac-062d-44f1-3c9d-69e1bf815700/public');
+INSERT INTO "property_images" ("propertyId","cfId","image","cfImageUrl") VALUES(1, '5533613e-0a07-49eb-3473-620816344100','Dcondo-Sign-Chiang-Mai-rental-condos-2.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/5533613e-0a07-49eb-3473-620816344100/public');
+INSERT INTO "property_images" ("propertyId","cfId","image","cfImageUrl") VALUES(1, 'abcb400b-4251-446e-5620-0f3116b61900','Dcondo-Sign-Chiang-Mai-rental-condos-3.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/abcb400b-4251-446e-5620-0f3116b61900/public');
+INSERT INTO "property_images" ("propertyId","cfId","image","cfImageUrl") VALUES(1, '12f4701b-5405-4bf6-8229-85014d90d900','Dcondo-Sign-Chiang-Mai-rental-condos-4.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/12f4701b-5405-4bf6-8229-85014d90d900/public');
+INSERT INTO "property_images" ("propertyId","cfId","image","cfImageUrl") VALUES(1, 'f85925a6-a125-4a2b-d06a-2d5190e64100','Dcondo-Sign-Chiang-Mai-rental-condos-5.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/f85925a6-a125-4a2b-d06a-2d5190e64100/public');
+INSERT INTO "property_images" ("propertyId","cfId","image","cfImageUrl") VALUES(1, '3715cd29-2f97-4a67-d13b-a23e19b1fe00','Dcondo-Sign-Chiang-Mai-rental-condos-6.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/3715cd29-2f97-4a67-d13b-a23e19b1fe00/public');
+INSERT INTO "property_images" ("propertyId","cfId","image","cfImageUrl") VALUES(1, '4841458b-8665-4ca9-1c50-4089c47ee300','Dcondo-Sign-Chiang-Mai-rental-condos-7.webp','https://imagedelivery.net/9dYZtR12J2uzlEZe4Joa5w/4841458b-8665-4ca9-1c50-4089c47ee300/public');
 
 

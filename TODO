@@ -1,5 +1,8 @@
 Image upload
-TODO hmtl image input for add, edit
+TODO change upload to a button
+TODO html image input for edit
+TODO disable the add / button if the image is being uploaded
+TODO disable the edit / button if the image is being uploaded
 TODO image preview on view
 TODO image preview on index
 TODO add the js to call the one time token endpoint

@@ -22,6 +22,9 @@ module.exports = {
     "updatedAt",
     "publishedAt",
     "deletedAt",
+    "cfId",
+    "cfImageUrl",
+    "isCfImageDraft", //should chnage this to is draft
   ], //these are the fields that will be removed from any rendering
   EXCLUDETABLES: ["userAccess"],
   RESERVEDTABLES: ["_user"], //these are the tables used internally that will be removed from any rendering

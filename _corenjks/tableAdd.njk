@@ -17,6 +17,7 @@ layout: layout.njk
      <form action="/add_{{ tableName }}" method="post">
     
     {% set disabled = false %} 
+    {% set disableButton = "" %} 
     {% set defaultInteger = 0 %}
      {% for field in fields %}
         {% if field.type == "definition" and field.variant == "constraint" %}
@@ -27,6 +28,7 @@ layout: layout.njk
                     <div class="form-group">
                         {% if field.name == "image" %}
                             {% include "htmlinputs/image.njk"  %}
+                            {% set disableButton = "disabled" %}
                         {% else %}
                             {% if field.foreignTable %}
                                 {% include "htmlinputs/select.njk"  %}
@@ -54,7 +56,7 @@ layout: layout.njk
     </div>
      <input type="hidden" id="formTableName" name="formTableName" value="">
 
-<button class="btn btn-primary btn-user btn-block" id="btn-create">
+<button class="btn btn-primary btn-user btn-block" id="btn-create" {{ disableButton }}>
     Create
 </button>
 <script type="text/javascript">{{theJs | safe}}</script>

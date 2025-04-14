@@ -79,7 +79,7 @@ document
       // Remove 'inp-' from the field name
 
       const cleanedKey = key.replace(/^inp-/, "");
-      formDataObject[cleanedKey] = value.trim();
+      if (cleanedKey != "image") formDataObject[cleanedKey] = value.trim();
 
       // Get the field element
       const field = document.getElementById("inp-" + cleanedKey);
@@ -102,10 +102,6 @@ let getAddDone = (response) => {
   response = JSON.parse(response);
   if (response.status == "ok") showAlert("Record Added", 1);
   else showAlert(response.error, 2);
-};
-
-let uploadIt = () => {
-  alert("upload");
 };
 
 /**

@@ -1,33 +1,8 @@
-/*
-// functions/getUploadUrl.js
-export async function onRequest(context) {
-  const accountId = "your_account_id";
-  const apiToken = "your_api_token";
-
-  const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/images/v2/direct_upload`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiToken}`,
-      },
-      body: new FormData(),
-    }
-  );
-
-  const data = await response.json();
-  return new Response(JSON.stringify({ uploadURL: data.result.uploadURL }), {
-    headers: { "Content-Type": "application/json" },
-  });
-}
-*/
-
 //JWT model
 const jwt = require("@tsndr/cloudflare-worker-jwt");
 //decode the jwt token
 let decodeJwt = async (req, secret) => {
   let bearer = req.get("authorization");
-  console.log(bearer);
   let details = "";
   if (bearer != null) {
     bearer = bearer.replace("Bearer ", "");
