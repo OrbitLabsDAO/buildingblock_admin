@@ -57,8 +57,12 @@ whenDocumentReady(
 
       // Helper function to make headers nicer
       const formatHeader = (header) => {
-        header = header.replace(/_/g, " "); // Replace underscores
-        header = header.replace(/([a-z])([A-Z])/g, "$1 $2"); // CamelCase to Title Case
+        if (header == "cfImageUrl") {
+          header = "Image Url";
+        } else {
+          header = header.replace(/_/g, " "); // Replace underscores
+          header = header.replace(/([a-z])([A-Z])/g, "$1 $2"); // CamelCase to Title Case
+        }
         return header
           .split(" ")
           .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
