@@ -159,6 +159,8 @@ CREATE TABLE "property_amenities" (
 	"publishedAt" TEXT DEFAULT CURRENT_TIMESTAMP,
 	"deletedAt" TEXT,
 	PRIMARY KEY("id" AUTOINCREMENT)
+	CONSTRAINT "fk_propertyId" FOREIGN KEY ("propertyId") REFERENCES "property"("id")
+
 );
 
 INSERT INTO "property_amenities" ("propertyId","name") VALUES(1, 'Balcony');

@@ -13,6 +13,8 @@ whenDocumentReady(
   (isReady = () => {
     let getViewDone = (response) => {
       response = JSON.parse(response);
+      console.log(response);
+
       if (response.data.length > 0) {
         const data = response.data[0];
         // Loop through the returned data and populate the form fields
