@@ -1,11 +1,9 @@
 Image upload
-TODO change upload to a button
 TODO html image input for edit
-TODO disable the add / button if the image is being uploaded
 TODO disable the edit / button if the image is being uploaded
 TODO image preview on view
+TODO image preview on edit
 TODO image preview on index
-TODO add the js to call the one time token endpoint
 TODO add the js to do the file upload
 TODO update the table post endpoint to handle the image upload (or have it in its own endpoint)
 TODO look into using a file uploader such as filepond
