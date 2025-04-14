@@ -17,15 +17,24 @@ whenDocumentReady(
         const data = response.data[0];
         // Loop through the returned data and populate the form fields
         Object.keys(data).forEach((key) => {
-          let field = document.getElementById("inp-" + key);
-          if (field) {
-            field.value = data[key]; // Set the value of the field
+          if (key == "cfImageUrl") {
+            document.getElementById("image-div").classList.add("d-none");
+            document.getElementById("image-uploading-text").innerText =
+              "Image preview";
+            document.getElementById("image-preview").src = data[key];
           } else {
-            //we didnt find it so lets look again with id
-            let field2 = document.getElementById("inp-" + key + "Id");
-            if (field2) {
-              field2.type == "text";
-              field2.value = data[key];
+            let field = document.getElementById("inp-" + key);
+            if (field) {
+              if (key != "image") field.value = data[key];
+
+              // Set the value of the field
+            } else {
+              //we didnt find it so lets look again with id
+              let field2 = document.getElementById("inp-" + key + "Id");
+              if (field2) {
+                field2.type == "text";
+                field2.value = data[key];
+              }
             }
           }
         });

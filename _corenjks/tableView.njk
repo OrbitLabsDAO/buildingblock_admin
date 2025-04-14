@@ -16,23 +16,27 @@ layout: layout.njk
     <div id="formInputs">
      <form action="/add_{{ tableName }}" method="post">
     {% set disabled = true %} 
-   
+   {% set imagePreview = true %} 
      {% for field in fields %}
-        {% if field.name != "" and field.name != null %}
+        {% if field.name and not field.name.match('^fk_') %}
             <div class="form-group">
-                {% if field.foreignTable %}
-                    {% include "htmlinputs/varchar.njk"  %}
+                {% if field.name == "image" %}
+                    {% include "htmlinputs/image.njk"  %}
                 {% else %}
-                    {% if field.datatype.variant == "integer" %}
-                        {% include "htmlinputs/integer.njk"  %}
-                    {% elif field.datatype.variant == "real" %}
-                        {% include "htmlinputs/real.njk"  %}
-                    {% elif field.datatype.variant == "text" %}
-                        {% include "htmlinputs/text.njk" %}
-                    {% elif field.datatype.variant == "varchar" %}
+                    {% if field.foreignTable %}
                         {% include "htmlinputs/varchar.njk"  %}
                     {% else %}
-                        {% include "htmlinputs/default.njk" %}
+                        {% if field.datatype.variant == "integer" %}
+                            {% include "htmlinputs/integer.njk"  %}
+                        {% elif field.datatype.variant == "real" %}
+                            {% include "htmlinputs/real.njk"  %}
+                        {% elif field.datatype.variant == "text" %}
+                            {% include "htmlinputs/text.njk" %}
+                        {% elif field.datatype.variant == "varchar" %}
+                            {% include "htmlinputs/varchar.njk"  %}
+                        {% else %}
+                            {% include "htmlinputs/default.njk" %}
+                        {% endif %}
                     {% endif %}
                 {% endif %}
             </div>

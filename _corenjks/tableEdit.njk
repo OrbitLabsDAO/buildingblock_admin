@@ -17,7 +17,7 @@ layout: layout.njk
     <form action="/add_{{ tableName }}" method="post">
     {% set imagePreview = true %} 
      {% for field in fields %}
-     {{field.value}}
+    aaa {{filed.name}}aa
         {% if field.type == "definition" and field.variant == "constraint" %}
             <!-- stop look up rendering this is a bug we have to fix later -->
         {% else %}
