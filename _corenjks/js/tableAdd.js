@@ -1,7 +1,7 @@
 const url = new URL(window.location.href);
 let parts = url.pathname.split("/").filter(Boolean);
 let tableName = parts.length > 1 ? parts[parts.length - 2] : null;
-
+let oneTimeUrl = "";
 function checkForeign() {
   const looksUps = Array.from(
     document.querySelectorAll("[data-foreigntable], [data-foreignid]")
@@ -69,15 +69,6 @@ document
   .addEventListener("click", function (event) {
     event.preventDefault(); // Prevent form submission
 
-    //check for a one time URL
-    const imageTrueEl = document.getElementById("imageTrue");
-
-    //TODO add the fetch one time url code and move the form submit to a seperate function (use await to get away from the dones maybe)
-    //TODO remove the hidden var from the form object so it is not sent to the server causing error
-    if (imageTrueEl && imageTrueEl.value === "true") {
-      alert("fetch one-time URL");
-    }
-
     const formData = new FormData(document.querySelector("form"));
 
     // Create a plain object from FormData and remove the 'inp-' prefix
@@ -127,6 +118,34 @@ whenDocumentReady(
   (isReady = () => {
     //check the fields for data_foreigntable
     checkForeign();
+    //check for a one time URL
+    const imageTrueEl = document.getElementById("imageTrue");
+
+    let doAdd = (oneTimeUrl) => {
+      alert(oneTimeUrl);
+    };
+
+    //TODO add the fetch one time url code and move the form submit to a seperate function (use await to get away from the dones maybe)
+    //TODO remove the hidden var from the form object so it is not sent to the server causing error
+    if (imageTrueEl && imageTrueEl.value === "true") {
+      let getOnTimeTokenDone = (response) => {
+        //console.log(response);
+        response = JSON.parse(response);
+        console.log(response);
+        if (response.url != "") {
+          //delete the element
+          oneTimeUrl = response.url;
+          alert(oneTimeUrl);
+          imageTrueEl.remove();
+        }
+      };
+
+      //TODO replace with await
+      //const res = await fetch('/getUploadUrl');
+      //const { uploadURL } = await res.json();
+      const theUrl = apiUrl + `getonetimetoken`;
+      xhrcall(1, theUrl, "", "json", "", getOnTimeTokenDone);
+    }
     // Show the table
     document.getElementById("showBody").classList.remove("d-none");
   })

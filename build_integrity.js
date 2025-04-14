@@ -29,6 +29,7 @@ const excludeItems = [
   "functions/api/account-settings.js",
   "functions/api/account.js",
   "functions/api/lookups.js",
+  "functions/api/getonetimetoken.js",
   "_corenjks/htmlinputs",
   "_corenjks/js",
   "_corenjks/account-create.njk",
