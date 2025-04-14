@@ -1,11 +1,9 @@
 Image upload
-TODO html image input for edit
+TODO change image on edit
 TODO disable the edit / button if the image is being uploaded
 TODO image preview on view
 TODO image preview on edit
 TODO image preview on index
-TODO add the js to do the file upload
-TODO update the table post endpoint to handle the image upload (or have it in its own endpoint)
 TODO look into using a file uploader such as filepond
 TODO Turns out we require the source folder so look to move these files that we use to the core directory so they are firther seperated
 TODO make the external calls (GETS) use the apikey we should define an api key to control scopes in the future
@@ -25,6 +23,11 @@ TODO image uploader input
 TODO password input
 
 FUTURE
+
+TODO replace with await
+const res = await fetch('/getUploadUrl');
+const { uploadURL } = await res.json();
+
 MAY NOT DO THESE INCLUDES, COULD BE OVERKILL MORE THOUGHT IS REQUIRED.
 includes
 the way i was thinking about njk files is wrong as it would mean doing the core files, we will have to think of a better

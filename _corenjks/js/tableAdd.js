@@ -1,7 +1,6 @@
 const url = new URL(window.location.href);
 let parts = url.pathname.split("/").filter(Boolean);
 let tableName = parts.length > 1 ? parts[parts.length - 2] : null;
-let oneTimeUrl = "";
 function checkForeign() {
   const looksUps = Array.from(
     document.querySelectorAll("[data-foreigntable], [data-foreignid]")
@@ -88,6 +87,16 @@ document
       if (isValid == false) submitIt = false;
     });
 
+    //over ride the upload as its an image
+    if (cfImageDetails) {
+      formDataObject.image = cfImageDetails.filename;
+      formDataObject.cfid = cfImageDetails.id;
+      formDataObject.cfImageUrl = cfImageDetails.variants[0];
+      formDataObject.isCfImageDraft = 0;
+    }
+    //console.log(cfImageDetails);
+    console.log(formDataObject);
+    submit = false;
     // Proceed if all validations pass
     if (submitIt == true) {
       // Convert the object to JSON
@@ -137,9 +146,6 @@ whenDocumentReady(
         }
       };
 
-      //TODO replace with await
-      //const res = await fetch('/getUploadUrl');
-      //const { uploadURL } = await res.json();
       const theUrl = apiUrl + `getonetimetoken`;
       xhrcall(1, theUrl, "", "json", "", getOnTimeTokenDone);
     }

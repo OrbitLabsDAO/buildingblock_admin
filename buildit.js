@@ -141,7 +141,8 @@ const generateApiFunctions = (tableNames) => {
   console.log("✅ API files Processed!");
 };
 
-const generateTablePages = (tableName, fields, tableNames) => {
+const generateTablePages = (tableName, fields, fieldsIndex, tableNames) => {
+  //todo update this funciton to handle different field types for indes and add/edit/view so we can render out relevant information on each screen
   const pageDir = path.join(siteDir, `tables/${tableName}`);
   fs.mkdirSync(pageDir, { recursive: true });
 
@@ -402,9 +403,18 @@ if (Array.isArray(parsedSchema.statement)) {
       const sanitizedFields = fields.filter(
         (f) => !env.EXCLUDEDFIELDS.includes(f.name)
       );
+
+      const sanitizedFieldsIndex = fields.filter(
+        (f) => !env.EXCLUDEDFIELDSINDEX.includes(f.name)
+      );
       // Generate table pages
       if (!env.EXCLUDETABLES.includes(tableName)) {
-        generateTablePages(tableName, sanitizedFields, tableNames);
+        generateTablePages(
+          tableName,
+          sanitizedFields,
+          sanitizedFieldsIndex,
+          tableNames
+        );
       }
     }
   });

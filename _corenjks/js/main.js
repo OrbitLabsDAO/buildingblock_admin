@@ -1,6 +1,9 @@
 let redirectUrl = ""; // hold the redcirect URL
 let token;
 let user;
+let oneTimeUrl = "";
+let cfImageDetails;
+let interval;
 //var table // datatable
 
 //TODO: replace this with plain js
@@ -124,23 +127,25 @@ let showPassword = (elementName, eyeNumber) => {
 };
 
 //check for a file to be selected
+let fileInput;
+if (checkElement("inp-image")) {
+  fileInput = document.getElementById("inp-image");
 
-const fileInput = document.getElementById("inp-image");
-
-fileInput.addEventListener("change", function (event) {
-  if (fileInput.files.length > 0) {
-    //console.log("File selected:", fileInput.files[0].name);
-    document.getElementById("image-div").classList.add("d-none");
-    document.getElementById("upload-image-div").classList.remove("d-none");
-    document.getElementById("upload-image-text").innerText =
-      fileInput.files[0].name;
-  } else {
-    //console.log("No file selected.");
-    document.getElementById("image-div").classList.remove("d-none");
-    document.getElementById("upload-image-div").classList.add("d-none");
-    document.getElementById("upload-image-text").innerText = "";
-  }
-});
+  fileInput.addEventListener("change", function (event) {
+    if (fileInput.files.length > 0) {
+      //console.log("File selected:", fileInput.files[0].name);
+      document.getElementById("image-div").classList.add("d-none");
+      document.getElementById("upload-image-div").classList.remove("d-none");
+      document.getElementById("upload-image-text").innerText =
+        fileInput.files[0].name;
+    } else {
+      //console.log("No file selected.");
+      document.getElementById("image-div").classList.remove("d-none");
+      document.getElementById("upload-image-div").classList.add("d-none");
+      document.getElementById("upload-image-text").innerText = "";
+    }
+  });
+}
 
 let removeImage = () => {
   fileInput.value = "";
@@ -149,9 +154,23 @@ let removeImage = () => {
   document.getElementById("upload-image-text").innerText = "";
 };
 
-//TODO can this be moved into checkField ?
 let uploadImage = (elm) => {
   //check that an image has been selected
+  let imageUploadDone = (response) => {
+    response = JSON.parse(response);
+    if (response.success == true) {
+      document.getElementById("btn-create").disabled = false;
+      //stop the interval
+      clearInterval(interval);
+      document.getElementById("image-uploading-text").innerText =
+        "Image Preview";
+      //show the preview
+      document.getElementById("image-preview").src =
+        response.result.variants[0];
+      //store the details
+      cfImageDetails = response.result;
+    }
+  };
 
   if (document.getElementById("inp-" + elm).files.length == 0) {
     //show error message
@@ -166,16 +185,18 @@ let uploadImage = (elm) => {
     document.getElementById("upload-image-div").classList.add("d-none");
     document.getElementById("image-preview-div").classList.remove("d-none");
     let dots = 3;
-    let interval = setInterval(() => {
+    interval = setInterval(() => {
       dots = (dots + 1) % 4;
       document.getElementById("image-uploading-text").innerText =
         "Image uploading" + Array(dots).fill(".").join("");
     }, 1000);
-    //TODO move thos to the done
-    //document.getElementById("btn-create").disabled = false;
+
     hideFieldError(elm);
     //upload the image
-    // xhrcall(1, apiUrl + "admin/image/", "", "", "", imageUploadDone, token);
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    xhrcall(0, oneTimeUrl, formData, "", "", imageUploadDone, "");
   }
 };
 
