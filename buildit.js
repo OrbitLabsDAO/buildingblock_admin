@@ -142,32 +142,33 @@ const generateApiFunctions = (tableNames) => {
 };
 
 const generateTablePages = (tableName, fields, fieldsIndex, tableNames) => {
-  //todo update this funciton to handle different field types for indes and add/edit/view so we can render out relevant information on each screen
   const pageDir = path.join(siteDir, `tables/${tableName}`);
   fs.mkdirSync(pageDir, { recursive: true });
 
-  // Process each field to extract constraints
-  const validatedFields = fields.map((field) => {
-    const isRequired =
-      field.definition &&
-      field.definition.some(
-        (def) => def.type === "constraint" && def.variant === "not null"
-      );
-
-    // Return the updated field object with all necessary properties
-    return {
-      ...field, // Preserve all existing properties
-      isRequired,
-    };
-  });
+  // Helper to validate fields (adds `isRequired`)
+  const validateFields = (fieldList) =>
+    fieldList.map((field) => {
+      const isRequired =
+        field.definition &&
+        field.definition.some(
+          (def) => def.type === "constraint" && def.variant === "not null"
+        );
+      return {
+        ...field,
+        isRequired,
+      };
+    });
 
   // Generate the table pages
   ["Index", "View", "Add", "Edit"].forEach((type) => {
+    const isIndexPage = type === "Index";
+    const relevantFields = validateFields(isIndexPage ? fieldsIndex : fields);
+
     const data = processFile(`table${type}.njk`, "_corenjks") || {};
     const filePath = path.join(pageDir, `${type.toLowerCase()}.html`);
     const inner = nunjucks.renderString(data.content, {
       tableName,
-      fields: validatedFields, // Now includes isRequired, foreignTable, foreignId
+      fields: relevantFields,
       tableNames,
       env,
     });
@@ -175,13 +176,13 @@ const generateTablePages = (tableName, fields, fieldsIndex, tableNames) => {
     const content = data.layout
       ? renderTemplateWithLayout(data.layout, {
           tableName,
-          fields: validatedFields,
+          fields: relevantFields,
           content: inner,
           tableNames,
           env,
         })
       : inner;
-    //console.log(validatedFields);
+
     fs.writeFileSync(filePath, content);
     console.log(`✅ Created page ${tableName}/${type}.html`);
   });

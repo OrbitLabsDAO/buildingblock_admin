@@ -16,6 +16,7 @@ layout: layout.njk
     <div id="formInputs">
      <form action="/add_{{ tableName }}" method="post">
     
+    {% set imagePreview = false %} 
     {% set disabled = false %} 
     {% set disableButton = "" %} 
     {% set defaultInteger = 0 %}
@@ -51,7 +52,6 @@ layout: layout.njk
              {% endif %}
         {% endif %}
     {% endfor %}
-
     </form>
     </div>
      <input type="hidden" id="formTableName" name="formTableName" value="">

@@ -13,7 +13,7 @@
       <a href="javascript:removeImage()" class="btn btn-primary btn-user">Remove</a>
       <a href="javascript:uploadImage('{{ field.name }}')" class="btn btn-primary btn-user">Upload</a>
   </div>
-  <div class="form-group d-none"  id="image-preview-div">
+  <div class="form-group  {% if imagePreview == false %}d-none{% endif %}  "  id="image-preview-div">
     <div id="image-uploading-text">Image uploading</div>
     <div>
       <img src=""  id="image-preview"/>

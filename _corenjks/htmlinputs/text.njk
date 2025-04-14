@@ -1,5 +1,5 @@
-<label  {% if field.name == "id"  %} class="d-none"  {% endif %}>{{ field.label }}</label>
-<textarea  data-type="text"  class="form-control form-control-user  {% if field.name == "id"  %} d-none  {% endif %}>" 
+<label  {% if field.name == "id" or field.name == "cfImageUrl"  %} class="d-none"  {% endif %}>{{ field.label }}</label>
+<textarea  data-type="text"  class="form-control form-control-user  {% if field.name == "id" or field.name == "cfImageUrl"  %} d-none  {% endif %}>" 
 name="inp-{{ field.name }}" 
 id="inp-{{ field.name }}"  
 data-foreigntable="{{ foreignTable }}"

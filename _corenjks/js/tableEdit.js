@@ -74,7 +74,7 @@ function checkForeign(callback) {
 function applyFormValues() {
   if (!editData || !foreignData) return;
 
-  document.querySelectorAll("input, select, textarea").forEach((field) => {
+  document.querySelectorAll(" select, textarea").forEach((field) => {
     const rawName = field.name; // e.g. inp-adminId
     const baseName = rawName.replace(/^inp-/, ""); // adminId
     const relatedKey = baseName.endsWith("Id")
@@ -83,7 +83,11 @@ function applyFormValues() {
 
     // Apply normal values from editData
     if (editData.hasOwnProperty(baseName)) {
-      field.value = editData[baseName];
+      if (baseName == "cfImageUrl") {
+        document.getElementById("image-uploading-text").innerText =
+          "Image preview";
+        document.getElementById("image-preview").src = editData[baseName];
+      } else field.value = editData[baseName];
     }
 
     // Handle select inputs with foreign data

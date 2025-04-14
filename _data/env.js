@@ -23,7 +23,6 @@ module.exports = {
     "publishedAt",
     "deletedAt",
     "cfId",
-    "cfImageUrl",
     "isCfImageDraft",
   ], //these are the fields that will be removed from any rendering
   EXCLUDEDFIELDSINDEX: [
