@@ -7,7 +7,7 @@ TODO add the js to call the one time token endpoint
 TODO add the js to do the file upload
 TODO update the table post endpoint to handle the image upload (or have it in its own endpoint)
 TODO look into using a file uploader such as filepond
-
+TODO Turns out we require the source folder so look to move these files that we use to the core directory so they are firther seperated
 TODO make the external calls (GETS) use the apikey we should define an api key to control scopes in the future
 
 SIGN UP

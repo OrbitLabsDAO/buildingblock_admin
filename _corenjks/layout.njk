@@ -1,28 +1,22 @@
+{% set theJs %}
+{% include 'js/main.js' %}
+{% endset %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-
     <title>{{env.TITLE}}</title>
-
     <!-- Custom fonts for this template-->
     <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-
     <!-- Custom styles for this template
-
     <link href="/assets/css/style.min.css" rel="stylesheet">
-
-
-
     -->
     <link href="/assets/css/style.css" rel="stylesheet">
     <!-- Custom styles for this page -->
@@ -32,16 +26,11 @@
     var apiUrl ="{{env.APIURL}}";
     var adminUrl = "{{env.ADMINURL}}";
     var envMode = "{{env.ENVIRONMENT}}";
-    
 </script>
-
 </head>
-
 <body id="page-top">
-
     <!-- Page Wrapper -->
     <div id="wrapper">
-
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
@@ -54,17 +43,14 @@
               -->
                 <div class="sidebar-brand-text mx-3">{{env.TITLE}}</div>
             </a>
-
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
                 <a class="nav-link" href="/dashboard">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
-
              <li class="nav-item" id="navadmin">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne"
                     aria-expanded="true" aria-controls="collapseOne">
@@ -79,21 +65,15 @@
                          {% for tableName in tableNames %}
                            <a class="collapse-item" href="/tables/{{ tableName }}/">{{ tableName | safe}}</a>
                         {% endfor %}
-
-
-                      
                     </div>
                 </div>
             </li>
-
             <!-- add you custom menu items here -->
            <!--
             This is not working yet as the layout it pulled from frontmatter it is having 
             issues looking in the custom directory, I will fix this (i promise) until then just
             cut and paste the menu items here. 
-          
             -->
-
             <!-- Divider -->
             <hr class="sidebar-divider">
             <div id="hideAdmin" class="d-none">
@@ -112,21 +92,15 @@
                     </div>
                 </div>
             </li>
-
-
             <!-- Divider -->
             <hr class="sidebar-divider">  
             </div> 
         </ul>
         <!-- End of Sidebar -->
-        
-
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
-
             <!-- Main Content -->
             <div id="content">
-
                 <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
@@ -149,7 +123,6 @@
                         </div>
                     </form>
                     -->
-
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">  
                       <div class="spinner-border float-right d-none" role="status" id="spinner">
@@ -186,14 +159,10 @@
                                 </a>
                             </div>
                         </li>
-
                     </ul>
-
                 </nav>
                 <!-- End of Topbar -->
-
                 <!-- Begin Page Content -->
-                
                 <div class="container-fluid">
                     <!-- Page Heading -->
                     <div class="alert alert-success  d-none" role="alert" id="accountsSuccess">
@@ -207,30 +176,23 @@
                 <!-- /.container-fluid -->
             </div>
             <!-- End of Main Content -->
-
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
                         <span>{{env.COPYRIGHT}}</span>
                     </div>
-
                 </div>
-  
             </footer>
             <!-- End of Footer -->
-
         </div>
         <!-- End of Content Wrapper -->
-
     </div>
     <!-- End of Page Wrapper -->
-
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
-
     <!-- Logout Modal-->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -250,7 +212,6 @@
             </div>
         </div>
     </div>
-
     <!-- modals -->
     <div class="modal" tabindex="-1" role="dialog" id="confirmation-modal">
   <div class="modal-dialog" role="document">
@@ -271,35 +232,19 @@
     </div>
   </div>
 </div>
-
 <!-- end  modals -->
-
     <!-- Bootstrap core JavaScript-->
     <script src="/assets/vendor/jquery/jquery.min.js"></script>
     <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
     <!-- Core plugin JavaScript-->
     <script src="/assets/vendor/jquery-easing/jquery.easing.min.js"></script>
-
     <!-- Custom scripts for all pages
-
-    <script src="/assets/js/app.min.js"></script>
-
-
-    -->
-{% set theJs %}
-{% include 'js/main.js' %}
-{% endset %}
     <script src="/assets/js/app.js"></script>
-
-        <!-- Page level plugins -->
-    <script src="/assets/vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="/assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-    <!-- Page level custom scripts -->
-
-
-
+    -->
+<script type="text/javascript">{{theJs | safe}}</script>
+<!-- Page level plugins -->
+<script src="/assets/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="/assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+<!-- Page level custom scripts -->
 </body>
-
 </html>
