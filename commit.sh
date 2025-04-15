@@ -57,7 +57,7 @@ if [ "$ACTION" = "origin" ]; then
     rm sql/schema.sql
 
     # Move _tmp/_schema.sql to sql
-    mv _tmp/_schema.sql sql/
+    mv _tmp/schema.sql sql/
     read -p wait2
 
     # Restore _source

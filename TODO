@@ -1,4 +1,5 @@
 Image upload
+TODO expand the table and highlight the one you are on
 TODO disable the edit button if the image is being uploaded
 TODO look into using a file uploader such as filepond
 TODO use the santiszed fields to hide the input element
@@ -14,6 +15,8 @@ TODO validate email
 
 SCHMEA
 TODO HANDLE MIGRATION
+TODO RATIONALISE TABLES
+Do we require property owner, this could be rolled into user but then we could lose the basics of the userid
 
 INPUT FIELDS
 TODO password input

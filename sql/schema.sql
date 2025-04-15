@@ -2,7 +2,6 @@
 DROP TABLE IF EXISTS _user;
 
 
-
 /*
 THESE ARE THE CORE TABLES 
 */
