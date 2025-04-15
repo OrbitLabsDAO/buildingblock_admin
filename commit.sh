@@ -33,7 +33,7 @@ if [ "$ACTION" = "origin" ]; then
     mv sql/schema.sql _tmp/
 
     # Copy _tmp/_schema.sql to sql
-    cp _tmp/_schema.sql sql/
+    cp _tmp/_schema.sql sql/schema.sql
     read -p wait1
 
     #todo change the move to the _tmp directory
