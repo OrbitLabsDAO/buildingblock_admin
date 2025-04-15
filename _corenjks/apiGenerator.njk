@@ -83,7 +83,7 @@ async function handleGet(request, env, params, tableName) {
     const fk = fks.results.find((fk) => fk.from === col.name);
     if (fk) {
       const readableCol = col.name.replace(/Id$/, ''); // remove 'Id' suffix
-      const alias = readableCol; // e.g. adminId => admin
+      const alias = readableCol; // e.g. userId => admin
       selectFields.push(`${fk.table}.name AS ${alias}`);
       joins.push(
         `LEFT JOIN ${fk.table} ON ${tableName}.${col.name} = ${fk.table}.${fk.to}`

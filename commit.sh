@@ -24,10 +24,13 @@ if [ "$ACTION" = "origin" ]; then
 
 
     echo "Moving files to keep them safe"
+    #todo check if their ia _tmp file and if not create one
+    #todo move sql/schema.sql to _tmp
+    #todo copy _tmp/_schema.sql to sql
+
+    #todo change the move to the _tmp directory
     mkdir -p _site/tmp
     mv _source _site/tmp/
-
-
     # Move entire _custome into _site/tmp2 to preserve structure
     mkdir -p _site/tmp2
     mv _custom _site/tmp2/
@@ -41,6 +44,10 @@ if [ "$ACTION" = "origin" ]; then
     else
         git push "$ACTION"
     fi
+
+    #todo delete sql/schema.sql
+    #todo move _tmp/_schema.sql to sql
+
 
     # Restore _source
     mv _site/tmp/_source ./_source

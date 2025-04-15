@@ -83,8 +83,8 @@ function applyFormValues() {
   if (!editData || !foreignData) return;
 
   document.querySelectorAll(" select, textarea").forEach((field) => {
-    const rawName = field.name; // e.g. inp-adminId
-    const baseName = rawName.replace(/^inp-/, ""); // adminId
+    const rawName = field.name; // e.g. inp-userId
+    const baseName = rawName.replace(/^inp-/, ""); // userId
     const relatedKey = baseName.endsWith("Id")
       ? baseName.slice(0, -2) // remove trailing 'Id' => 'admin'
       : baseName;
