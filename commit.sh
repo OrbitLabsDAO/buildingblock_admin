@@ -34,7 +34,6 @@ if [ "$ACTION" = "origin" ]; then
 
     # Copy _tmp/_schema.sql to sql
     cp _tmp/_schema.sql sql/schema.sql
-    read -p wait1
 
     #todo change the move to the _tmp directory
     mkdir -p _site/tmp
@@ -58,7 +57,6 @@ if [ "$ACTION" = "origin" ]; then
 
     # Move _tmp/_schema.sql to sql
     mv _tmp/schema.sql sql/
-    read -p wait2
 
     # Restore _source
     mv _site/tmp/_source ./_source
