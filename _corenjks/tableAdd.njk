@@ -25,13 +25,15 @@ layout: layout.njk
             <!-- stop look up rendering this is a bug we have to fix later -->
         {% else %}
             {% if field.name != "id" %}
+               
                 {% if field.name != "" and field.name != null %}
                     <div class="form-group">
                         {% if field.name == "image" %}
                             {% include "htmlinputs/image.njk"  %}
                             {% set disableButton = "disabled" %}
                         {% else %}
-                            {% if field.foreignTable %}
+                        
+                            {% if field.foreignTable or field.selectOptions  %}
                                 {% include "htmlinputs/select.njk"  %}
                             {% else %}
                                 {% if field.datatype.variant == "integer" %}

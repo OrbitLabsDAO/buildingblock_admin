@@ -1,4 +1,3 @@
-<!-- this is a select so we can assume it is a foreign look up and we have some rules for these, to make it look neater we remove the  trailing id -->
 {% set labelLength = field.label | length %}
 {% set lastThree = field.label[labelLength - 3] ~ field.label[labelLength - 2] ~ field.label[labelLength - 1] %}
 {% if lastThree == ' Id' %}
@@ -6,13 +5,23 @@
 {% else %}
   {% set cleanLabel = field.label %}
 {% endif %}
-<label  {% if field.name == "id"  %} class="d-none"  {% endif %}>{{ cleanLabel }}</label>
+
+<label {% if field.name == "id" %} class="d-none" {% endif %}>{{ cleanLabel }}</label>
 <select
-class="form-control form-control-user  {% if field.name == "id"  %} d-none  {% endif %}" 
- name="inp-{{ field.name }}" id="inp-{{ field.name }}"
- data-foreigntable="{{ field.foreignTable }}"
- data-foreignId="{{ field.foreignId }}"
- {% if disabled %}disabled{% endif %}
- {% if field.isRequired %}required{% endif %}>
+  class="form-control form-control-user {% if field.name == "id" %} d-none {% endif %}"
+  name="inp-{{ field.name }}"
+  id="inp-{{ field.name }}"
+  data-foreigntable="{{ field.foreignTable }}"
+  data-foreignId="{{ field.foreignId }}"
+  {% if disabled %}disabled{% endif %}
+  {% if field.isRequired %}required{% endif %}
+>
+
+{% if field.selectOptions %}
+    <option value="">Please Select</option>
+    {% for option in field.selectOptions %}
+      <option value="{{ option.value }}">{{ option.value }}</option>
+    {% endfor %}
+  {% endif %}
 </select>
-<span class="text-danger d-none" id="error-{{field.name}}"></span>  
+<span class="text-danger d-none" id="error-{{ field.name }}"></span>

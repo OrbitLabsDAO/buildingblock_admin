@@ -146,6 +146,8 @@ const generateTablePages = (tableName, fields, fieldsIndex, tableNames) => {
   fs.mkdirSync(pageDir, { recursive: true });
 
   // Helper to validate fields (adds `isRequired`)
+
+  /*
   const validateFields = (fieldList) =>
     fieldList.map((field) => {
       const isRequired =
@@ -158,12 +160,56 @@ const generateTablePages = (tableName, fields, fieldsIndex, tableNames) => {
         isRequired,
       };
     });
+    */
+  //new validate fields function to render selects
+
+  const validateFields = (fieldList) =>
+    fieldList.map((field) => {
+      const isRequired =
+        field.definition &&
+        field.definition.some(
+          (def) => def.type === "constraint" && def.variant === "not null"
+        );
+
+      const checkConstraint = field.definition?.find(
+        (def) => def.type === "constraint" && def.variant === "check"
+      );
+
+      let selectOptions = null;
+
+      if (
+        checkConstraint &&
+        checkConstraint.expression?.variant === "operation" &&
+        checkConstraint.expression?.operation === "in"
+      ) {
+        const expr = checkConstraint.expression;
+
+        // e.g., `status IN (1, 2, 3)`
+        if (
+          expr.right?.variant === "list" &&
+          Array.isArray(expr.right.expression)
+        ) {
+          selectOptions = expr.right.expression.map((item) => {
+            if (item.variant === "number") return parseInt(item.value);
+            if (item.variant === "string") return item.value;
+            return item;
+          });
+        }
+      }
+
+      console.log(selectOptions);
+      return {
+        ...field,
+        isRequired,
+        selectOptions,
+      };
+    });
 
   // Generate the table pages
   ["Index", "View", "Add", "Edit"].forEach((type) => {
     const isIndexPage = type === "Index";
     const relevantFields = validateFields(isIndexPage ? fieldsIndex : fields);
-
+    //console.log(relevantFields);
     const data = processFile(`table${type}.njk`, "_corenjks") || {};
     const filePath = path.join(pageDir, `${type.toLowerCase()}.html`);
     const inner = nunjucks.renderString(data.content, {
