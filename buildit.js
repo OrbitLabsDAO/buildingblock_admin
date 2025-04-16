@@ -177,6 +177,7 @@ const generateTablePages = (tableName, fields, fieldsIndex, tableNames) => {
 
       let selectOptions = null;
 
+      // Handle check constraints like `status IN (1, 2, 3)` and turn them into selects
       if (
         checkConstraint &&
         checkConstraint.expression?.variant === "operation" &&
@@ -184,20 +185,34 @@ const generateTablePages = (tableName, fields, fieldsIndex, tableNames) => {
       ) {
         const expr = checkConstraint.expression;
 
-        // e.g., `status IN (1, 2, 3)`
         if (
           expr.right?.variant === "list" &&
           Array.isArray(expr.right.expression)
         ) {
           selectOptions = expr.right.expression.map((item) => {
-            if (item.variant === "number") return parseInt(item.value);
-            if (item.variant === "string") return item.value;
-            return item;
+            if (item.variant === "number") {
+              return { value: item.value, label: item.value };
+            }
+            if (item.variant === "string") {
+              return { value: item.value, label: item.value };
+            }
+            return { value: item.value, label: item.value };
           });
         }
       }
+      // Handle BOOLEAN fields and turn them into yes / no selects
+      //TODO : we could have an override here that that checks field / table sets a custom value
+      if (
+        !selectOptions &&
+        field.datatype &&
+        field.datatype.variant === "boolean"
+      ) {
+        selectOptions = [
+          { value: "1", label: "Yes" },
+          { value: "0", label: "No" },
+        ];
+      }
 
-      console.log(selectOptions);
       return {
         ...field,
         isRequired,

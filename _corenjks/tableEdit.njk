@@ -26,7 +26,8 @@ layout: layout.njk
                         {% if field.name == "image" %}
                             {% include "htmlinputs/image.njk"  %}
                         {% else %}
-                            {% if field.foreignTable %}
+                        
+                             {% if field.foreignTable or field.selectOptions  %}
                                 {% include "htmlinputs/select.njk"  %}
                             {% else %}
                                 {% if field.datatype.variant == "integer" %}

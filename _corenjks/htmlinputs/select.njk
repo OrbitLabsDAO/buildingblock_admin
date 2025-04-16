@@ -20,7 +20,7 @@
 {% if field.selectOptions %}
     <option value="">Please Select</option>
     {% for option in field.selectOptions %}
-      <option value="{{ option.value }}">{{ option.value }}</option>
+      <option value="{{ option.value }}">{% if field.datatype.variant === "boolean" %} {{option.label}} {% else %} {{ option.value }}{% endif %}</option>
     {% endfor %}
   {% endif %}
 </select>

@@ -80,41 +80,46 @@ async function checkForeign() {
 }
 
 function applyFormValues() {
+  console.log(editData);
   if (!editData || !foreignData) return;
 
-  document.querySelectorAll(" select, textarea").forEach((field) => {
-    const rawName = field.name; // e.g. inp-userId
-    const baseName = rawName.replace(/^inp-/, ""); // userId
-    const relatedKey = baseName.endsWith("Id")
-      ? baseName.slice(0, -2) // remove trailing 'Id' => 'admin'
-      : baseName;
+  document
+    .querySelectorAll('input[type="number"], select, textarea')
+    .forEach((field) => {
+      const rawName = field.name; // e.g. inp-userId
+      const baseName = rawName.replace(/^inp-/, ""); // userId
+      const relatedKey = baseName.endsWith("Id")
+        ? baseName.slice(0, -2) // remove trailing 'Id' => 'admin'
+        : baseName;
 
-    // Apply normal values from editData
-    if (editData.hasOwnProperty(baseName)) {
-      if (baseName == "cfImageUrl") {
-        document.getElementById("image-uploading-text").innerText =
-          "Image preview";
-        document.getElementById("image-preview").src = editData[baseName];
-      } else field.value = editData[baseName];
-    }
-
-    // Handle select inputs with foreign data
-    if (field.tagName === "SELECT") {
-      const targetValue = editData[relatedKey];
-      const optionsList = foreignData[rawName]; // still using full raw field name here (e.g., inp-adminId)
-
-      if (Array.isArray(optionsList)) {
-        const matchedOptionIndex = Array.from(field.options).findIndex(
-          (option) =>
-            optionsList.find((item) => item.name == targetValue)?.id ==
-            option.value
-        );
-        if (matchedOptionIndex !== -1) {
-          field.selectedIndex = matchedOptionIndex;
+      // Apply normal values from editData
+      if (editData.hasOwnProperty(baseName)) {
+        if (baseName == "cfImageUrl") {
+          document.getElementById("image-uploading-text").innerText =
+            "Image preview";
+          document.getElementById("image-preview").src = editData[baseName];
+        } else {
+          field.value = editData[baseName];
         }
       }
-    }
-  });
+
+      // Handle select inputs with foreign data
+      if (field.tagName === "SELECT") {
+        const targetValue = editData[relatedKey];
+        const optionsList = foreignData[rawName]; // still using full raw field name here (e.g., inp-adminId)
+
+        if (Array.isArray(optionsList)) {
+          const matchedOptionIndex = Array.from(field.options).findIndex(
+            (option) =>
+              optionsList.find((item) => item.name == targetValue)?.id ==
+              option.value
+          );
+          if (matchedOptionIndex !== -1) {
+            field.selectedIndex = matchedOptionIndex;
+          }
+        }
+      }
+    });
 }
 
 document
