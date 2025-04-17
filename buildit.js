@@ -518,6 +518,30 @@ if (Array.isArray(parsedSchema.statement)) {
   });
   console.log("✅ Table files Processed!");
 
+  async function updateSharedCountryList() {
+    const res = await fetch("https://restcountries.com/v3.1/all");
+    const countries = await res.json();
+
+    // Sort alphabetically by name
+    const countryOptions = countries
+      .map((c) => ({
+        value: c.cca2,
+        label: c.name.common,
+      }))
+      .filter((c) => c.value && c.label)
+      .sort((a, b) => a.label.localeCompare(b.label));
+
+    env.SHAREDOPTIONS.countryList = countryOptions;
+
+    console.log(
+      "✅ Updated SHAREDOPTIONS.countryList with",
+      countryOptions.length,
+      "countries"
+    );
+  }
+
+  //get the country list
+  await updateSharedCountryList();
   // Process custom layouts in the _custom/layouts folder
   processCustomLayouts();
   // Generate account pages in the _site/account folder
