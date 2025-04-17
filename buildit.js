@@ -1,9 +1,8 @@
-const fs = require("fs");
-const path = require("path");
-const sqliteParser = require("sqlite-parser");
-const nunjucks = require("nunjucks");
-const matter = require("gray-matter");
-const { count } = require("console");
+import fs from "fs";
+import path from "path";
+import sqliteParser from "sqlite-parser";
+import nunjucks from "nunjucks";
+import matter from "gray-matter";
 
 // === ENVIRONMENT SETUP ===
 const args = process.argv.slice(2);

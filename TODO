@@ -28,6 +28,7 @@ TODO validate email
 FUTURE
 
 TODO change all the xhrcall to use use promises (xhrcall2) and depericate XHRCALL
+TODO move to es module to handle promises better (amongst other things)
 TODO replace with await
 const res = await fetch('/getUploadUrl');
 const { uploadURL } = await res.json();
