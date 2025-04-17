@@ -8,8 +8,6 @@ TODO make the external calls (GETS) use the apikey we should define an api key t
 
 SQL
 TODO rationlaise the database
-TODO change lookup to foreignKyes
-TODO add a new lookup endpoint to render out data to look up (we could also just store this in env may be easier)
 
 SIGN UP
 

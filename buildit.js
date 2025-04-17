@@ -45,6 +45,9 @@ const customFolder = path.join(__dirname, "_custom");
  * Copy a directory from the source path to the destination path.
  * @param {string} src - The source path.
  * @param {string} dest - The destination path.
+ * @description
+ * This function recursively copies all files and directories from the source path
+ * to the destination path.
  */
 const copyDirectory = (src, dest) => {
   if (!fs.existsSync(dest)) {
@@ -59,6 +62,7 @@ const copyDirectory = (src, dest) => {
 
     // If the item is a directory, recursively copy it
     if (fs.lstatSync(srcPath).isDirectory()) {
+      // Recursively call copyDirectory
       copyDirectory(srcPath, destPath);
     } else {
       // Otherwise, copy the file
@@ -141,73 +145,76 @@ const generateApiFunctions = (tableNames) => {
   console.log("✅ API files Processed!");
 };
 
-const generateTablePages = (tableName, fields, fieldsIndex, tableNames) => {
+/**
+ * Generates the table pages for a given table.
+ * @param {string} tableName - The name of the table to generate pages for.
+ * @param {object[]} fields - The list of fields in the table.
+ * @param {object[]} fieldsIndex - The list of fields in the table's index.
+ * @param {string[]} tableNames - The list of all table names.
+ * @param {object} sharedOptions - An object containing shared select options.
+ * @param {object} fieldOptionMapping - An object containing table-specific select overrides.
+ */
+const generateTablePages = (
+  tableName,
+  fields,
+  fieldsIndex,
+  tableNames,
+  sharedOptions,
+  fieldOptionMapping
+) => {
   const pageDir = path.join(siteDir, `tables/${tableName}`);
   fs.mkdirSync(pageDir, { recursive: true });
 
-  // Helper to validate fields (adds `isRequired`)
-
-  /*
-  const validateFields = (fieldList) =>
+  //validate fields function to render selects
+  const validateFields = (fieldList, tableName) =>
     fieldList.map((field) => {
       const isRequired =
         field.definition &&
         field.definition.some(
           (def) => def.type === "constraint" && def.variant === "not null"
         );
-      return {
-        ...field,
-        isRequired,
-      };
-    });
-    */
-  //new validate fields function to render selects
-
-  const validateFields = (fieldList) =>
-    fieldList.map((field) => {
-      const isRequired =
-        field.definition &&
-        field.definition.some(
-          (def) => def.type === "constraint" && def.variant === "not null"
-        );
-
       const checkConstraint = field.definition?.find(
         (def) => def.type === "constraint" && def.variant === "check"
       );
 
       let selectOptions = null;
 
-      // Handle check constraints like `status IN (1, 2, 3)` and turn them into selects
+      // 1. Use override from env.FIELDOPTIONMAPPING
+      const overrideKey = fieldOptionMapping?.[tableName]?.[field.name];
+      if (overrideKey) {
+        const overrideOptions = Array.isArray(overrideKey)
+          ? overrideKey
+          : sharedOptions?.[overrideKey];
+
+        if (overrideOptions) {
+          selectOptions = overrideOptions;
+        }
+      }
+
+      // 2. Check constraints (e.g., status IN (1, 2, 3))
       if (
-        checkConstraint &&
-        checkConstraint.expression?.variant === "operation" &&
-        checkConstraint.expression?.operation === "in"
+        !selectOptions &&
+        checkConstraint?.expression?.variant === "operation" &&
+        checkConstraint.expression.operation === "in"
       ) {
         const expr = checkConstraint.expression;
-
         if (
           expr.right?.variant === "list" &&
           Array.isArray(expr.right.expression)
         ) {
-          selectOptions = expr.right.expression.map((item) => {
-            if (item.variant === "number") {
-              return { value: item.value, label: item.value };
-            }
-            if (item.variant === "string") {
-              return { value: item.value, label: item.value };
-            }
-            return { value: item.value, label: item.value };
-          });
+          selectOptions = expr.right.expression.map((item) => ({
+            value: item.value,
+            label: item.value,
+          }));
         }
       }
-      // Handle BOOLEAN fields and turn them into yes / no selects
-      //TODO : we could have an override here that that checks field / table sets a custom value
+
+      // 3. Boolean fallback
       if (
         !selectOptions &&
-        field.datatype &&
-        field.datatype.variant === "boolean"
+        field.datatype?.variant?.toLowerCase() === "boolean"
       ) {
-        selectOptions = [
+        selectOptions = sharedOptions?.yesNo || [
           { value: "1", label: "Yes" },
           { value: "0", label: "No" },
         ];
@@ -223,7 +230,10 @@ const generateTablePages = (tableName, fields, fieldsIndex, tableNames) => {
   // Generate the table pages
   ["Index", "View", "Add", "Edit"].forEach((type) => {
     const isIndexPage = type === "Index";
-    const relevantFields = validateFields(isIndexPage ? fieldsIndex : fields);
+    const relevantFields = validateFields(
+      isIndexPage ? fieldsIndex : fields,
+      tableName
+    );
     //console.log(relevantFields);
     const data = processFile(`table${type}.njk`, "_corenjks") || {};
     const filePath = path.join(pageDir, `${type.toLowerCase()}.html`);
@@ -315,6 +325,7 @@ const processCustomLayouts = () => {
 
 /**
  * Copies all .js functions from _custom/functions to functions/api.
+ * This allows developers to easily create new API endpoints.
  */
 const processCustomFunctions = () => {
   console.log("✅ Processing custom functions!");
@@ -334,6 +345,9 @@ const processCustomFunctions = () => {
 
 /**
  * Process custom folders for table- or new- prefixed overrides.
+ * @param {string} [prefix=""] - The prefix to filter custom folders by.
+ * @param {string} [outputSubfolder=""] - The subfolder to create in the output folder.
+ * @param {string} [jsDest="functions/api/"] - The destination folder for JavaScript files.
  */
 const processCustomFolders = (
   prefix = "",
@@ -341,18 +355,28 @@ const processCustomFolders = (
   jsDest = "functions/api/"
 ) => {
   console.log(`✅ Processing custom ${prefix}!`);
+
+  // Create the custom folder if it doesn't exist
   fs.mkdirSync(customFolder, { recursive: true });
+
+  // Iterate over the custom folder and find all folders that start with the prefix
   fs.readdirSync(customFolder)
     .filter((f) => f.startsWith(prefix))
     .forEach((folder) => {
+      console.log(`✅ Processing custom folder: ${folder}`);
+
+      // Get the base name of the folder (without the prefix)
       const baseName = folder.replace(prefix, "");
-      const srcFolder = path.join(customFolder, folder);
+
+      // Create the output folder for this custom folder
       const outputPath = path.join(siteDir, outputSubfolder, baseName);
       fs.mkdirSync(outputPath, { recursive: true });
 
-      fs.readdirSync(srcFolder).forEach((file) => {
-        const fullPath = path.join(srcFolder, file);
+      // Iterate over the files in the custom folder
+      fs.readdirSync(folder).forEach((file) => {
+        const fullPath = path.join(folder, file);
 
+        // If the file is a JavaScript file, copy it to the output folder
         if (isJsFile(file)) {
           const destJsPath = path.join(
             jsDest,
@@ -362,12 +386,14 @@ const processCustomFolders = (
           fs.copyFileSync(fullPath, destJsPath);
           console.log(`✅ Copied JS: ${file} to ${destJsPath}`);
         } else if (isTemplateFile(file)) {
-          const { layout, content } = processFile(file, srcFolder) || {};
+          // If the file is a template file, render it with the context
+          const { layout, content } = processFile(file, folder) || {};
           const viewType = file
             .replace("table", "")
             .replace(".njk", "")
             .toLowerCase();
           const outputFile = path.join(outputPath, `${viewType}.html`);
+
           const renderedInner = nunjucks.renderString(content, {
             env,
             tableNames,
@@ -381,6 +407,7 @@ const processCustomFolders = (
               })
             : renderedInner;
 
+          // Write the rendered template to the output folder
           fs.writeFileSync(outputFile, final);
           console.log(`✅ Created custom page: ${outputFile}`);
         }
@@ -469,31 +496,44 @@ if (Array.isArray(parsedSchema.statement)) {
       const sanitizedFieldsIndex = fields.filter(
         (f) => !env.EXCLUDEDFIELDSINDEX.includes(f.name)
       );
+
+      const sharedOptions = env.SHAREDOPTIONS;
+      const fieldOptionMapping = env.FIELDOPTIONMAPPING;
       // Generate table pages
       if (!env.EXCLUDETABLES.includes(tableName)) {
         generateTablePages(
           tableName,
           sanitizedFields,
           sanitizedFieldsIndex,
-          tableNames
+          tableNames,
+          sharedOptions,
+          fieldOptionMapping
         );
       }
     }
   });
   console.log("✅ Table files Processed!");
 
-  // === ADDITIONAL PAGES ===
+  // Process custom layouts in the _custom/layouts folder
   processCustomLayouts();
+  // Generate account pages in the _site/account folder
   processAccountFiles(tableNames);
+  // Generate API endpoints in the functions/api/tables folder
   generateApiFunctions(tableNames);
+  // Process custom table folders in the _custom/tables folder and output in the _site/tables folder
   processCustomFolders("table_", "tables/", "functions/api/");
+  // Process custom new folders in the _custom/new folder and output in the _site folder
   processCustomFolders("new_", "", "functions/api/");
+  // Copy all .js functions from _custom/functions to functions/api
   processCustomFunctions();
 
-  // === MAIN INDEX PAGE ===
+  /**
+   * Generate the main index page.
+   * This writes the rendered output of 'indexMain.njk' to 'index.html'.
+   */
   fs.writeFileSync(
-    path.join(siteDir, "index.html"),
-    nunjucks.render("indexMain.njk", { tableNames })
+    path.join(siteDir, "index.html"), // Define the output path for the index file
+    nunjucks.render("indexMain.njk", { tableNames }) // Render the template with table names
   );
   console.log("✅ Main index page generated!");
 } else {
