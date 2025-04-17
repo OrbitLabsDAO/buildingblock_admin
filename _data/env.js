@@ -65,7 +65,10 @@ module.exports = {
     /**
      * A list of countries
      * @type {Object[]}
+     *
+     * source : https://cdn.jsdelivr.net/npm/world_countries_lists@latest/data/countries/en/countries.json
      */
+
     countryList: [
       { value: "US", label: "United States" },
       { value: "CA", label: "Canada" },

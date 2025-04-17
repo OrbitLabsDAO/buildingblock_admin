@@ -1,6 +1,8 @@
 SQL
 TODO rationlaise the database
 
+TODO have a list generator script that populates arrays for useful data such as countries, example here https://cdn.jsdelivr.net/npm/world_countries_lists@latest/data/countries/en/countries.json
+
 Image upload
 TODO disable the edit button if the image is being uploaded
 TODO look into using a file uploader such as filepond
