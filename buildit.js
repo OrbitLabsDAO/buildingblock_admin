@@ -1,8 +1,8 @@
-import fs from "fs";
-import path from "path";
-import sqliteParser from "sqlite-parser";
-import nunjucks from "nunjucks";
-import matter from "gray-matter";
+const fs = require("fs");
+const path = require("path");
+const sqliteParser = require("sqlite-parser");
+const nunjucks = require("nunjucks");
+const matter = require("gray-matter");
 
 // === ENVIRONMENT SETUP ===
 const args = process.argv.slice(2);
@@ -180,7 +180,6 @@ const generateTablePages = (
       let selectOptions = null;
 
       // 1. Use override from env.FIELDOPTIONMAPPING
-      console.log(env.SHAREDOPTIONS.countryList);
       const overrideKey = fieldOptionMapping?.[tableName]?.[field.name];
       if (overrideKey) {
         const overrideOptions = Array.isArray(overrideKey)
