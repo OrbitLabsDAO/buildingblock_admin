@@ -4,7 +4,45 @@ let user;
 let oneTimeUrl = "";
 let cfImageDetails;
 let interval;
-//var table // datatable
+
+// Step 1: Get all collapse containers and links
+const collapses = document.querySelectorAll('[id^="collapse"]');
+const allMenuLinks = document.querySelectorAll(".collapse-item");
+
+// Step 2: Track which collapse to expand
+let activeCollapse = null;
+
+// Step 3: Set active menu item and find which collapse it's inside
+allMenuLinks.forEach((link) => {
+  const href = link.getAttribute("href")?.toLowerCase();
+  const matches = href?.includes(`/tables/${tableName.toLowerCase()}/`);
+
+  if (matches) {
+    link.classList.add("active");
+
+    // Traverse up to find the collapse div
+    let current = link.parentElement;
+    while (current && !current.classList.contains("collapse")) {
+      current = current.parentElement;
+    }
+
+    if (current) {
+      activeCollapse = current;
+    }
+  } else {
+    link.classList.remove("active");
+  }
+});
+
+// Step 4: Expand only the active collapse and collapse others
+collapses.forEach((collapse) => {
+  if (collapse === activeCollapse) {
+    collapse.classList.add("show");
+    collapse.removeAttribute("data-parent"); // optional: keeps it open
+  } else {
+    collapse.classList.remove("show");
+  }
+});
 
 //TODO: replace this with plain js
 (function ($) {

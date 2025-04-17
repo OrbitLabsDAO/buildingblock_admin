@@ -52,18 +52,18 @@
                     <span>Dashboard</span></a>
             </li>
              <li class="nav-item" id="navadmin">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne"
+                <a class="nav-link" href="#" data-toggle="collapse" data-target="#collapseOne"
                     aria-expanded="true" aria-controls="collapseOne">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Tables</span>
                 </a>
-                <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionSidebar">
+                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Tables</h6>
                         <div id="backpageprojectmenu"></div>
-                        {{ tableName}}
-                         {% for tableName in tableNames %}
-                           <a class="collapse-item" href="/tables/{{ tableName }}/">{{ tableName | safe}}</a>
+                        
+                         {% for tName in tableNames %}
+                           <a class="collapse-item  " href="/tables/{{ tName }}/">{{ tName | safe}}</a>
                         {% endfor %}
                     </div>
                 </div>

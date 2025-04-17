@@ -1,13 +1,12 @@
+SQL
+TODO rationlaise the database
+
 Image upload
-TODO expand the table and highlight the one you are on
 TODO disable the edit button if the image is being uploaded
 TODO look into using a file uploader such as filepond
 TODO use the santiszed fields to hide the input element
 TODO Turns out we require the source folder so look to move these files that we use to the core directory so they are further seperated
 TODO make the external calls (GETS) use the apikey we should define an api key to control scopes in the future
-
-SQL
-TODO rationlaise the database
 
 SIGN UP
 

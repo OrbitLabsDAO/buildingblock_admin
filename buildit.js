@@ -288,7 +288,11 @@ const processAccountFiles = (tableNames) => {
 
     const inner = nunjucks.renderString(content, { env, tableNames });
     const final = layout
-      ? renderTemplateWithLayout(layout, { content: inner, env, tableNames })
+      ? renderTemplateWithLayout(layout, {
+          content: inner,
+          env,
+          tableNames,
+        })
       : inner;
 
     fs.writeFileSync(outputFile, final);
@@ -398,7 +402,7 @@ const processCustomFolders = (
             env,
             tableNames,
           });
-
+          console.log(tableName);
           const final = layout
             ? renderTemplateWithLayout(layout, {
                 content: renderedInner,
