@@ -61,7 +61,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Tables</h6>
                         <div id="backpageprojectmenu"></div>
-
+                        {{ tableName}}
                          {% for tableName in tableNames %}
                            <a class="collapse-item" href="/tables/{{ tableName }}/">{{ tableName | safe}}</a>
                         {% endfor %}
