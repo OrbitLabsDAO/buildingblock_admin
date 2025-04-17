@@ -1,7 +1,15 @@
-SQL
-TODO rationlaise the database
+INPUT FIELDS
+TODO password input
+TODOuse a nice select with search and such
+TODO use a nice select with search and such
+TODO add a nice edit for text areas
 
-TODO have a list generator script that populates arrays for useful data such as countries, example here https://cdn.jsdelivr.net/npm/world_countries_lists@latest/data/countries/en/countries.json
+SCHMEA
+TODO HANDLE MIGRATION
+TODO RATIONALISE TABLES
+Do we require property owner, this could be rolled into user but then we could lose the basics of the userid
+TODO update country to be a varchar
+TODO use the varchar length to set the max length of the input field
 
 Image upload
 TODO disable the edit button if the image is being uploaded
@@ -16,14 +24,6 @@ TODO forgot password flow
 TODO register create user
 TODO check email is being sent
 TODO validate email
-
-SCHMEA
-TODO HANDLE MIGRATION
-TODO RATIONALISE TABLES
-Do we require property owner, this could be rolled into user but then we could lose the basics of the userid
-
-INPUT FIELDS
-TODO password input
 
 FUTURE
 

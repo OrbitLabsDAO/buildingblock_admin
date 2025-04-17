@@ -3,6 +3,7 @@ const path = require("path");
 const sqliteParser = require("sqlite-parser");
 const nunjucks = require("nunjucks");
 const matter = require("gray-matter");
+const { count } = require("console");
 
 // === ENVIRONMENT SETUP ===
 const args = process.argv.slice(2);
@@ -180,6 +181,7 @@ const generateTablePages = (
       let selectOptions = null;
 
       // 1. Use override from env.FIELDOPTIONMAPPING
+      console.log(env.SHAREDOPTIONS.countryList);
       const overrideKey = fieldOptionMapping?.[tableName]?.[field.name];
       if (overrideKey) {
         const overrideOptions = Array.isArray(overrideKey)
@@ -265,6 +267,7 @@ const generateTablePages = (
  */
 const processAccountFiles = (tableNames) => {
   console.log("✅ Processing Account files!");
+
   const files = fs
     .readdirSync(coreFolder)
     .filter((f) => f.startsWith("account-") && f.endsWith(".njk"));
@@ -421,149 +424,183 @@ const processCustomFolders = (
   console.log(`✅ Custom ${prefix} processed!`);
 };
 
+/**
+ * Fetches a list of countries from a public API and updates the shared options with country data.
+ * Each country is represented as an object containing a country code and its common name.
+ * The list is sorted alphabetically by country name and stored in `env.SHAREDOPTIONS.countryList`.
+ */
+
+async function updateSharedCountryList() {
+  const urlEntry = env.DATALISTS.find(
+    (item) => item.value === "updateSharedCountryList"
+  );
+  if (!urlEntry) {
+    console.error("❌ URL for updateSharedCountryList not found in DATALISTS");
+    return;
+  }
+
+  const res = await fetch(urlEntry.URL);
+  const countries = await res.json();
+
+  const prioritise = urlEntry.prioritise || [];
+  const exclude = urlEntry.exclude || [];
+
+  // Build and filter list
+  const allOptions = countries
+    .map((c) => ({
+      value: c.cca2,
+      label: c.name.common,
+    }))
+    .filter((c) => c.value && c.label && !exclude.includes(c.value));
+
+  const topCountries = [];
+  const remainingCountries = [];
+
+  for (const country of allOptions) {
+    if (prioritise.includes(country.value)) {
+      topCountries.push(country);
+    } else {
+      remainingCountries.push(country);
+    }
+  }
+
+  topCountries.sort((a, b) => a.label.localeCompare(b.label));
+  remainingCountries.sort((a, b) => a.label.localeCompare(b.label));
+
+  const countryOptions = [...topCountries, ...remainingCountries];
+
+  env.SHAREDOPTIONS.countryList = countryOptions;
+
+  console.log(
+    `✅ Updated SHAREDOPTIONS.countryList with ${countryOptions.length} countries (Top: ${topCountries.length}, Excluded: ${exclude.length})`
+  );
+}
+
 // === BUILD START ===
-if (fs.existsSync(siteDir))
-  fs.rmSync(siteDir, { recursive: true, force: true });
-fs.mkdirSync(siteDir, { recursive: true });
+/**
+ * Main entry point for the build script.
+ * @returns {Promise<void>} Resolves when the build is complete.
+ */
+(async () => {
+  try {
+    // === UPDATE SHARED COUNTRY LIST ===
+    // Update the SHAREDOPTIONS.countryList with the latest country list
+    await updateSharedCountryList();
 
-if (fs.existsSync(assetsFolder))
-  copyDirectory(assetsFolder, path.join(siteDir, "assets"));
-if (fs.existsSync(functionsFolder))
-  copyDirectory(functionsFolder, path.join(siteDir, "functions"));
+    // === CLEAN SITE FOLDER ===
+    if (fs.existsSync(siteDir))
+      fs.rmSync(siteDir, { recursive: true, force: true });
+    fs.mkdirSync(siteDir, { recursive: true });
 
-// === PARSE TABLES FROM SCHEMA ===
-let tableNames = [];
-// === Collect all valid table names (after exclusions) ===
-if (Array.isArray(parsedSchema.statement)) {
-  tableNames = parsedSchema.statement
-    .filter(
-      (stmt) =>
+    // === COPY ASSETS AND FUNCTIONS ===
+    if (fs.existsSync(assetsFolder))
+      copyDirectory(assetsFolder, path.join(siteDir, "assets"));
+    if (fs.existsSync(functionsFolder))
+      copyDirectory(functionsFolder, path.join(siteDir, "functions"));
+
+    // === PARSE TABLES FROM SCHEMA ===
+    // === Collect all valid table names (after exclusions) ===
+    const tableNames = parsedSchema.statement
+      .filter(
+        (stmt) =>
+          stmt.variant === "create" &&
+          stmt.format === "table" &&
+          !env.EXCLUDETABLES.includes(stmt.name.name)
+      )
+      .map((stmt) => stmt.name.name)
+      .filter((name) => !env.RESERVEDTABLES.includes(name));
+
+    // === GENERATE TABLE PAGES ===
+    console.log("✅ Processing Table files!");
+
+    // Process each statement in the parsed schema
+    parsedSchema.statement.forEach((stmt) => {
+      // Check if the statement is a CREATE TABLE statement
+      if (
         stmt.variant === "create" &&
         stmt.format === "table" &&
         !env.EXCLUDETABLES.includes(stmt.name.name)
-    )
-    .map((stmt) => stmt.name.name)
-    .filter((name) => !env.RESERVEDTABLES.includes(name)); // filter out reserved tables
-}
+      ) {
+        const tableName = stmt.name.name;
+        const fields = stmt.definition;
+        // Generate human-readable field labels
+        // Loop through each field
+        fields.forEach((field) => {
+          // Check if the field has a name and generate a human-readable label
+          if (field.name) {
+            field.label = field.name
+              .replace(/_/g, " ")
+              .replace(/([a-z])([A-Z])/g, "$1 $2")
+              .replace(/\b\w/g, (c) => c.toUpperCase());
+          }
 
-// === GENERATE TABLE PAGES ===
-console.log("✅ Processing Table files!");
+          // Check if this field has a foreign key constraint
+          if (
+            field.definition &&
+            field.definition[0] &&
+            field.definition[0].variant === "foreign key"
+          ) {
+            const foreignTable = field.definition[0].references.name; // The table this field references
+            const foreignId = field.definition[0].references.columns[0].name; // The field it references
+            const primaryId = field.columns[0].name; // The primary key field name (the current field)
+            // Now loop through fields again to add foreign table and foreign id to the field that matches the primary field
+            fields.forEach((compareField) => {
+              if (compareField.name === primaryId) {
+                compareField.foreignTable = foreignTable;
+                compareField.foreignId = foreignId;
+              }
+            });
+          }
+        });
 
-if (Array.isArray(parsedSchema.statement)) {
-  // Process each statement in the parsed schema
-  parsedSchema.statement.forEach((stmt) => {
-    // Check if the statement is a CREATE TABLE statement
-    if (
-      stmt.variant === "create" &&
-      stmt.format === "table" &&
-      !env.EXCLUDETABLES.includes(stmt.name.name)
-    ) {
-      const tableName = stmt.name.name;
-      const fields = stmt.definition;
-      // Generate human-readable field labels
-      // Loop through each field
-      fields.forEach((field) => {
-        // Check if the field has a name and generate a human-readable label
-        if (field.name) {
-          field.label = field.name
-            .replace(/_/g, " ")
-            .replace(/([a-z])([A-Z])/g, "$1 $2")
-            .replace(/\b\w/g, (c) => c.toUpperCase());
-        }
-
-        // Check if this field has a foreign key constraint
-        if (
-          field.definition &&
-          field.definition[0] &&
-          field.definition[0].variant === "foreign key"
-        ) {
-          const foreignTable = field.definition[0].references.name; // The table this field references
-          const foreignId = field.definition[0].references.columns[0].name; // The field it references
-          const primaryId = field.columns[0].name; // The primary key field name (the current field)
-          //console.log(tableName, primaryId, foreignTable, foreignId);
-
-          // Now loop through fields again to add foreign table and foreign id to the field that matches the primary field
-          fields.forEach((compareField) => {
-            if (compareField.name === primaryId) {
-              compareField.foreignTable = foreignTable;
-              compareField.foreignId = foreignId;
-            }
-          });
-        }
-      });
-
-      // Filter out fields that should be excluded
-      const sanitizedFields = fields.filter(
-        (f) => !env.EXCLUDEDFIELDS.includes(f.name)
-      );
-
-      const sanitizedFieldsIndex = fields.filter(
-        (f) => !env.EXCLUDEDFIELDSINDEX.includes(f.name)
-      );
-
-      const sharedOptions = env.SHAREDOPTIONS;
-      const fieldOptionMapping = env.FIELDOPTIONMAPPING;
-      // Generate table pages
-      if (!env.EXCLUDETABLES.includes(tableName)) {
-        generateTablePages(
-          tableName,
-          sanitizedFields,
-          sanitizedFieldsIndex,
-          tableNames,
-          sharedOptions,
-          fieldOptionMapping
+        // Filter out fields that should be excluded
+        const sanitizedFields = fields.filter(
+          (f) => !env.EXCLUDEDFIELDS.includes(f.name)
         );
+
+        const sanitizedFieldsIndex = fields.filter(
+          (f) => !env.EXCLUDEDFIELDSINDEX.includes(f.name)
+        );
+        //set the shared optons and field options for the select
+        const sharedOptions = env.SHAREDOPTIONS;
+        const fieldOptionMapping = env.FIELDOPTIONMAPPING;
+        // Generate table pages
+        if (!env.EXCLUDETABLES.includes(tableName)) {
+          generateTablePages(
+            tableName,
+            sanitizedFields,
+            sanitizedFieldsIndex,
+            tableNames,
+            sharedOptions,
+            fieldOptionMapping
+          );
+        }
       }
-    }
-  });
-  console.log("✅ Table files Processed!");
+    });
+    console.log("✅ Table files Processed!");
+    // Process custom layouts in the _custom/layouts folder
+    processCustomLayouts();
+    // Generate account pages in the _site/account folder
+    processAccountFiles(tableNames);
+    // Generate API endpoints in the functions/api/tables folder
+    generateApiFunctions(tableNames);
+    // Process custom table folders in the _custom/tables folder and output in the _site/tables folder
+    processCustomFolders("table_", "tables/", "functions/api/");
+    // Process custom new folders in the _custom/new folder and output in the _site folder
+    processCustomFolders("new_", "", "functions/api/");
+    // Copy all .js functions from _custom/functions to functions/api
+    processCustomFunctions();
 
-  async function updateSharedCountryList() {
-    const res = await fetch("https://restcountries.com/v3.1/all");
-    const countries = await res.json();
-
-    // Sort alphabetically by name
-    const countryOptions = countries
-      .map((c) => ({
-        value: c.cca2,
-        label: c.name.common,
-      }))
-      .filter((c) => c.value && c.label)
-      .sort((a, b) => a.label.localeCompare(b.label));
-
-    env.SHAREDOPTIONS.countryList = countryOptions;
-
-    console.log(
-      "✅ Updated SHAREDOPTIONS.countryList with",
-      countryOptions.length,
-      "countries"
+    /**
+     * Generate the main index page.
+     * This writes the rendered output of 'indexMain.njk' to 'index.html'.
+     */
+    fs.writeFileSync(
+      path.join(siteDir, "index.html"), // Define the output path for the index file
+      nunjucks.render("indexMain.njk", { tableNames }) // Render the template with table names
     );
+    console.log("✅ Main index page generated!");
+  } catch (err) {
+    console.error("❌ Failed to update country list:", err);
   }
-
-  //get the country list
-  await updateSharedCountryList();
-  // Process custom layouts in the _custom/layouts folder
-  processCustomLayouts();
-  // Generate account pages in the _site/account folder
-  processAccountFiles(tableNames);
-  // Generate API endpoints in the functions/api/tables folder
-  generateApiFunctions(tableNames);
-  // Process custom table folders in the _custom/tables folder and output in the _site/tables folder
-  processCustomFolders("table_", "tables/", "functions/api/");
-  // Process custom new folders in the _custom/new folder and output in the _site folder
-  processCustomFolders("new_", "", "functions/api/");
-  // Copy all .js functions from _custom/functions to functions/api
-  processCustomFunctions();
-
-  /**
-   * Generate the main index page.
-   * This writes the rendered output of 'indexMain.njk' to 'index.html'.
-   */
-  fs.writeFileSync(
-    path.join(siteDir, "index.html"), // Define the output path for the index file
-    nunjucks.render("indexMain.njk", { tableNames }) // Render the template with table names
-  );
-  console.log("✅ Main index page generated!");
-} else {
-  console.error("❌ Parsed schema is not in the expected format.");
-}
+})();

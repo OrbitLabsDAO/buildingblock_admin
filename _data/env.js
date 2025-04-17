@@ -14,6 +14,14 @@ module.exports = {
   CANCREATEACCOUNT: process.env.CANCREATEACCOUNT,
   COMPLEXPASSWORD: process.env.COMPLEXPASSWORD,
   RESETPASSWORD: process.env.RESETPASSWORD,
+  DATALISTS: [
+    {
+      value: "updateSharedCountryList",
+      URL: "https://restcountries.com/v3.1/all",
+      prioritise: ["US", "GB", "CA", "AU", "DE", "FR"], // ISO 3166-1 alpha-2 country codes
+      exclude: ["AQ", "IR", "KP"], // Exclude Antarctica, Iran, North Korea (example)
+    },
+  ],
   EXCLUDEDFIELDS: [
     "password",
     "resetPassword",
@@ -63,17 +71,10 @@ module.exports = {
       { value: "viewer", label: "Viewer" },
     ],
     /**
-     * A list of countries
+     * A list of countries fetched from restcountries.com
      * @type {Object[]}
-     *
-     * source : https://cdn.jsdelivr.net/npm/world_countries_lists@latest/data/countries/en/countries.json
      */
-
-    countryList: [
-      { value: "US", label: "United States" },
-      { value: "CA", label: "Canada" },
-      { value: "MX", label: "Mexico" },
-    ],
+    countryList: [],
   },
 
   /**
