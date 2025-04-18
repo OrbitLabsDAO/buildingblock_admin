@@ -8,7 +8,7 @@ if [ "$ACTION" = "origin" ]; then
 
 
     if [ -n "$BRANCH" ]; then
-        echo "Doing branch stuff..."
+        echo "Doing branch stuff on origin..."
         if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
             git checkout "$BRANCH"
         else
@@ -72,7 +72,7 @@ fi
 
 if [ "$ACTION" = "github" ]; then
     if [ -n "$BRANCH" ]; then
-        echo "Doing branch stuff..."
+        echo "Doing branch stuff on github..."
         git checkout "$BRANCH" 2>/dev/null || echo "⚠️  Warning: Could not switch to branch '$BRANCH'."
     else
         echo "⚠️  No branch provided — skipping checkout."
