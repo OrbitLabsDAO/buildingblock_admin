@@ -1,16 +1,21 @@
 INPUT FIELDS
 TODO password input
-TODOuse a nice select with search and such
 TODO use a nice select with search and such
 TODO add a nice edit for text areas
+TODO have a way to chain screen together so first property, then goes to property images and the property amenities etc
+TODO email input field
+TODO date input field
 
 SCHMEA
-TODO HANDLE MIGRATION
-TODO RATIONALISE TABLES
-Do we require property owner, this could be rolled into user but then we could lose the basics of the userid
-TODO update country to be a varchar
+
+TODO userid in token_owner, this could not be neeeded as they log into another admin for thier property stuff.
+TODO update property_rental_cost to use the exchange rate and not local cost as we did with the property table
+TODO update property_rental_payment to use the exchange rate and not local cost as we did with the property table
+TODO maybe store the exhange rate info in a new table and just store the crypto that was used for payment in property_rental_cost and property_rental_payment
 TODO use the varchar length to set the max length of the input field
 TODO parse what input we want the field to be from the comment (this may be overkill)
+TODO ability to set a range for select min max (1,10)
+TODO handle migration
 
 Image upload
 TODO disable the edit button if the image is being uploaded
