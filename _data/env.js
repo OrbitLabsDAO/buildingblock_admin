@@ -57,8 +57,8 @@ module.exports = {
      * @type {Object[]}
      */
     yesNo: [
-      { value: "yes", label: "Yes" },
-      { value: "no", label: "No" },
+      { value: "0", label: "No" },
+      { value: "1", label: "Yes" },
     ],
     /**
      * A list of user roles
@@ -68,6 +68,10 @@ module.exports = {
       { value: "admin", label: "Administrator" },
       { value: "editor", label: "Editor" },
       { value: "viewer", label: "Viewer" },
+    ],
+    propertyTypes: [
+      { value: "1", label: "Condo" },
+      { value: "2", label: "House" },
     ],
     /**
      * A list of countries fetched from restcountries.com
@@ -99,6 +103,7 @@ module.exports = {
        * @type {String}
        */
       country: "countryList",
+      propertyType: "propertyTypes",
     },
     users: {
       /**

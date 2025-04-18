@@ -13,6 +13,7 @@ layout: layout.njk
 <p class="mb-4">
 </p>
     {% set disableButton = "" %} 
+    {% set showQuill = true %} 
     <div id="formInputs">
     <form action="/add_{{ tableName }}" method="post">
     {% set imagePreview = true %} 
@@ -55,6 +56,10 @@ layout: layout.njk
 <button class="btn btn-primary btn-user btn-block" id="btn-update">
     Update
 </button>
+<!-- Include the Quill js library -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+<!-- Include the Quill library -->
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 <script type="text/javascript">{{theJs | safe}}</script>
 
 

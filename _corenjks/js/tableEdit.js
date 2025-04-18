@@ -79,12 +79,24 @@ async function checkForeign() {
   }
 }
 
+const quills = [];
+
+document.querySelectorAll(".editor").forEach((editorEl, index) => {
+  const quill = new Quill(editorEl, {
+    theme: "snow",
+  });
+  quills.push(quill);
+});
+
 function applyFormValues() {
   console.log(editData);
   if (!editData || !foreignData) return;
 
+  document;
   document
-    .querySelectorAll('input[type="number"], select, textarea')
+    .querySelectorAll(
+      'input[type="number"], input[data-type="varchar"], select, textarea'
+    )
     .forEach((field) => {
       const rawName = field.name; // e.g. inp-userId
       const baseName = rawName.replace(/^inp-/, ""); // userId

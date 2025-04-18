@@ -21,7 +21,7 @@ layout: layout.njk
         {% set disabled = false %}
         {% set disableButton = "" %}
         {% set defaultInteger = 0 %}
-
+        {% set showQuill = true %} 
         {% for field in fields %}
             {% if field.type != "definition" or field.variant != "constraint" %}
                 {% if field.name and field.name != "id" %}
@@ -51,6 +51,7 @@ layout: layout.njk
                 {% endif %}
             {% endif %}
         {% endfor %}
+      
     </form>
 </div>
 
@@ -59,7 +60,11 @@ layout: layout.njk
 <button class="btn btn-primary btn-user btn-block" id="btn-create" {{ disableButton }}>
     Create
 </button>
-
+<!-- Include the Quill js library -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+<!-- Include the Quill library -->
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 <script type="text/javascript">
     {{ theJs | safe }}
 </script>
+

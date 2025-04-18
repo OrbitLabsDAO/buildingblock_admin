@@ -111,6 +111,15 @@ let getAddDone = (response) => {
   else showAlert(response.error, 2);
 };
 
+const quills = [];
+
+document.querySelectorAll(".editor").forEach((editorEl, index) => {
+  const quill = new Quill(editorEl, {
+    theme: "snow",
+  });
+  quills.push(quill);
+});
+
 /**
  * Show an error message for a field
  */
