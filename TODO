@@ -10,6 +10,7 @@ TODO RATIONALISE TABLES
 Do we require property owner, this could be rolled into user but then we could lose the basics of the userid
 TODO update country to be a varchar
 TODO use the varchar length to set the max length of the input field
+TODO parse what input we want the field to be from the comment (this may be overkill)
 
 Image upload
 TODO disable the edit button if the image is being uploaded
