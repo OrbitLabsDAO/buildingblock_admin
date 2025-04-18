@@ -30,7 +30,8 @@ layout: layout.njk
                             {% include "htmlinputs/image.njk" %}
                             {% set disableButton = "disabled" %}
                         {% elif field.name == "password" %}
-                            {% include "htmlinputs/password.njk" %}
+                            <!-- TODO finish the input password UI -->
+                            {% include "htmlinputs/text.njk" %}
                         {% elif field.foreignTable or field.selectOptions %}
                             {% include "htmlinputs/select.njk" %}
                         {% else %}
