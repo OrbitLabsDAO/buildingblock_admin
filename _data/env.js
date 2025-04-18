@@ -23,7 +23,6 @@ module.exports = {
     },
   ],
   EXCLUDEDFIELDS: [
-    "password",
     "resetPassword",
     "isDeleted",
     "createdAt",
