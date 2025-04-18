@@ -47,9 +47,19 @@ const excludeItems = [
   "_corenjks/tableEdit.njk",
   "_corenjks/tableIndex.njk",
   "_corenjks/tableView.njk",
+  "functions/api/tables/agent.js", //you can remove this, this is the demo script
   "functions/api/tables/property.js", //you can remove this, this is the demo script
   "functions/api/tables/property_amenities.js", //you can remove this, this is the demo script
+  "functions/api/tables/property_distribution.js", //you can remove this, this is the demo script
   "functions/api/tables/property_images.js", //you can remove this, this is the demo script
+  "functions/api/tables/property_leads.js", //you can remove this, this is the demo script
+  "functions/api/tables/property_rental_agreement.js", //you can remove this, this is the demo script
+  "functions/api/tables/property_rental_cost.js", //you can remove this, this is the demo script
+  "functions/api/tables/property_rental_payment.js", //you can remove this, this is the demo script
+  "functions/api/tables/property_rental_cost.js", //you can remove this, this is the demo script
+  "functions/api/tables/property_tenant.js", //you can remove this, this is the demo script
+  "functions/api/tables/property_token.js", //you can remove this, this is the demo script
+  "functions/api/tables/token_owner.js", //you can remove this, this is the demo script
   "functions/api/crowdfund.js", //you can remove this, this is the demo script
 ];
 
