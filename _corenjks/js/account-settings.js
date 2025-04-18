@@ -1,12 +1,21 @@
+// Set the table name so the menu parsing works
+tableName = "_user";
+
+/**
+ * Executes a function when the document is ready.
+ * @param {Function} f - The function to execute.
+ */
 let whenDocumentReady = (f) => {
   /in/.test(document.readyState)
     ? setTimeout("whenDocumentReady(" + f + ")", 9)
     : f();
 };
 
+// Add event listener for password update
 document
   .getElementById("btn-update-password")
   .addEventListener("click", function () {
+    // Retrieve password values
     const oldPassword = document
       .getElementById("inp-old-password")
       .value.trim();
@@ -24,6 +33,7 @@ document
 
     let hasError = false;
 
+    // Validate passwords
     if (!oldPassword) {
       document.getElementById("error-old-password").textContent =
         "Old password is required.";
@@ -50,6 +60,7 @@ document
 
     if (hasError) return;
 
+    // Prepare payload for password update
     const user = JSON.parse(localStorage.getItem("user"));
     const payload = {
       id: user.id,
@@ -61,33 +72,40 @@ document
     const theUrl = `${apiUrl}account-settings/`;
     const requestBody = JSON.stringify(payload);
 
+    // Define callback for password update response
     let getPasswordUpdateDone = (response) => {
       let res = JSON.parse(response);
       if (res.status == "ok") {
         showAlert("Password Updated", 1);
       } else {
-        showAlert("Error updating passwpord please try again", 2);
+        showAlert("Error updating password please try again", 2);
       }
     };
 
+    // Make API call to update password
     xhrcall(4, theUrl, requestBody, "json", "", getPasswordUpdateDone);
   });
 
+// Add event listener for general settings update
 document.getElementById("btn-update").addEventListener("click", () => {
   const email = document.getElementById("inp-email").value;
   let isValid = true;
-  // Email validation (if the field name contains "email")
+
+  // Email validation
   if (validateEmail(email) == false) {
     isValid = false;
     showFieldError("email", "Please enter a valid email address.");
   } else hideFieldError("email");
 
+  // Retrieve other input values
   const name = document.getElementById("inp-name").value;
   const phone = document.getElementById("inp-phone").value;
   const username = document.getElementById("inp-username").value;
+
+  // Validate other fields
   if (name == "") {
     isValid = false;
-    showFieldError("name", "Please enter a valid name .");
+    showFieldError("name", "Please enter a valid name.");
   } else hideFieldError("name");
 
   if (phone == "") {
@@ -101,8 +119,9 @@ document.getElementById("btn-update").addEventListener("click", () => {
   } else hideFieldError("username");
 
   if (isValid == true) {
+    // Prepare payload for settings update
     const payload = {
-      id: user.id, // include id so the backend knows who to update
+      id: user.id, // Include id for backend update
       name: name,
       email: email,
       phone: phone,
@@ -110,6 +129,8 @@ document.getElementById("btn-update").addEventListener("click", () => {
     };
     const theUrl = `${apiUrl}account-settings/`;
     const requestBody = JSON.stringify(payload);
+
+    // Define callback for settings update response
     let getUpdateDone = (response) => {
       let res = JSON.parse(response);
       if (res.status == "ok") {
@@ -119,18 +140,21 @@ document.getElementById("btn-update").addEventListener("click", () => {
       }
     };
 
+    // Make API call to update settings
     xhrcall(4, theUrl, requestBody, "json", "", getUpdateDone);
   } else {
     showAlert("Error updating settings please try again", 2);
   }
 });
 
+// Execute when the document is ready
 whenDocumentReady(() => {
+  // Define callback for view data retrieval
   const getViewDone = (response) => {
     try {
       response = typeof response === "string" ? JSON.parse(response) : response;
 
-      // If data is an array, use the first item
+      // Use the first item if data is an array
       let data = Array.isArray(response.data)
         ? response.data[0]
         : response.data;
@@ -143,19 +167,20 @@ whenDocumentReady(() => {
       } else {
         console.warn("⚠️ No data returned from API.");
       }
-
       document.getElementById("showBody").classList.remove("d-none");
     } catch (e) {
       console.error("❌ Error processing response:", e);
     }
   };
 
+  // Retrieve user from local storage
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   if (!user.id) {
     console.error("❌ No user ID found in localStorage.");
     return;
   }
 
+  // Make API call to retrieve view data
   const theUrl = `${apiUrl}account-settings/?id=${user.id}`;
   xhrcall(1, theUrl, "", "json", "", getViewDone);
 });

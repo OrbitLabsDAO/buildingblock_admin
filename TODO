@@ -1,4 +1,22 @@
-TODO add image upload
+INPUT FIELDS
+TODO password input
+TODOuse a nice select with search and such
+TODO use a nice select with search and such
+TODO add a nice edit for text areas
+
+SCHMEA
+TODO HANDLE MIGRATION
+TODO RATIONALISE TABLES
+Do we require property owner, this could be rolled into user but then we could lose the basics of the userid
+TODO update country to be a varchar
+TODO use the varchar length to set the max length of the input field
+TODO parse what input we want the field to be from the comment (this may be overkill)
+
+Image upload
+TODO disable the edit button if the image is being uploaded
+TODO look into using a file uploader such as filepond
+TODO use the santiszed fields to hide the input element
+TODO Turns out we require the source folder so look to move these files that we use to the core directory so they are further seperated
 TODO make the external calls (GETS) use the apikey we should define an api key to control scopes in the future
 
 SIGN UP
@@ -8,14 +26,14 @@ TODO register create user
 TODO check email is being sent
 TODO validate email
 
-SCHMEA
-TODO HANDLE MIGRATION
-
-INPUT FIELDS
-TODO image uploader input
-TODO password input
-
 FUTURE
+
+TODO change all the xhrcall to use use promises (xhrcall2) and depericate XHRCALL
+TODO move to es module to handle promises better (amongst other things)
+TODO replace with await
+const res = await fetch('/getUploadUrl');
+const { uploadURL } = await res.json();
+
 MAY NOT DO THESE INCLUDES, COULD BE OVERKILL MORE THOUGHT IS REQUIRED.
 includes
 the way i was thinking about njk files is wrong as it would mean doing the core files, we will have to think of a better

@@ -14,6 +14,8 @@ const excludeItems = [
   "_corenjks/htmlinputs/text.njk",
   "_corenjks/htmlinputs/varchar.njk",
   "_corenjks/htmlinputs/select.njk",
+  "_corenjks/htmlinputs/image.njk",
+  "_corenjks/htmlinputs/password.njk",
   "_corenjks/js/account-dashboard.js",
   "_corenjks/js/account-settings.js",
   "_corenjks/js/account.js",
@@ -21,12 +23,14 @@ const excludeItems = [
   "_corenjks/js/tableEdit.js",
   "_corenjks/js/tableIndex.js",
   "_corenjks/js/tableView.js",
+  "_corenjks/js/main.js",
   "functions/api",
   "functions/api/tables",
   "functions/api/tables/_user.js",
   "functions/api/account-settings.js",
   "functions/api/account.js",
   "functions/api/lookups.js",
+  "functions/api/getonetimetoken.js",
   "_corenjks/htmlinputs",
   "_corenjks/js",
   "_corenjks/account-create.njk",
@@ -43,6 +47,10 @@ const excludeItems = [
   "_corenjks/tableEdit.njk",
   "_corenjks/tableIndex.njk",
   "_corenjks/tableView.njk",
+  "functions/api/tables/property.js", //you can remove this, this is the demo script
+  "functions/api/tables/property_amenities.js", //you can remove this, this is the demo script
+  "functions/api/tables/property_images.js", //you can remove this, this is the demo script
+  "functions/api/crowdfund.js", //you can remove this, this is the demo script
 ];
 
 // Setup readline interface for CLI interaction

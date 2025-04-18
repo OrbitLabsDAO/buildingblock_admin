@@ -1,0 +1,22 @@
+<div class="form-group">
+  <div class="form-group"  id="image-div">
+  <label>Choose an image</label>
+      <input type="file" class=" form-control-user"
+      name="inp-{{ field.name }}" id="inp-{{ field.name }}" 
+      aria-describedby="{{ field.name }}" 
+      required> 
+      <div class="text-danger d-none" id="error-{{field.name}}"></div>  
+      <input type="hidden" name="imageTrue" id="imageTrue" value="true">
+  </div>
+  <div id="upload-image-div" class="d-none">
+      <span id="upload-image-text"></a></span>
+      <a href="javascript:removeImage()" class="btn btn-primary btn-user">Remove</a>
+      <a href="javascript:uploadImage('{{ field.name }}')" class="btn btn-primary btn-user">Upload</a>
+  </div>
+  <div class="form-group  {% if imagePreview == false %}d-none{% endif %}  "  id="image-preview-div">
+    <div id="image-uploading-text">Image uploading</div>
+    <div>
+      <img src=""  id="image-preview"/>
+    </div>
+  </div>  
+</div>

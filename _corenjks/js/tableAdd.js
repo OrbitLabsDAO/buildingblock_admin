@@ -1,7 +1,6 @@
 const url = new URL(window.location.href);
 let parts = url.pathname.split("/").filter(Boolean);
 let tableName = parts.length > 1 ? parts[parts.length - 2] : null;
-
 function checkForeign() {
   const looksUps = Array.from(
     document.querySelectorAll("[data-foreigntable], [data-foreignid]")
@@ -41,7 +40,6 @@ function checkForeign() {
   function checkForeignDone(response) {
     response = JSON.parse(response);
     const data = response.data;
-    console.log(data);
     Object.keys(data).forEach((fieldName) => {
       const selectEl = document.getElementById(fieldName);
       if (!selectEl) return;
@@ -61,12 +59,6 @@ function checkForeign() {
 
       // Restore selected value if we have editData
       const cleanName = fieldName.replace(/^inp-/, "");
-
-      if (editData && editData[cleanName] !== undefined) {
-        selectEl.value = editData[cleanName];
-      } else {
-        selectEl.selectedIndex = 0;
-      }
     });
   }
 }
@@ -80,20 +72,31 @@ document
 
     // Create a plain object from FormData and remove the 'inp-' prefix
     const formDataObject = {};
-    let isValid = true;
+    let submitIt = true;
 
     formData.forEach((value, key) => {
       // Remove 'inp-' from the field name
+
       const cleanedKey = key.replace(/^inp-/, "");
-      formDataObject[cleanedKey] = value.trim();
+      if (cleanedKey != "image") formDataObject[cleanedKey] = value.trim();
 
       // Get the field element
       const field = document.getElementById("inp-" + cleanedKey);
-      isValid = checkField(field, cleanedKey, value);
+
+      let isValid = checkField(field, cleanedKey, value);
+      if (isValid == false) submitIt = false;
     });
 
+    //over ride the upload as its an image
+    if (cfImageDetails) {
+      formDataObject.image = cfImageDetails.filename;
+      formDataObject.cfid = cfImageDetails.id;
+      formDataObject.cfImageUrl = cfImageDetails.variants[0];
+      formDataObject.isCfImageDraft = 0;
+    }
+
     // Proceed if all validations pass
-    if (isValid) {
+    if (submitIt == true) {
       // Convert the object to JSON
       const requestBody = JSON.stringify(formDataObject);
       // Call the table endpoint
@@ -122,6 +125,24 @@ whenDocumentReady(
   (isReady = () => {
     //check the fields for data_foreigntable
     checkForeign();
+    //check for a one time URL
+    const imageTrueEl = document.getElementById("imageTrue");
+
+    //get a one time URL. is it wise to call this everytime?
+    if (imageTrueEl && imageTrueEl.value === "true") {
+      let getOnTimeTokenDone = (response) => {
+        response = JSON.parse(response);
+        if (response.url != "") {
+          //store the URL
+          oneTimeUrl = response.url;
+          //delete the element
+          imageTrueEl.remove();
+        }
+      };
+
+      const theUrl = apiUrl + `getonetimetoken`;
+      xhrcall(1, theUrl, "", "json", "", getOnTimeTokenDone);
+    }
     // Show the table
     document.getElementById("showBody").classList.remove("d-none");
   })
