@@ -23,6 +23,7 @@ layout: layout.njk
         {% set defaultInteger = 0 %}
         {% set showQuill = true %} 
         {% for field in fields %}
+            {{filed.value}}
             {% if field.type != "definition" or field.variant != "constraint" %}
                 {% if field.name and field.name != "id" %}
                     <div class="form-group">
