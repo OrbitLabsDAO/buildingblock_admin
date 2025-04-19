@@ -79,34 +79,22 @@ async function checkForeign() {
   }
 }
 
-const quills = [];
-
-document.querySelectorAll(".editor").forEach((editorEl, index) => {
-  const quill = new Quill(editorEl, {
-    theme: "snow",
-  });
-  quills.push(quill);
-});
-
 function applyFormValues() {
-  console.log(editData);
   if (!editData || !foreignData) return;
 
-  document;
   document
     .querySelectorAll(
       'input[type="number"], input[data-type="varchar"], select, textarea'
     )
     .forEach((field) => {
       const rawName = field.name; // e.g. inp-userId
-      const baseName = rawName.replace(/^inp-/, ""); // userId
+      const baseName = rawName.replace(/^inp-/, ""); // e.g. "userId"
       const relatedKey = baseName.endsWith("Id")
-        ? baseName.slice(0, -2) // remove trailing 'Id' => 'admin'
+        ? baseName.slice(0, -2)
         : baseName;
 
-      // Apply normal values from editData
       if (editData.hasOwnProperty(baseName)) {
-        if (baseName == "cfImageUrl") {
+        if (baseName === "cfImageUrl") {
           document.getElementById("image-uploading-text").innerText =
             "Image preview";
           document.getElementById("image-preview").src = editData[baseName];
@@ -115,10 +103,9 @@ function applyFormValues() {
         }
       }
 
-      // Handle select inputs with foreign data
       if (field.tagName === "SELECT") {
         const targetValue = editData[relatedKey];
-        const optionsList = foreignData[rawName]; // still using full raw field name here (e.g., inp-adminId)
+        const optionsList = foreignData[rawName];
 
         if (Array.isArray(optionsList)) {
           const matchedOptionIndex = Array.from(field.options).findIndex(
@@ -132,6 +119,13 @@ function applyFormValues() {
         }
       }
     });
+
+  // 💬 Populate any Quill editors
+  Object.entries(quillEditors).forEach(([fieldName, quillInstance]) => {
+    if (editData.hasOwnProperty(fieldName)) {
+      quillInstance.root.innerHTML = editData[fieldName];
+    }
+  });
 }
 
 document
@@ -153,10 +147,23 @@ document
       // Get the field element
       const field = document.getElementById("inp-" + cleanedKey);
 
+      // ✅ If there's a Quill editor for this field, override the value with Quill's HTML
+
       let isValid = checkField(field, cleanedKey, value);
       if (isValid == false) submitIt = false;
     });
-    console.log(field.name);
+
+    // ✅ Dynamically include Quill field values
+    //TODO THIS IS REPEAT CODE IN THE ADD AND EDIT SO WE CAN MOVE IT TO MAIN
+    Object.entries(quillEditors).forEach(([key, quillInstance]) => {
+      const cleanedKey = key.replace(/^inp-/, "");
+      const value = quillInstance.root.innerHTML;
+      formDataObject[cleanedKey] = value; // 👈 cleanedKey instead of fieldName
+      //check the field
+      let isValid = checkQuill(value, key, quillInstance);
+      if (isValid === false) submitIt = false;
+    });
+
     //over ride the upload as its an image
     if (cfImageDetails) {
       formDataObject.image = cfImageDetails.filename;

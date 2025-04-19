@@ -75,19 +75,24 @@ document
     let submitIt = true;
 
     formData.forEach((value, key) => {
-      // Remove 'inp-' from the field name
-
       const cleanedKey = key.replace(/^inp-/, "");
-      if (cleanedKey != "image") formDataObject[cleanedKey] = value.trim();
+      if (cleanedKey !== "image") formDataObject[cleanedKey] = value.trim();
 
-      // Get the field element
       const field = document.getElementById("inp-" + cleanedKey);
-
       let isValid = checkField(field, cleanedKey, value);
-      if (isValid == false) submitIt = false;
+      if (isValid === false) submitIt = false;
+    });
+    // 👉 Include Quill editor data
+    Object.entries(quillEditors).forEach(([key, quillInstance]) => {
+      const cleanedKey = key.replace(/^inp-/, "");
+      const value = quillInstance.root.innerHTML;
+      formDataObject[cleanedKey] = value; // 👈 cleanedKey instead of fieldName
+      //check the field
+      let isValid = checkQuill(value, key, quillInstance);
+      if (isValid === false) submitIt = false;
     });
 
-    //over ride the upload as its an image
+    // Overwrite the upload if it's an image
     if (cfImageDetails) {
       formDataObject.image = cfImageDetails.filename;
       formDataObject.cfid = cfImageDetails.id;
@@ -95,12 +100,10 @@ document
       formDataObject.isCfImageDraft = 0;
     }
 
-    // Proceed if all validations pass
-    if (submitIt == true) {
-      // Convert the object to JSON
+    // Submit if all validations pass
+    if (submitIt === true) {
       const requestBody = JSON.stringify(formDataObject);
-      // Call the table endpoint
-      let theUrl = apiUrl + `tables/${tableName}`;
+      const theUrl = apiUrl + `tables/${tableName}`;
       xhrcall(0, theUrl, requestBody, "json", "", getAddDone);
     }
   });
@@ -110,15 +113,6 @@ let getAddDone = (response) => {
   if (response.status == "ok") showAlert("Record Added", 1);
   else showAlert(response.error, 2);
 };
-
-const quills = [];
-
-document.querySelectorAll(".editor").forEach((editorEl, index) => {
-  const quill = new Quill(editorEl, {
-    theme: "snow",
-  });
-  quills.push(quill);
-});
 
 /**
  * Show an error message for a field

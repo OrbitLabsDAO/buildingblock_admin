@@ -109,11 +109,29 @@ collapses.forEach((collapse) => {
   });
 })(jQuery); // End of use strict
 
+//set up quill editors
+const quillEditors = {};
+
+document.querySelectorAll(".editor").forEach((editorEl) => {
+  const id = editorEl.id.replace(/^inp-/, ""); // e.g. 'address1'
+  const quill = new Quill(editorEl, { theme: "snow" });
+  quillEditors[id] = quill;
+});
+
+/**
+ * Displays elements based on user permissions
+ */
 let showElements = () => {
+  // Retrieve the user object from localStorage
   const user = JSON.parse(window.localStorage.user);
-  if (user.isAdmin == 1)
+
+  // Check if the user is an admin
+  if (user.isAdmin == 1) {
+    // Show the "Create a Cycle" button if the user is an admin
     document.getElementById("btn-create-cy").classList.remove("d-none");
-  // Show the table
+  }
+
+  // Show the main content table
   document.getElementById("showBody").classList.remove("d-none");
 };
 
@@ -244,84 +262,144 @@ let uploadImage = (elm) => {
   }
 };
 
+/**
+ * Check if a Quill editor is valid.
+ *
+ * @param {string} value The value of the Quill editor.
+ * @param {string} cleanedKey The cleaned key of the Quill editor.
+ * @param {object} quillInstance The Quill instance.
+ *
+ * @return {boolean} True if the Quill editor is valid, false otherwise.
+ */
+function checkQuill(value, cleanedKey, quillInstance) {
+  // Get the container element
+  const container = quillInstance.root.closest(".ql-container");
+
+  // Check if the Quill editor is required
+  const isRequired =
+    container?.hasAttribute("required") ||
+    container?.getAttribute("required") !== null;
+
+  // Check if the Quill editor is empty
+  if (isRequired && (value.trim() === "" || value === "<p><br></p>")) {
+    // Show an error message
+    showFieldError(cleanedKey, "This field is required.");
+    return false;
+  } else {
+    // Hide any error messages
+    hideFieldError(cleanedKey);
+  }
+
+  // Return true if the Quill editor is valid
+  return true;
+}
+
+/**
+ * Checks if a field is valid.
+ *
+ * @param {object} field The input field element.
+ * @param {string} cleanedKey The cleaned key of the field.
+ * @param {string} value The value of the field.
+ *
+ * @return {boolean} True if the field is valid, false otherwise.
+ */
 function checkField(field, cleanedKey, value) {
   let isValid = true;
 
-  // Check if the field is required (based on 'required' attribute)
-  if (field) {
-    //TODO make sure this uses the correct image input and not hardcode as this will not work with multipile images
-    if (field.name == "inp-image") {
-      if (field.files.length == 0) {
-        //show error message
-        showFieldError(cleanedKey, "An Image is required.");
-      } else {
-        hideFieldError(cleanedKey);
-      }
-      return isValid;
-    }
+  if (!field) return true;
 
-    if (field.tagName === "SELECT") {
-      if (field.selectedIndex === 0) {
-        isValid = false;
-        showFieldError(cleanedKey, "This field is required.");
-      } else hideFieldError(cleanedKey);
-      return isValid;
+  // Special case: image
+  if (field.name === "inp-image") {
+    if (field.files.length === 0) {
+      showFieldError(cleanedKey, "An image is required.");
+      isValid = false;
     } else {
-      if (
-        field.required == true &&
-        field.value === "" &&
-        field.tagName != "SELECT"
-      ) {
-        isValid = false;
-        return isValid;
-        showFieldError(cleanedKey, "This field is required.");
-      } else {
-        hideFieldError(cleanedKey);
-      }
-    }
-    // Email validation (if the field name contains "email")
-    if (cleanedKey.toLowerCase().includes("email")) {
-      if (validateEmail(value) == false) {
-        isValid = false;
-        showFieldError(cleanedKey, "Please enter a valid email address.");
-      } else {
-        hideFieldError(cleanedKey);
-      }
-      return isValid;
-    }
-
-    // Basic integer validation
-    if (field && field.type === "number") {
-      if (isNaN(value) || value.trim() === "") {
-        isValid = false;
-        showFieldError(cleanedKey, "Please enter a valid integer.");
-      } else {
-        hideFieldError(cleanedKey);
-      }
-      return isValid;
-    }
-
-    // Email validation (if the field name contains "email")
-    if (cleanedKey.toLowerCase().includes("email")) {
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email regex
-      if (!emailPattern.test(value)) {
-        isValid = false;
-        showFieldError(cleanedKey, "Please enter a valid email address.");
-      } else {
-        hideFieldError(cleanedKey);
-      }
-      return isValid;
+      hideFieldError(cleanedKey);
     }
     return isValid;
   }
+
+  // Select
+  if (field.tagName === "SELECT") {
+    if (field.selectedIndex === 0) {
+      showFieldError(cleanedKey, "This field is required.");
+      isValid = false;
+    } else {
+      hideFieldError(cleanedKey);
+    }
+    return isValid;
+  }
+
+  // Required field
+  if (field.required && value.trim() === "") {
+    showFieldError(cleanedKey, "This field is required.");
+    return false;
+  } else {
+    hideFieldError(cleanedKey);
+  }
+
+  // Email
+  if (
+    cleanedKey.toLowerCase().includes("email") ||
+    field.dataset.type === "email"
+  ) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(value)) {
+      showFieldError(cleanedKey, "Please enter a valid email address.");
+      isValid = false;
+    } else {
+      hideFieldError(cleanedKey);
+    }
+    return isValid;
+  }
+
+  // Number/integer
+  if (field.type === "number" || field.dataset.type === "integer") {
+    if (isNaN(value) || value.trim() === "") {
+      showFieldError(cleanedKey, "Please enter a valid number.");
+      isValid = false;
+    } else {
+      hideFieldError(cleanedKey);
+    }
+    return isValid;
+  }
+
+  // Varchar
+  //TODO replace this with a check based on the varchar size
+  /*
+  if (field.dataset.type === "varchar") {
+    const maxLength = field.maxLength || 255;
+    if (value.length > maxLength) {
+      showFieldError(
+        cleanedKey,
+        `This field must be ${maxLength} characters or less.`
+      );
+      isValid = false;
+    } else {
+      hideFieldError(cleanedKey);
+    }
+    return isValid;
+  }
+  */
+
+  return isValid;
 }
 
+/**
+ * Show an error message for a field.
+ *
+ * @param {string} fieldName The name of the field to show the error message for.
+ * @param {string} message The error message to show.
+ */
 function showFieldError(fieldName, message) {
   const errorElement = document.getElementById("error-" + fieldName);
   const fieldElement = document.getElementById("inp-" + fieldName);
+
   if (errorElement) {
     // Focus on the field with the error
     fieldElement.focus();
+
+    // Show the error message
     errorElement.classList.remove("d-none");
     errorElement.textContent = message;
   }
@@ -339,7 +417,17 @@ function hideFieldError(fieldName) {
 }
 
 //this fucntion validates an email address.
+/**
+ * Validate an email address.
+ *
+ * @param {string} email The email address to validate.
+ * @returns {boolean} true if the email address is valid, false otherwise.
+ */
 let validateEmail = (email) => {
+  /**
+   * Regular expression to validate an email address.
+   * Source: https://stackoverflow.com/a/46181/1197418
+   */
   const re =
     /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(email);
@@ -349,22 +437,36 @@ let goBack = () => {
   history.back();
 };
 
+/**
+ * Displays an alert message to the user.
+ *
+ * @param {string} message - The message to display.
+ * @param {number} alertType - The type of alert (1 for success, 2 for danger).
+ * @param {boolean} [timeoutBool=1] - Whether to hide the alert after a timeout.
+ */
 let showAlert = (message, alertType, timeoutBool = 1) => {
   let alertEl;
-  //set the alert type
+
+  // Select the appropriate alert element based on the alert type
   if (alertType == 1) alertEl = document.getElementById("accountsSuccess");
   if (alertType == 2) alertEl = document.getElementById("accountsDanger");
-  //set the message
+
+  // Set the alert message
   alertEl.innerHTML = message;
-  //remove the class
+
+  // Show the alert element
   alertEl.classList.remove("d-none");
-  alertEl.offsetTop; //Getting Y of target element
+
+  // Scroll to the top of the page to make the alert visible
+  alertEl.offsetTop; // for triggering reflow
   window.scrollTo(0, top);
-  //clear it after 5 seconds
-  if (timeoutBool == 1)
+
+  // Hide the alert after 5 seconds if timeoutBool is true
+  if (timeoutBool == 1) {
     alertTimeout = setTimeout(function () {
       alertEl.classList.add("d-none");
     }, 5000);
+  }
 };
 
 /* 
@@ -376,8 +478,16 @@ to include accounts.js and app.js in every page
 
 */
 
+/**
+ * Retrieves the authentication token from localStorage.
+ *
+ * @returns {string} The token if it exists, otherwise an empty string.
+ */
 let getToken = () => {
+  // Retrieve token from localStorage
   token = window.localStorage.token;
+
+  // Check if the token is not empty or undefined
   if (token != "" && token != undefined) {
     return token;
   } else {
@@ -385,8 +495,15 @@ let getToken = () => {
   }
 };
 
+/**
+ * Checks if the user is logged in and if they are an admin.
+ *
+ * If the user is logged in and is an admin, the "Create Cycle" button is shown.
+ * If the user is logged in but is not an admin, the "Create Cycle" button is hidden.
+ * If the user is not logged in, the user is redirected to the login page.
+ */
 let checkLogin = () => {
-  //check if it is not a login page
+  // Check if it is not a login page
   if (
     window.location.pathname == "/create-account" ||
     window.location.pathname == "/create-account/" ||
@@ -395,36 +512,37 @@ let checkLogin = () => {
     window.location.pathname == "/forgot-password" ||
     window.location.pathname == "/forgot-password/"
   ) {
-    //window.location = '/'
+    // If it is a login page, do nothing
   } else {
-    //get the user object
+    // Get the user object
     let tmpUser = window.localStorage.user;
-    //check it exists
+    // Check if the user object exists
     if (tmpUser != undefined) {
-      //decode the json
+      // Decode the JSON
       user = JSON.parse(window.localStorage.user);
 
-      //check admin stuff
+      // Check if the user is an admin
       if (user.isAdmin == 1) {
-        //if (checkElement("btn-create-cy") == true)
-        // document.getElementById('btn-create-cy').classList.remove("d-none");
+        // Show the "Create Cycle" button if the user is an admin
+        // if (checkElement("btn-create-cy") == true)
+        //   document.getElementById('btn-create-cy').classList.remove("d-none");
         document.getElementById("hideAdmin").classList.remove("d-none");
       } else {
-        //delete the html node
-        document.getElementById("hideAdmin").remove();
+        // Hide the "Create Cycle" button if the user is not an admin
+        document.getElementById("hideAdmin").classList.add("d-none");
       }
 
-      //check the user is logged in some one could spoof this so we could do a valid jwt check here
-      //but i prefer to do it when we ping the api for the data for this user.
+      // Check if the user is logged in
       if (user.loggedin != 1) {
+        // If the user is not logged in, redirect to the login page
         window.location = "/login";
       } else {
-        //clear the cache
-        //clearCache();
-        //set the jwt and user
+        // If the user is logged in, clear the cache
+        // clearCache();
+        // Set the JWT and user
         getToken();
+        // Set the user's name in the top right corner of the page
         if (checkElement("user-account-header") == true) {
-          //if (typeof(checkElement) != 'undefined' && checkElement != null) {
           if (user.username != "" && user.username != undefined)
             document.getElementById("user-account-header").innerHTML =
               user.username;
@@ -434,10 +552,11 @@ let checkLogin = () => {
         }
       }
     } else {
+      // If the user object does not exist, redirect to the login page
       window.location = "/login/";
     }
 
-    //check if they are on an admin page, this is a JS check so it is not optimal but it will do for now
+    // Check if the user is on an admin page
     if (user.isAdmin == 0) {
       console.log(window.location.pathname);
       if (
@@ -445,15 +564,23 @@ let checkLogin = () => {
         window.location.pathname == "/tables/adminuser/add" ||
         window.location.pathname == "/tables/adminuser/edit"
       )
+        // If the user is not an admin and is on an admin page, redirect to the dashboard
         window.location = "/dashboard/";
     }
   }
 };
 
+/**
+ * Clears the user's cache (localStorage).
+ * @param {number} clearUser 1 to clear the user's token, user object, and settings, 0 to only clear the cache.
+ */
 let clearCache = (clearUser = 0) => {
   if (clearUser == 1) {
+    // Clear the user's token
     window.localStorage.token = "";
+    // Clear the user's object
     window.localStorage.user = "";
+    // Clear the user's settings
     window.localStorage.settings = "";
   }
 };
@@ -462,6 +589,12 @@ let clearCache = (clearUser = 0) => {
 end of global account stuff
 */
 
+/**
+ * Retrieves a URL parameter.
+ *
+ * @param {string} param The name of the parameter to retrieve.
+ * @returns {string} The value of the parameter if it exists, otherwise an empty string.
+ */
 let getUrlParamater = (param) => {
   let searchParams = new URLSearchParams(window.location.search);
   let res = searchParams.has(param); // true
@@ -471,6 +604,17 @@ let getUrlParamater = (param) => {
 
 //this function makes the XHR calls.
 
+/**
+ * Makes an XMLHttpRequest (XHR) call.
+ *
+ * @param {number} type Type of HTTP request (0 = POST, 1 = GET, 2 = PATCH, 3 = DELETE, 4 = PUT).
+ * @param {string} method URL of the request.
+ * @param {string} [bodyObj=""] Body of the request, if any.
+ * @param {string} [setHeader=""] Header to set, if any.
+ * @param {string} [redirectUrl=""] URL to redirect to after the request, if any.
+ * @param {string} [callback=""] Callback function to call with the response, if any.
+ * @returns {Promise} Promise that resolves with the response, or rejects with an error.
+ */
 let xhrcall2 = (
   type = 1,
   method,
@@ -542,7 +686,17 @@ let xhrcall2 = (
     xhr.send(bodyObj !== "" ? bodyObj : null);
   });
 };
-
+/**
+ * Makes an XMLHttpRequest (XHR) call.
+ *
+ * @param {number} type Type of HTTP request (0 = POST, 1 = GET, 2 = PATCH, 3 = DELETE, 4 = PUT).
+ * @param {string} method URL of the request.
+ * @param {string} [bodyObj=""] Body of the request, if any.
+ * @param {string} [setHeader=""] Header to set, if any.
+ * @param {string} [redirectUrl=""] URL to redirect to after the request, if any.
+ * @param {string} [callback=""] Callback function to call with the response, if any.
+ * @returns {Promise} Promise that resolves with the response, or rejects with an error.
+ */
 let xhrcall = async (
   type = 1,
   method,
@@ -551,12 +705,6 @@ let xhrcall = async (
   redirectUrl = "",
   callback = ""
 ) => {
-  //debug
-  //console.log(apiUrl)
-  //console.log(bodyObj)
-  //console.log(method)
-  //console.log(callback)
-
   //get  auth token if it is blank
   const auth = getToken();
 

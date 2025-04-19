@@ -4,11 +4,15 @@ TODO load the value
 TODO save the value
 TODO password input
 TODO use a nice select with search and such
-TODO add a nice edit for text areas
 TODO have a way to chain screen together so first property, then goes to property images and the property amenities etc
 TODO email input field
 TODO date input field
 TODO map input
+TODO valid map check
+TODO select value set on create based on default value on add
+TODO put a star next to required fields edit
+TODO put a star next to required fields add
+TODO on view change country to the actual country not the code
 
 SCHMEA
 
