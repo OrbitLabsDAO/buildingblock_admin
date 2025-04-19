@@ -187,6 +187,7 @@ const generateTablePages = (
           : sharedOptions?.[overrideKey];
 
         if (overrideOptions) {
+          field.isRequired = true;
           selectOptions = overrideOptions;
         }
       }
@@ -202,6 +203,7 @@ const generateTablePages = (
           expr.right?.variant === "list" &&
           Array.isArray(expr.right.expression)
         ) {
+          field.isRequired = true;
           selectOptions = expr.right.expression.map((item) => ({
             value: item.value,
             label: item.value,
@@ -214,6 +216,7 @@ const generateTablePages = (
         !selectOptions &&
         field.datatype?.variant?.toLowerCase() === "boolean"
       ) {
+        field.isRequired = true;
         selectOptions = sharedOptions?.yesNo || [
           { value: "1", label: "Yes" },
           { value: "0", label: "No" },

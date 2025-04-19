@@ -321,7 +321,7 @@ function checkField(field, cleanedKey, value) {
 
   // Select
   if (field.tagName === "SELECT") {
-    if (field.selectedIndex === 0) {
+    if (field.selectedIndex === 0 && field.required) {
       showFieldError(cleanedKey, "This field is required.");
       isValid = false;
     } else {
