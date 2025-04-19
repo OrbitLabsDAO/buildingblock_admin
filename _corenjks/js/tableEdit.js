@@ -156,7 +156,7 @@ document
       let isValid = checkField(field, cleanedKey, value);
       if (isValid == false) submitIt = false;
     });
-
+    console.log(field.name);
     //over ride the upload as its an image
     if (cfImageDetails) {
       formDataObject.image = cfImageDetails.filename;
