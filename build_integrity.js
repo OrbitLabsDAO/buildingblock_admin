@@ -8,15 +8,13 @@ const corenjksDir = path.join(__dirname, "_corenjks");
 
 // Excluded paths (relative to root like 'functions/api/...')
 const excludeItems = [
-  "_corenjks/htmlinputs/default.njk",
-  "_corenjks/htmlinputs/integer.njk",
-  "_corenjks/htmlinputs/real.njk",
+  "_corenjks/htmlinputs/fieldcheck.njk",
+  "_corenjks/htmlinputs/map.njk",
   "_corenjks/htmlinputs/text.njk",
   "_corenjks/htmlinputs/varchar.njk",
   "_corenjks/htmlinputs/select.njk",
   "_corenjks/htmlinputs/image.njk",
   "_corenjks/htmlinputs/date.njk",
-  "_corenjks/htmlinputs/email.njk",
   "_corenjks/htmlinputs/password.njk",
   "_corenjks/js/account-dashboard.js",
   "_corenjks/js/account-settings.js",
