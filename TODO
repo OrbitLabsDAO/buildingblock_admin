@@ -1,6 +1,7 @@
 INPUT FIELDS
-TODO email input field
-TODO phone input field
+TODO check the saves on add and edit still work now we have rationalised the code into a generic inputtype
+TODO email input field into generic
+TODO phone input field into generic
 TODO map input
 TODO valid map check
 TODO text set the default value on add,reals should default to 0 add and be saved and then set on edit

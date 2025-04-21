@@ -12,42 +12,15 @@ layout: layout.njk
     </div>
 <p class="mb-4">
 </p>
-
-    <div id="formInputs">
-     <form action="/add_{{ tableName }}" method="post">
-    {% set disabled = true %} 
-    {% set imagePreview = true %} 
-    {% set showQuill = false %} 
-     {% for field in fields %}
-        {% if field.name and not field.name.match('^fk_') %}
-            <div class="form-group">
-                {% if field.name == "image" %}
-                    {% include "htmlinputs/image.njk"  %}
-                {% else %}
-                    {% if field.foreignTable %}
-                        {% include "htmlinputs/varchar.njk"  %}
-                    {% else %}
-                        {% if field.datatype.variant == "integer" %}
-                            {% include "htmlinputs/integer.njk"  %}
-                        {% elif field.datatype.variant == "real" %}
-                            {% include "htmlinputs/real.njk"  %}
-                        {% elif field.datatype.variant == "text" %}
-                            {% include "htmlinputs/text.njk" %}
-                        {% elif field.datatype.variant == "varchar" %}
-                            {% include "htmlinputs/varchar.njk"  %}
-                        {% else %}
-                            {% include "htmlinputs/default.njk" %}
-                        {% endif %}
-                    {% endif %}
-                {% endif %}
-            </div>
-        {% endif %}
-    {% endfor %}
-
+<div id="formInputs">
+    <form action="/add_{{ tableName }}" method="post">
+        {% set disabled = true %} 
+        {% set imagePreview = true %} 
+        {% set showQuill = false %} 
+        <!-- process the fields -->
+        {% include("htmlinputs/fieldcheck.njk") %}  
     </form>
-    </div>
-     <input type="hidden" id="formTableName" name="formTableName" value="">
-
-
+</div>
+<input type="hidden" id="formTableName" name="formTableName" value="">
 <script type="text/javascript">{{theJs | safe}}</script>
 

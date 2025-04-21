@@ -1,0 +1,14 @@
+{% for field in fields %}
+    {% set firstThree = field.name[0] ~ field.name[1] ~ field.name[2] %}
+    {% if field.name and field.name != "id" and firstThree != "fk_" %}               
+        <div class="form-group">
+            {% if field.inputType == "select" or field.inputType == "map" or field.inputType == "password"  or field.inputType == "text"   or field.inputType == "date" or field.inputType == "image"  %}   
+                <!-- TODO make sure the rendering above sets each field type  -->
+                {% set templatePath = "htmlinputs/" + (field.inputType or "default") + ".njk" %}
+                {% include templatePath %}
+            {% else %}
+                {% include "htmlinputs/generic.njk" %}
+            {% endif %}
+        </div>
+    {% endif %}
+{% endfor %}

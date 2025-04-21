@@ -1,6 +1,11 @@
 <!-- this is a varchar but it can be called from the table view as if it finds a foreign id and then 
  we can assume (as we do with the select) it is a foreign look up and we have some rules for these, 
 to make it look neater we remove the  trailing id 
+
+note as this is a generic function and all that changess the type we can just set this using inputType as we set this further up the build chain
+
+is data-type required?
+
 -->
 {% set labelLength = field.label | length %}
 {% set lastThree = field.label[labelLength - 3] ~ field.label[labelLength - 2] ~ field.label[labelLength - 1] %}
@@ -11,7 +16,7 @@ to make it look neater we remove the  trailing id
 {% endif %}
 {% set safeSize = field.maxCharacters or 30 %}
 <label  {% if field.name == "id"  %} class="d-none"  {% endif %}>{{ cleanLabel }} {% if field.isRequired %}*{% endif %}</label>
-<input type="text" data-type="varchar" 
+<input type="{{ field.inputType }}" data-type="{{ field.inputType }}" 
        class="form-control {% if field.name == 'id' %} d-none {% endif %}" 
        name="inp-{{ field.name }}" 
        id="inp-{{ field.name }}" 

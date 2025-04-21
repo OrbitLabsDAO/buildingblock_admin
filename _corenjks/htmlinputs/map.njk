@@ -1,0 +1,33 @@
+edit 
+<!-- 
+
+TODO Add a view / add flag to the table field above (this is currently disabled so we may normalise this)
+TODO Render out the map in views
+TODO 
+-->
+<label >{{ field.label }}  {% if field.isRequired %}*{% endif %}</label>
+{% if field.name == "map" and disabled %}  
+    <textarea  data-type="text"  class="form-control" 
+        name="inp-{{ field.name }}" 
+        id="inp-{{ field.name }}"  
+        {% if disabled %}disabled{% endif %}
+        {% if field.isRequired %}required{% endif %}
+        rows="4" cols="50" aria-describedby="{{ field.name }}">
+    </textarea>
+{% else %}
+    <iframe
+    src="https://www.google.com/maps?q=Bangkok,Thailand&output=embed"
+    width="100%"
+    height="300"
+    style="border:0"
+    allowfullscreen=""
+    loading="lazy">
+    </iframe>
+ {% endif %}
+<span class="text-danger d-none" id="error-{{field.name}}"></span>  
+
+
+
+
+
+

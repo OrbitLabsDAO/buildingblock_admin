@@ -12,25 +12,16 @@ layout: layout.njk
     </div>
 <p class="mb-4">
 </p>
-    {% set disableButton = "" %} 
-    {% set showQuill = true %} 
-    <div id="formInputs">
+{% set disableButton = "" %} 
+{% set showQuill = true %} 
+<div id="formInputs">
     <form action="/add_{{ tableName }}" method="post">
-    {% set imagePreview = true %} 
-      {% for field in fields %}
-            {% set firstThree = field.name[0] ~ field.name[1] ~ field.name[2] %}
-            {% if field.name and field.name != "id" and firstThree != "fk_" %}               
-                <div class="form-group">
-                    <!-- TODO make sure the rendering above sets each field type -->
-                    {% set templatePath = "htmlinputs/" + (field.inputType or "default") + ".njk" %}
-                    {% include templatePath %}
-                </div>
-            {% endif %}
-        {% endfor %}
+        {% set imagePreview = true %} 
+        <!-- process the fields -->
+        {% include("htmlinputs/fieldcheck.njk") %}  
     </form>
-    </div>
-     <input type="hidden" id="formTableName" name="formTableName" value="">
-
+</div>
+<input type="hidden" id="formTableName" name="formTableName" value="">
 <button class="btn btn-primary btn-user btn-block" id="btn-update">
     Update
 </button>
