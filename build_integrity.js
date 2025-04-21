@@ -10,6 +10,7 @@ const corenjksDir = path.join(__dirname, "_corenjks");
 const excludeItems = [
   "_corenjks/htmlinputs/fieldcheck.njk",
   "_corenjks/htmlinputs/map.njk",
+  "_corenjks/htmlinputs/geberic.njk",
   "_corenjks/htmlinputs/text.njk",
   "_corenjks/htmlinputs/varchar.njk",
   "_corenjks/htmlinputs/select.njk",
