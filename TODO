@@ -1,11 +1,11 @@
 INPUT FIELDS
-TODO text set the default value on add,reals should default to 0 add and be saved and then set on edit
-TODO password input
-TODO have a way to chain screen together so first property, then goes to property images and the property amenities etc
 TODO email input field
 TODO phone input field
 TODO map input
 TODO valid map check
+TODO text set the default value on add,reals should default to 0 add and be saved and then set on edit
+TODO password input
+TODO have a way to chain screen together so first property, then goes to property images and the property amenities etc
 TODO select value set on create based on default value on add
 TODO ability to set a range for select min max (1,10)
 
