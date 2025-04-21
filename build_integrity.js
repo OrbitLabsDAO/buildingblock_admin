@@ -15,6 +15,8 @@ const excludeItems = [
   "_corenjks/htmlinputs/varchar.njk",
   "_corenjks/htmlinputs/select.njk",
   "_corenjks/htmlinputs/image.njk",
+  "_corenjks/htmlinputs/date.njk",
+  "_corenjks/htmlinputs/email.njk",
   "_corenjks/htmlinputs/password.njk",
   "_corenjks/js/account-dashboard.js",
   "_corenjks/js/account-settings.js",
