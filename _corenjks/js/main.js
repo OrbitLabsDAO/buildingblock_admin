@@ -136,14 +136,22 @@ let showElements = () => {
 };
 
 //this function checks if an element exits
-let checkElement = (element) => {
-  let checkedElement = document.getElementById(element);
-  //If it isn't "undefined" and it isn't "null", then it exists.
-  if (typeof checkedElement != "undefined" && checkedElement != null) {
-    return true;
-  } else {
-    return false;
+let checkElement = (selector) => {
+  // If it starts with "#", treat as ID
+  if (selector.startsWith("#")) {
+    const el = document.getElementById(selector.slice(1));
+    return el !== null;
   }
+
+  // If it starts with ".", treat as class
+  if (selector.startsWith(".")) {
+    const els = document.querySelectorAll(selector);
+    return els.length > 0;
+  }
+
+  // Otherwise, treat as tag or general selector
+  const els = document.querySelectorAll(selector);
+  return els.length > 0;
 };
 
 //check the password
@@ -184,7 +192,7 @@ let showPassword = (elementName, eyeNumber) => {
 
 //check for a file to be selected
 let fileInput;
-if (checkElement("inp-image")) {
+if (checkElement("#inp-image")) {
   fileInput = document.getElementById("inp-image");
 
   fileInput.addEventListener("change", function (event) {
@@ -237,7 +245,7 @@ let uploadImage = (elm) => {
     //show error message
     showFieldError(elm, "An Image is required.");
     //disable the create button
-    if (checkElement("btn-create"))
+    if (checkElement("#btn-create"))
       document.getElementById("btn-create").disabled = true;
   } else {
     if (checkElement(document.getElementById("btn-update")))
@@ -524,8 +532,6 @@ let checkLogin = () => {
       // Check if the user is an admin
       if (user.isAdmin == 1) {
         // Show the "Create Cycle" button if the user is an admin
-        // if (checkElement("btn-create-cy") == true)
-        //   document.getElementById('btn-create-cy').classList.remove("d-none");
         document.getElementById("hideAdmin").classList.remove("d-none");
       } else {
         // Hide the "Create Cycle" button if the user is not an admin
@@ -542,7 +548,7 @@ let checkLogin = () => {
         // Set the JWT and user
         getToken();
         // Set the user's name in the top right corner of the page
-        if (checkElement("user-account-header") == true) {
+        if (checkElement("#user-account-header") == true) {
           if (user.username != "" && user.username != undefined)
             document.getElementById("user-account-header").innerHTML =
               user.username;
@@ -626,7 +632,7 @@ let xhrcall2 = (
   return new Promise((resolve, reject) => {
     const auth = getToken();
 
-    if (checkElement("spinner") == true) {
+    if (checkElement("#spinner") == true) {
       document.getElementById("spinner").classList.remove("d-none");
     }
 
@@ -708,9 +714,7 @@ let xhrcall = async (
   //get  auth token if it is blank
   const auth = getToken();
 
-  //checkElement = document.getElementById("spinner");
-  if (checkElement("spinner") == true) {
-    //if (typeof(checkElement) != 'undefined' && checkElement != null) {
+  if (checkElement("#spinner") == true) {
     document.getElementById("spinner").classList.remove("d-none");
   }
   let url = method;
@@ -763,9 +767,7 @@ let xhrcall = async (
       document.getElementById("spinner").classList.add("d-none");
   };
   xhr.onload = function () {
-    if (checkElement("confirmation-modal-delete-button") == true) {
-      //checkElement = document.getElementById("confirmation-modal-delete-button");
-      //if (typeof(checkElement) != 'undefined' && checkElement != null) {
+    if (checkElement("#confirmation-modal-delete-button") == true) {
       document.getElementById("spinner").classList.add("d-none");
     }
     //check if its an error

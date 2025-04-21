@@ -18,7 +18,7 @@ whenDocumentReady(
     //document.getElementById('showBody').classList.remove('d-none')
 
     //check if the email input exists
-    if (checkElement("inp-email") == true) {
+    if (checkElement("#inp-email") == true) {
       //add a key press listener to the email
       document
         .getElementById("inp-email")
@@ -88,7 +88,7 @@ whenDocumentReady(
     ==================================================================================*/
 
     //check if the login button exists
-    if (checkElement("btn-login") == true) {
+    if (checkElement("#btn-login") == true) {
       //this function handles the login
       document
         .getElementById("btn-login")
@@ -156,7 +156,7 @@ whenDocumentReady(
     }
 
     //check if the create account button exists
-    if (checkElement("btn-create-account") == true) {
+    if (checkElement("#btn-create-account") == true) {
       //add a click event listener
       document
         .getElementById("btn-create-account")
@@ -244,7 +244,7 @@ whenDocumentReady(
         });
     }
 
-    if (checkElement("btn-forgot-password") == true) {
+    if (checkElement("#btn-forgot-password") == true) {
       document
         .getElementById("btn-forgot-password")
         .addEventListener("click", function () {
@@ -344,7 +344,7 @@ whenDocumentReady(
       return;
     }
 
-    if (checkElement("btn-profile-update") == true) {
+    if (checkElement("#btn-profile-update") == true) {
       document
         .getElementById("btn-profile-update")
         .addEventListener("click", function () {
@@ -401,7 +401,7 @@ whenDocumentReady(
         });
     }
 
-    if (checkElement("btn-reset-password") == true) {
+    if (checkElement("#btn-reset-password") == true) {
       document
         .getElementById("btn-reset-password")
         .addEventListener("click", function () {

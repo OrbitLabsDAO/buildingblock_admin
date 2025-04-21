@@ -1,12 +1,13 @@
 INPUT FIELDS
 TODO password input
-TODO use a nice select with search and such
 TODO have a way to chain screen together so first property, then goes to property images and the property amenities etc
 TODO email input field
+TODO phone input field
 TODO date input field
 TODO map input
 TODO valid map check
 TODO select value set on create based on default value on add
+TODO ability to set a range for select min max (1,10)
 
 SCHMEA
 
@@ -14,9 +15,7 @@ TODO userid in token_owner, this could not be neeeded as they log into another a
 TODO update property_rental_cost to use the exchange rate and not local cost as we did with the property table
 TODO update property_rental_payment to use the exchange rate and not local cost as we did with the property table
 TODO maybe store the exhange rate info in a new table and just store the crypto that was used for payment in property_rental_cost and property_rental_payment
-TODO use the varchar length to set the max length of the input field
 TODO parse what input we want the field to be from the comment (this may be overkill)
-TODO ability to set a range for select min max (1,10)
 TODO handle migration
 
 Image upload

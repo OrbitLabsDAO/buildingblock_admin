@@ -10,15 +10,15 @@
 <!-- TODO if schema has a default for a check in set the default in the selectedValue IE "bedrooms" INTEGER CHECK(bedrooms IN (1, 2,3,4,5,7,8)) DEFAULT 1  NOT NULL, -- Number of bedrooms -->
 <label {% if field.name == "id" %} class="d-none" {% endif %}>{{ cleanLabel }}  {% if field.isRequired %}*{% endif %}</label>
 <select
-  class="form-control form-control-user {% if field.name == "id" %} d-none {% endif %}"
+  class="form-control selectpicker {% if field.name == "id" %} d-none {% endif %}"
   name="inp-{{ field.name }}"
   id="inp-{{ field.name }}"
   data-foreigntable="{{ field.foreignTable }}"
   data-foreignId="{{ field.foreignId }}"
+  data-live-search="true"
   {% if disabled %}disabled{% endif %}
   {% if field.isRequired %}required{% endif %}
 >
-
 {% if field.selectOptions %}
     <option value="">Please Select</option>
      {% for option in field.selectOptions %}

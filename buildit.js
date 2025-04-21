@@ -1,4 +1,5 @@
 const fs = require("fs");
+
 const path = require("path");
 const sqliteParser = require("sqlite-parser");
 const nunjucks = require("nunjucks");
@@ -187,7 +188,6 @@ const generateTablePages = (
           : sharedOptions?.[overrideKey];
 
         if (overrideOptions) {
-          field.isRequired = true;
           selectOptions = overrideOptions;
         }
       }
@@ -203,7 +203,6 @@ const generateTablePages = (
           expr.right?.variant === "list" &&
           Array.isArray(expr.right.expression)
         ) {
-          field.isRequired = true;
           selectOptions = expr.right.expression.map((item) => ({
             value: item.value,
             label: item.value,
@@ -216,17 +215,43 @@ const generateTablePages = (
         !selectOptions &&
         field.datatype?.variant?.toLowerCase() === "boolean"
       ) {
-        field.isRequired = true;
         selectOptions = sharedOptions?.yesNo || [
           { value: "1", label: "Yes" },
           { value: "0", label: "No" },
         ];
       }
 
+      // Default input type is based on SQL data type
+      let inputType = field.inputType;
+      if (inputType == "" || !inputType) {
+        inputType = field.datatype?.variant?.toLowerCase() || "text";
+        ///console.log(field);
+        // Special override cases
+        if (field.foreignTable || selectOptions) {
+          inputType = "select";
+        } else if (inputType === "boolean") {
+          inputType = "select"; // or checkbox
+        } else if (inputType === "varchar") {
+          inputType = "varchar";
+        } else if (inputType === "real") {
+          inputType = "real";
+        } else if (inputType === "integer") {
+          inputType = "integer";
+        } else if (
+          inputType === "date" ||
+          field.name.toLowerCase().includes("date")
+        ) {
+          inputType = "date";
+        } else if (field.name.toLowerCase().includes("email")) {
+          inputType = "email";
+        }
+      }
+
       return {
         ...field,
         isRequired,
         selectOptions,
+        inputType,
       };
     });
 
@@ -429,52 +454,95 @@ const processCustomFolders = (
  * Fetches a list of countries from a public API and updates the shared options with country data.
  * Each country is represented as an object containing a country code and its common name.
  * The list is sorted alphabetically by country name and stored in `env.SHAREDOPTIONS.countryList`.
+ *
+ * TODO - store the downloaded list as a file and use it as a fall back if it fails to download
  */
 
 async function updateSharedCountryList() {
-  const urlEntry = env.DATALISTS.find(
-    (item) => item.value === "updateSharedCountryList"
-  );
-  if (!urlEntry) {
-    console.error("❌ URL for updateSharedCountryList not found in DATALISTS");
-    return;
-  }
+  try {
+    console.log("✅ Processing country list!");
 
-  const res = await fetch(urlEntry.URL);
-  const countries = await res.json();
-
-  const prioritise = urlEntry.prioritise || [];
-  const exclude = urlEntry.exclude || [];
-
-  // Build and filter list
-  const allOptions = countries
-    .map((c) => ({
-      value: c.cca2,
-      label: c.name.common,
-    }))
-    .filter((c) => c.value && c.label && !exclude.includes(c.value));
-
-  const topCountries = [];
-  const remainingCountries = [];
-
-  for (const country of allOptions) {
-    if (prioritise.includes(country.value)) {
-      topCountries.push(country);
-    } else {
-      remainingCountries.push(country);
+    const urlEntry = env.DATALISTS.find(
+      (item) => item.value === "updateSharedCountryList"
+    );
+    if (!urlEntry) {
+      console.error(
+        "❌ URL for updateSharedCountryList not found in DATALISTS"
+      );
+      return;
     }
+
+    let countries;
+    let fetchedFromRemote = false;
+
+    try {
+      const res = await fetch(urlEntry.URL);
+
+      if (!res.ok) {
+        throw new Error(`Fetch failed with status ${res.status}`);
+      }
+
+      countries = await res.json();
+      fetchedFromRemote = true;
+    } catch (fetchErr) {
+      console.warn(
+        "⚠️ Fetch failed, using fallback countries.json:",
+        fetchErr.message
+      );
+
+      const fallbackData = await fs.readFile("./_data/countries.json", "utf-8");
+      countries = JSON.parse(fallbackData);
+    }
+
+    const prioritise = urlEntry.prioritise || [];
+    const exclude = urlEntry.exclude || [];
+
+    const allOptions = countries
+      .map((c) => ({
+        value: c.cca2,
+        label: c.name.common,
+      }))
+      .filter((c) => c.value && c.label && !exclude.includes(c.value));
+
+    const topCountries = [];
+    const remainingCountries = [];
+
+    for (const country of allOptions) {
+      if (prioritise.includes(country.value)) {
+        topCountries.push(country);
+      } else {
+        remainingCountries.push(country);
+      }
+    }
+
+    topCountries.sort((a, b) => a.label.localeCompare(b.label));
+    remainingCountries.sort((a, b) => a.label.localeCompare(b.label));
+
+    const countryOptions = [...topCountries, ...remainingCountries];
+
+    env.SHAREDOPTIONS.countryList = countryOptions;
+
+    console.log(
+      `✅ Updated SHAREDOPTIONS.countryList with ${countryOptions.length} countries (Top: ${topCountries.length}, Excluded: ${exclude.length})`
+    );
+
+    // ✅ Save updated data back to the fallback file if fetched from remote
+    if (fetchedFromRemote) {
+      fs.writeFile(
+        "./_data/countries.json",
+        JSON.stringify(countries, null, 2),
+        (err) => {
+          if (err) {
+            console.error("❌ Failed to save country list:", err);
+          } else {
+            console.log("📁 Saved fresh country list to _data/countries.json");
+          }
+        }
+      );
+    }
+  } catch (err) {
+    console.error("❌ Failed to update country list:", err);
   }
-
-  topCountries.sort((a, b) => a.label.localeCompare(b.label));
-  remainingCountries.sort((a, b) => a.label.localeCompare(b.label));
-
-  const countryOptions = [...topCountries, ...remainingCountries];
-
-  env.SHAREDOPTIONS.countryList = countryOptions;
-
-  console.log(
-    `✅ Updated SHAREDOPTIONS.countryList with ${countryOptions.length} countries (Top: ${topCountries.length}, Excluded: ${exclude.length})`
-  );
 }
 
 // === BUILD START ===
@@ -527,12 +595,40 @@ async function updateSharedCountryList() {
         // Generate human-readable field labels
         // Loop through each field
         fields.forEach((field) => {
+          //set the field type to default text
+          field.type = "text";
           // Check if the field has a name and generate a human-readable label
           if (field.name) {
             field.label = field.name
               .replace(/_/g, " ")
               .replace(/([a-z])([A-Z])/g, "$1 $2")
               .replace(/\b\w/g, (c) => c.toUpperCase());
+          }
+
+          // Extract varchar length
+          field.maxCharacters = 0;
+          if (
+            field.datatype &&
+            (field.datatype.variant === "varchar" ||
+              field.datatype.variant === "char") &&
+            field.datatype.args &&
+            field.datatype.args.expression &&
+            field.datatype.args.expression.length > 0
+          ) {
+            const charLimit = field.datatype.args.expression[0].value;
+            field.maxCharacters = parseInt(charLimit, 10); // Store as a number
+          }
+
+          const nameLower = field.name?.toLowerCase() || "";
+          if (
+            nameLower.includes("date") ||
+            nameLower.endsWith("at") || // like createdAt, updatedAt, publishedAt
+            field.datatype?.variant === "date" || // in case explicitly set
+            field.datatype?.variant === "datetime" ||
+            (field.datatype?.variant === "varchar" &&
+              parseInt(field.maxCharacters, 10) === 10) // "YYYY-MM-DD"
+          ) {
+            field.inputType = "date";
           }
 
           // Check if this field has a foreign key constraint
@@ -544,6 +640,7 @@ async function updateSharedCountryList() {
             const foreignTable = field.definition[0].references.name; // The table this field references
             const foreignId = field.definition[0].references.columns[0].name; // The field it references
             const primaryId = field.columns[0].name; // The primary key field name (the current field)
+            field.inputType = "select";
             // Now loop through fields again to add foreign table and foreign id to the field that matches the primary field
             fields.forEach((compareField) => {
               if (compareField.name === primaryId) {

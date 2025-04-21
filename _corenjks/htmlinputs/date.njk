@@ -1,11 +1,12 @@
-<label  {% if field.name == "id"  %} class="d-none"  {% endif %}>{{ field.label }}  {% if field.isRequired %}*{% endif %}</label>
-p
-<input type="text"  data-type="default"  class="form-control {% if field.name == "id"  %} d-none  {% endif %}>" 
+<label  {% if field.name == "id"  %} class="d-none"  {% endif %}>{{ field.label }}  {% if field.isRequired %}*{% endif %} </label>
+
+<input data-provide="datepicker" class="datepicker form-control  {% if field.name == "id"  %} d-none  {% endif %}>" 
        name="inp-{{ field.name }}" 
        id="inp-{{ field.name }}" 
        data-foriegnTable="{{ foreignTable }}"
        data-foriegnId="{{ foreignId }}"
        aria-describedby="{{ field.name }}" value="" {% if disabled %}disabled{% endif %} 
-       placeholder="Unsupported Type: {{ field.datatype.variant }}"
+       placeholder="mm/dd/yyyy"
        {% if field.isRequired %}required{% endif %}>
+
 <span class="text-danger d-none" id="error-{{field.name}}"></span> 

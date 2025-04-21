@@ -126,6 +126,8 @@ function applyFormValues() {
       quillInstance.root.innerHTML = editData[fieldName];
     }
   });
+
+  $(".selectpicker").selectpicker("refresh");
 }
 
 document

@@ -1,5 +1,5 @@
 <label  {% if field.name == "id"  %} class="d-none"  {% endif %}>{{ field.label }}  {% if field.isRequired %}*{% endif %}</label>
-<input  data-type="real"  type="number" class="form-control form-control-user  {% if field.name == "id"  %} d-none  {% endif %}>" 
+<input  data-type="real"  type="number" class="form-control {% if field.name == "id"  %} d-none  {% endif %}>" 
        name="inp-{{ field.name }}"
        id="inp-{{ field.name }}" 
        data-foreigntable="{{ foreignTable }}"

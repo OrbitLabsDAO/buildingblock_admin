@@ -59,6 +59,22 @@ function checkForeign() {
 
       // Restore selected value if we have editData
       const cleanName = fieldName.replace(/^inp-/, "");
+      $(".selectpicker").selectpicker("refresh");
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const dd = String(today.getDate()).padStart(2, "0");
+      const formatted = `${yyyy}-${mm}-${dd}`;
+
+      $(".datepicker").val(formatted); // set default value
+      $(".datepicker")
+        .datepicker({
+          format: "yyyy-mm-dd",
+          autoclose: true,
+          todayHighlight: true,
+        })
+        .datepicker("setDate", formatted); // sets highlighted date
+      // }
     });
   }
 }
