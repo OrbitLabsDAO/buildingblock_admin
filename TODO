@@ -1,15 +1,15 @@
 INPUT FIELDS
+TODO text set the default value on add,reals should default to 0 add and be saved and then set on edit
 TODO password input
 TODO have a way to chain screen together so first property, then goes to property images and the property amenities etc
 TODO email input field
 TODO phone input field
-TODO date input field
 TODO map input
 TODO valid map check
 TODO select value set on create based on default value on add
 TODO ability to set a range for select min max (1,10)
 
-SCHMEA
+SCHEMA
 
 TODO userid in token_owner, this could not be neeeded as they log into another admin for thier property stuff.
 TODO update property_rental_cost to use the exchange rate and not local cost as we did with the property table

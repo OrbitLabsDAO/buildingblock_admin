@@ -222,6 +222,7 @@ const generateTablePages = (
       }
 
       // Default input type is based on SQL data type
+
       let inputType = field.inputType;
       if (inputType == "" || !inputType) {
         inputType = field.datatype?.variant?.toLowerCase() || "text";
@@ -595,9 +596,10 @@ async function updateSharedCountryList() {
         // Generate human-readable field labels
         // Loop through each field
         fields.forEach((field) => {
-          //set the field type to default text
+          // Set the default input type
           field.type = "text";
-          // Check if the field has a name and generate a human-readable label
+
+          // Generate a human-readable label
           if (field.name) {
             field.label = field.name
               .replace(/_/g, " ")
@@ -605,43 +607,61 @@ async function updateSharedCountryList() {
               .replace(/\b\w/g, (c) => c.toUpperCase());
           }
 
-          // Extract varchar length
+          // Extract varchar/char max length
           field.maxCharacters = 0;
           if (
             field.datatype &&
             (field.datatype.variant === "varchar" ||
               field.datatype.variant === "char") &&
-            field.datatype.args &&
-            field.datatype.args.expression &&
-            field.datatype.args.expression.length > 0
+            field.datatype.args?.expression?.length > 0
           ) {
             const charLimit = field.datatype.args.expression[0].value;
-            field.maxCharacters = parseInt(charLimit, 10); // Store as a number
+            field.maxCharacters = parseInt(charLimit, 10);
           }
 
+          // Auto-detect date fields
           const nameLower = field.name?.toLowerCase() || "";
           if (
             nameLower.includes("date") ||
-            nameLower.endsWith("at") || // like createdAt, updatedAt, publishedAt
-            field.datatype?.variant === "date" || // in case explicitly set
+            nameLower.endsWith("at") || // like createdAt, updatedAt
+            field.datatype?.variant === "date" ||
             field.datatype?.variant === "datetime" ||
-            (field.datatype?.variant === "varchar" &&
-              parseInt(field.maxCharacters, 10) === 10) // "YYYY-MM-DD"
+            ((nameLower.includes("date") || nameLower.includes("day")) &&
+              field.datatype?.variant === "varchar" &&
+              parseInt(field.maxCharacters, 10) === 10)
           ) {
             field.inputType = "date";
           }
 
-          // Check if this field has a foreign key constraint
+          // Extract default value
+          if (Array.isArray(field.definition)) {
+            const defaultDef = field.definition.find(
+              (def) => def.variant === "default"
+            );
+
+            if (defaultDef) {
+              const defaultValNode = defaultDef.value;
+              if (defaultValNode?.type === "literal") {
+                field.defaultValue = defaultValNode.value;
+              } else if (defaultValNode?.type === "identifier") {
+                field.value = defaultValNode.name; // e.g., CURRENT_TIMESTAMP
+              }
+            }
+          }
+
+          // Check for foreign key constraints
           if (
             field.definition &&
             field.definition[0] &&
             field.definition[0].variant === "foreign key"
           ) {
-            const foreignTable = field.definition[0].references.name; // The table this field references
-            const foreignId = field.definition[0].references.columns[0].name; // The field it references
-            const primaryId = field.columns[0].name; // The primary key field name (the current field)
+            const foreignTable = field.definition[0].references.name;
+            const foreignId = field.definition[0].references.columns[0].name;
+            const primaryId = field.columns[0].name;
+
             field.inputType = "select";
-            // Now loop through fields again to add foreign table and foreign id to the field that matches the primary field
+
+            // Match foreign reference to the actual field
             fields.forEach((compareField) => {
               if (compareField.name === primaryId) {
                 compareField.foreignTable = foreignTable;

@@ -78,13 +78,12 @@ async function checkForeign() {
     return {};
   }
 }
-
 function applyFormValues() {
   if (!editData || !foreignData) return;
 
   document
     .querySelectorAll(
-      'input[type="number"], input[data-type="varchar"], select, textarea'
+      'input[type="number"], input[data-type="varchar"], input.datepicker, select, textarea'
     )
     .forEach((field) => {
       const rawName = field.name; // e.g. inp-userId
@@ -92,17 +91,38 @@ function applyFormValues() {
       const relatedKey = baseName.endsWith("Id")
         ? baseName.slice(0, -2)
         : baseName;
-
+      console.log(field);
+      console.log(baseName);
       if (editData.hasOwnProperty(baseName)) {
-        if (baseName === "cfImageUrl") {
+        console.log("in");
+        const value = editData[baseName];
+
+        // 🗓 Handle datepicker separately
+        if (field.classList.contains("datepicker")) {
+          console.log("initaa");
+          const parsedDate = new Date(value);
+          if (!isNaN(parsedDate)) {
+            // Format for the datepicker plugin: mm/dd/yyyy
+            const formattedDate = `${String(parsedDate.getMonth() + 1).padStart(
+              2,
+              "0"
+            )}/${String(parsedDate.getDate()).padStart(
+              2,
+              "0"
+            )}/${parsedDate.getFullYear()}`;
+            field.value = formattedDate;
+            $(field).datepicker("update", formattedDate); // for Bootstrap-datepicker or similar
+          }
+        } else if (baseName === "cfImageUrl") {
           document.getElementById("image-uploading-text").innerText =
             "Image preview";
-          document.getElementById("image-preview").src = editData[baseName];
+          document.getElementById("image-preview").src = value;
         } else {
-          field.value = editData[baseName];
+          field.value = value;
         }
       }
 
+      // 🔁 Handle select dropdowns
       if (field.tagName === "SELECT") {
         const targetValue = editData[relatedKey];
         const optionsList = foreignData[rawName];
