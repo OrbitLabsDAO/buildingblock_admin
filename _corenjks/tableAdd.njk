@@ -16,6 +16,7 @@ layout: layout.njk
     <form action="/add_{{ tableName }}" method="post">
         {% set imagePreview = false %}
         {% set disabled = false %}
+        {% set viewType = "add" %}
         {% set disableButton = "" %}
         {% set defaultInteger = 0 %}
         {% set showQuill = true %} 

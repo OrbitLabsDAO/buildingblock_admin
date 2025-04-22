@@ -633,6 +633,20 @@ async function updateSharedCountryList() {
             field.inputType = "date";
           }
 
+          // Auto-detect telephone or mobile fields
+          if (
+            nameLower.includes("telephone") ||
+            nameLower.includes("mobile") ||
+            nameLower.includes("phone")
+          ) {
+            field.inputType = "tel";
+          }
+
+          // Auto-detect telephone or mobile fields
+          if (nameLower == "map") {
+            field.inputType = "map";
+          }
+
           // Extract default value
           if (Array.isArray(field.definition)) {
             const defaultDef = field.definition.find(
@@ -642,9 +656,11 @@ async function updateSharedCountryList() {
             if (defaultDef) {
               const defaultValNode = defaultDef.value;
               if (defaultValNode?.type === "literal") {
-                field.defaultValue = defaultValNode.value;
-              } else if (defaultValNode?.type === "identifier") {
-                field.value = defaultValNode.name; // e.g., CURRENT_TIMESTAMP
+                field.inputValue = defaultValNode.value;
+                console.log(field.inputValue);
+              } else if (defaultValNode.value?.type === "identifier") {
+                field.inputValue = defaultValNode.name; // e.g., CURRENT_TIMESTAMP
+                console.log(field.inputValue);
               }
             }
           }

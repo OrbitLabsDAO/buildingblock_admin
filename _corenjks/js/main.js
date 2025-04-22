@@ -270,6 +270,27 @@ let uploadImage = (elm) => {
   }
 };
 
+//TODO : make this work for more than one map by using classes
+/*
+TEST 
+
+<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d158858.58518374225!2d-0.2664025124317395!3d51.52852620465898!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47d8a00baf21de75%3A0x52963a5addd52a99!2sLondon%2C%20UK!5e0!3m2!1sen!2sth!4v1745296125738!5m2!1sen!2sth" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+*/
+document
+  .getElementById("inp-map")
+  .addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault(); // prevent form submission
+      const isValid = checkField(this, "map", this.value);
+      if (isValid) {
+        document.getElementById("inp-map-view").classList.remove("d-none");
+        document.getElementById("inp-map-view").src = this.value;
+        document.getElementById("map-view").classList.remove("d-none");
+      }
+    }
+  });
+
 /**
  * Check if a Quill editor is valid.
  *
@@ -365,6 +386,39 @@ function checkField(field, cleanedKey, value) {
   if (field.type === "number" || field.dataset.type === "integer") {
     if (isNaN(value) || value.trim() === "") {
       showFieldError(cleanedKey, "Please enter a valid number.");
+      isValid = false;
+    } else {
+      hideFieldError(cleanedKey);
+    }
+    return isValid;
+  }
+
+  // Phone number
+  if (
+    cleanedKey.toLowerCase().includes("phone") ||
+    cleanedKey.toLowerCase().includes("mobile") ||
+    cleanedKey.toLowerCase().includes("telephone") ||
+    field.dataset.type === "tel"
+  ) {
+    const phonePattern = /^\+?[0-9\s\-()]{7,20}$/; // Accepts +66, (123), 123-4567, 0123456789 etc.
+    if (!phonePattern.test(value)) {
+      showFieldError(cleanedKey, "Please enter a valid phone number.");
+      isValid = false;
+    } else {
+      hideFieldError(cleanedKey);
+    }
+    return isValid;
+  }
+
+  // Map link
+  if (
+    cleanedKey.toLowerCase().includes("map") ||
+    field.dataset.type === "map"
+  ) {
+    const googleMapPattern =
+      /^https:\/\/(maps\.app\.goo\.gl|www\.google\.com\/maps)\//;
+    if (!googleMapPattern.test(value.trim())) {
+      showFieldError(cleanedKey, "Please enter a valid Google Maps link.");
       isValid = false;
     } else {
       hideFieldError(cleanedKey);

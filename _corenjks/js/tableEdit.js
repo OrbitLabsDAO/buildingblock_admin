@@ -164,7 +164,7 @@ function applyFormValues() {
 
   document
     .querySelectorAll(
-      'input[type="number"], input[data-type="varchar"], input.datepicker, select, textarea'
+      'input[type="email"], input[type="number"], input[data-type="varchar"], input.datepicker, select, textarea'
     )
     .forEach((field) => {
       const rawName = field.name; // e.g. inp-userId

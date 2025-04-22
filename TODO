@@ -1,10 +1,13 @@
+MAIN WEBSITE
+TODO remove demo links until they are ready with the new code
+
 INPUT FIELDS
-TODO check the saves on add and edit still work now we have rationalised the code into a generic inputtype
-TODO email input field into generic
-TODO phone input field into generic
-TODO map input
+TODO check mapinput save on add
+TODO check mapinput save on edit
+TODO check mapinput renders on edit
+TODO check mapinput save on view
+TODO check mapinput save on index
 TODO valid map check
-TODO text set the default value on add,reals should default to 0 add and be saved and then set on edit
 TODO password input
 TODO have a way to chain screen together so first property, then goes to property images and the property amenities etc
 TODO select value set on create based on default value on add

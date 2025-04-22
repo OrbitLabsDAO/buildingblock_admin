@@ -19,11 +19,13 @@ is data-type required?
 <input type="{{ field.inputType }}" data-type="{{ field.inputType }}" 
        class="form-control {% if field.name == 'id' %} d-none {% endif %}" 
        name="inp-{{ field.name }}" 
+       value="{{ field.inputValue }}"
        id="inp-{{ field.name }}" 
        aria-describedby="{{ field.name }}" 
        data-foreigntable="{{ field.foreignTable }}"
        data-foreignId="{{ field.foreignId }}"
        size="{{ safeSize}}"
+       {% if field.inputType == "tel" %}pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"{% endif %}
        {% if field.maxCharacters %}maxlength="{{ field.maxCharacters }}"{% endif %}
        {% if disabled %}disabled{% endif %}
        {% if field.isRequired %}required{% endif %}>
