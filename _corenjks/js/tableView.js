@@ -6,7 +6,6 @@ let editData = "";
 let foreignData = "";
 /*
   TODO add the applyfromvaluem get data and getforienddata function from edit and view and move to main
-  TODO first name select is not showing for some reason
   
 */
 
