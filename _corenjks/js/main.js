@@ -274,23 +274,28 @@ let uploadImage = (elm) => {
 /*
 TEST 
 
-<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d158858.58518374225!2d-0.2664025124317395!3d51.52852620465898!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47d8a00baf21de75%3A0x52963a5addd52a99!2sLondon%2C%20UK!5e0!3m2!1sen!2sth!4v1745296125738!5m2!1sen!2sth" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d158858.58518374225!2d-0.2664025124317395!3d51.52852620465898!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47d8a00baf21de75%3A0x52963a5addd52a99!2sLondon%2C%20UK!5e0!3m2!1sen!2sth!4v1745296125738!5m2!1sen!2sth
+
+https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2482.2132298427973!2d-0.135661122882682!3d51.52764877181792!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48761bccc506725f%3A0x3bb9e6e4b6391e8e!2sLondon%20Euston%20Station!5e0!3m2!1sen!2sth!4v1745339657701!5m2!1sen!2sth
 
 */
-document
-  .getElementById("inp-map")
-  .addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      event.preventDefault(); // prevent form submission
-      const isValid = checkField(this, "map", this.value);
-      if (isValid) {
-        document.getElementById("inp-map-view").classList.remove("d-none");
-        document.getElementById("inp-map-view").src = this.value;
-        document.getElementById("map-view").classList.remove("d-none");
-      }
-    }
-  });
+const mapInput = document.getElementById("inp-map");
 
+if (mapInput) {
+  document
+    .getElementById("inp-map")
+    .addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault(); // prevent form submission
+        const isValid = checkField(this, "map", this.value);
+        if (isValid) {
+          document.getElementById("inp-map-view").classList.remove("d-none");
+          document.getElementById("inp-map-view").src = this.value;
+          document.getElementById("map-view").classList.remove("d-none");
+        }
+      }
+    });
+}
 /**
  * Check if a Quill editor is valid.
  *

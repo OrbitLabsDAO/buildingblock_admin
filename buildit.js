@@ -432,7 +432,6 @@ const processCustomFolders = (
             env,
             tableNames,
           });
-          console.log(tableName);
           const final = layout
             ? renderTemplateWithLayout(layout, {
                 content: renderedInner,
@@ -657,10 +656,8 @@ async function updateSharedCountryList() {
               const defaultValNode = defaultDef.value;
               if (defaultValNode?.type === "literal") {
                 field.inputValue = defaultValNode.value;
-                console.log(field.inputValue);
               } else if (defaultValNode.value?.type === "identifier") {
                 field.inputValue = defaultValNode.name; // e.g., CURRENT_TIMESTAMP
-                console.log(field.inputValue);
               }
             }
           }

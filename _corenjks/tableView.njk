@@ -14,13 +14,20 @@ layout: layout.njk
 </p>
 <div id="formInputs">
     <form action="/add_{{ tableName }}" method="post">
-        {% set disabled = true %} 
         {% set imagePreview = true %} 
+        {% set disabled = true %}
+        {% set viewType = "view" %}
+        {% set disableButton = "" %}
+        {% set defaultInteger = 0 %}
         {% set showQuill = false %} 
         <!-- process the fields -->
         {% include("htmlinputs/fieldcheck.njk") %}  
     </form>
 </div>
 <input type="hidden" id="formTableName" name="formTableName" value="">
+<!-- Include the Quill js library -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+<!-- Include the Quill library -->
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 <script type="text/javascript">{{theJs | safe}}</script>
 

@@ -2,12 +2,13 @@ MAIN WEBSITE
 TODO remove demo links until they are ready with the new code
 
 INPUT FIELDS
-TODO check mapinput save on add
-TODO check mapinput save on edit
-TODO check mapinput renders on edit
-TODO check mapinput save on view
+
+TODO check html rendering on view
+TODO check map rendering on view
+TODO render html for text on view
+TODO replace selects on view
+
 TODO check mapinput save on index
-TODO valid map check
 TODO password input
 TODO have a way to chain screen together so first property, then goes to property images and the property amenities etc
 TODO select value set on create based on default value on add

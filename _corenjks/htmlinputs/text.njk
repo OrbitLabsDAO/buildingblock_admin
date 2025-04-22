@@ -1,15 +1,21 @@
 
 <label  {% if field.name == "id" or field.name == "cfImageUrl"  %} class="d-none"  {% endif %}>{{ field.label }}  {% if field.isRequired %}*{% endif %}</label>
 {% if showQuill == false %}
-    <textarea  data-type="text"  class="form-control {% if field.name == "id" or field.name == "cfImageUrl"  %} d-none  {% endif %}>" 
-        name="inp-{{ field.name }}" 
-        id="inp-{{ field.name }}"  
-        data-foreigntable="{{ foreignTable }}"
-        data-foreignId="{{ foreignId }}"
-        {% if disabled %}disabled{% endif %}
-        {% if field.isRequired %}required{% endif %}
-        rows="4" cols="50" aria-describedby="{{ field.name }}">
-    </textarea>
+     {% if viewType == "view" %}
+        <div contenteditable="false">
+        {{ field.value }}
+        </div>
+     {% else %}
+        <textarea  data-type="text"  class="form-control {% if field.name == "id" or field.name == "cfImageUrl"  %} d-none  {% endif %}>" 
+            name="inp-{{ field.name }}" 
+            id="inp-{{ field.name }}"  
+            data-foreigntable="{{ foreignTable }}"
+            data-foreignId="{{ foreignId }}"
+            {% if disabled %}disabled{% endif %}
+            {% if field.isRequired %}required{% endif %}
+            rows="4" cols="50" aria-describedby="{{ field.name }}">
+        </textarea>
+     {% endif %}
  {% else %}
     <div 
         class="editor  {% if field.name == "id" or field.name == "cfImageUrl"  %} d-none  {% endif %}"

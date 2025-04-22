@@ -164,7 +164,7 @@ function applyFormValues() {
 
   document
     .querySelectorAll(
-      'input[type="email"], input[type="number"], input[data-type="varchar"], input.datepicker, select, textarea'
+      'input[type="tel"],input[type="real"],input[type="email"],input[type="map"], input[type="number"], input[data-type="varchar"], input.datepicker, select, textarea'
     )
     .forEach((field) => {
       const rawName = field.name; // e.g. inp-userId
@@ -216,6 +216,10 @@ function applyFormValues() {
             field.selectedIndex = matchedOptionIndex;
           }
         }
+      }
+
+      if (baseName == "map") {
+        document.getElementById("inp-map-view").src = editData[baseName];
       }
     });
 
