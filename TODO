@@ -3,13 +3,8 @@ TODO remove demo links until they are ready with the new code
 
 INPUT FIELDS
 
-TODO check html rendering on view
-TODO check map rendering on view
-TODO render html for text on view
-TODO replace selects on view
+TODO render out the different selectss
 
-TODO check mapinput save on index
-TODO password input
 TODO have a way to chain screen together so first property, then goes to property images and the property amenities etc
 TODO select value set on create based on default value on add
 TODO ability to set a range for select min max (1,10)
@@ -39,6 +34,7 @@ TODO validate email
 
 FUTURE
 
+TODO password input
 TODO change all the xhrcall to use use promises (xhrcall2) and depericate XHRCALL
 TODO move to es module to handle promises better (amongst other things)
 TODO replace with await

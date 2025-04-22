@@ -2,7 +2,9 @@
 <label  {% if field.name == "id" or field.name == "cfImageUrl"  %} class="d-none"  {% endif %}>{{ field.label }}  {% if field.isRequired %}*{% endif %}</label>
 {% if showQuill == false %}
      {% if viewType == "view" %}
-        <div contenteditable="false">
+        <div contenteditable="false"    
+             name="inp-{{ field.name }}" 
+             id="inp-{{ field.name }}"  >
         {{ field.value }}
         </div>
      {% else %}
@@ -12,7 +14,7 @@
             data-foreigntable="{{ foreignTable }}"
             data-foreignId="{{ foreignId }}"
             {% if disabled %}disabled{% endif %}
-            {% if field.isRequired %}required{% endif %}
+            {% if field.isRequired and viewType != "view" %}required{% endif %}
             rows="4" cols="50" aria-describedby="{{ field.name }}">
         </textarea>
      {% endif %}

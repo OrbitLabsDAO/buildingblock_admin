@@ -309,22 +309,6 @@ document
   });
 
 /**
- * Waits for the document to be ready and then resolves the Promise.
- * @returns {Promise<void>} A Promise that resolves when the document is ready.
- */
-function whenDocumentReady() {
-  return new Promise((resolve) => {
-    if (document.readyState === "loading") {
-      // If the document is still loading, wait for the DOMContentLoaded event
-      document.addEventListener("DOMContentLoaded", resolve);
-    } else {
-      // If the document is already ready, resolve immediately
-      resolve();
-    }
-  });
-}
-
-/**
  * Initializes the form by retrieving the necessary data and populating the form fields.
  * This function is called once the document is ready and relies on the following functions:
  * - getOneTimeUrl(): Retrieves a one-time URL token if the "imageTrue" element is present and its value is "true".
@@ -353,6 +337,22 @@ const initForm = async () => {
   // Show the form
   document.getElementById("showBody").classList.remove("d-none");
 };
+
+/**
+ * Waits for the document to be ready and then resolves the Promise.
+ * @returns {Promise<void>} A Promise that resolves when the document is ready.
+ */
+function whenDocumentReady() {
+  return new Promise((resolve) => {
+    if (document.readyState === "loading") {
+      // If the document is still loading, wait for the DOMContentLoaded event
+      document.addEventListener("DOMContentLoaded", resolve);
+    } else {
+      // If the document is already ready, resolve immediately
+      resolve();
+    }
+  });
+}
 
 // Make sure the page is ready before starting the data retrieval and form population
 whenDocumentReady().then(() => {

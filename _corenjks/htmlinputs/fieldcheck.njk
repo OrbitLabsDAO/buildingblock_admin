@@ -1,12 +1,11 @@
 {% for field in fields %}
     {%if viewType == "view" %}
-        {% if field.inputType == "select" or field.inputType == "password"  or field.inputType == "date" or field.inputType == "image"  %}   
+        {% if field.inputType == "password"  or field.inputType == "date" or field.inputType == "image"  %}   
             {% set inputType = "text" %}
         {% else %}
             {% set inputType = field.inputType %}
         {% endif %} 
     {% endif %}
-    {{field.inputType }}
     {% set firstThree = field.name[0] ~ field.name[1] ~ field.name[2] %}
     {% if field.name and field.name != "id" and firstThree != "fk_" %}               
         <div class="form-group">

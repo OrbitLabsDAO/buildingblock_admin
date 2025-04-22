@@ -1,4 +1,3 @@
-{{ field | dump}}
 <label >{{ field.label }}  {% if field.isRequired %}*{% endif %}</label>
 <input type="{{ field.inputType }}" data-type="{{ field.inputType }}" 
     class="form-control {% if field.name == 'id' %} d-none {% endif %}" 
