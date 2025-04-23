@@ -7,7 +7,6 @@
 {% endif %}
 {% set defaultConstraint = field.definition | selectattr("variant", "equalto", "default") | list | first %}
 {% set selectedValue = defaultConstraint and defaultConstraint.value and defaultConstraint.value.value or '' %}
-<!-- TODO if schema has a default for a check in set the default in the selectedValue IE "bedrooms" INTEGER CHECK(bedrooms IN (1, 2,3,4,5,7,8)) DEFAULT 1  NOT NULL, -- Number of bedrooms -->
 <label {% if field.name == "id" %} class="d-none" {% endif %}>{{ cleanLabel }}  {% if field.isRequired %}*{% endif %}</label>
 
 <select

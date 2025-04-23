@@ -3,11 +3,11 @@ TODO remove demo links until they are ready with the new code
 
 INPUT FIELDS
 
-TODO render out the different selectss
-
+TODO if schema has a default for a check in set the default in the selectedValue IE "bedrooms" INTEGER CHECK(bedrooms IN (1, 2,3,4,5,7,8)) DEFAULT 1 NOT NULL, -- Number of bedrooms
 TODO have a way to chain screen together so first property, then goes to property images and the property amenities etc
 TODO select value set on create based on default value on add
 TODO ability to set a range for select min max (1,10)
+TODO ability to turn of checking for each field by having a settings array in env
 
 SCHEMA
 
@@ -15,7 +15,6 @@ TODO userid in token_owner, this could not be neeeded as they log into another a
 TODO update property_rental_cost to use the exchange rate and not local cost as we did with the property table
 TODO update property_rental_payment to use the exchange rate and not local cost as we did with the property table
 TODO maybe store the exhange rate info in a new table and just store the crypto that was used for payment in property_rental_cost and property_rental_payment
-TODO parse what input we want the field to be from the comment (this may be overkill)
 TODO handle migration
 
 Image upload

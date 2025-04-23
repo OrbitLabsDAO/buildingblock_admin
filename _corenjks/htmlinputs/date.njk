@@ -2,9 +2,7 @@
 <input data-provide="datepicker" class="datepicker form-control  {% if field.name == "id"  %} d-none  {% endif %}>" 
        name="inp-{{ field.name }}" 
        id="inp-{{ field.name }}" 
-       data-foriegnTable="{{ foreignTable }}"
-       data-foriegnId="{{ foreignId }}"
-       aria-describedby="{{ field.name }}" value="" {% if disabled %}disabled{% endif %} 
-       placeholder="mm/dd/yyyy"
+       aria-describedby="{{ field.name }}" {% if disabled %}disabled{% endif %} 
+       placeholder="yyyy/MM/dd"
        {% if field.isRequired %}required{% endif %}>
 <span class="text-danger d-none" id="error-{{field.name}}"></span> 
