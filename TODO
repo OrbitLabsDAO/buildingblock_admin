@@ -2,7 +2,7 @@ MAIN WEBSITE
 TODO remove demo links until they are ready with the new code
 
 INPUT FIELDS
-
+TODO rendering lookups in the index table is complicated as we dont know what type of database field it is.
 TODO if schema has a default for a check in set the default in the selectedValue IE "bedrooms" INTEGER CHECK(bedrooms IN (1, 2,3,4,5,7,8)) DEFAULT 1 NOT NULL, -- Number of bedrooms
 TODO have a way to chain screen together so first property, then goes to property images and the property amenities etc
 TODO select value set on create based on default value on add

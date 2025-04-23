@@ -128,7 +128,6 @@ function renderTable() {
 
   // Loop through the response data
   theData.forEach((item) => {
-    console.log(item);
     // Format values and create a row array
     let rowData = headers.map((header) => formatValue(item[header]));
 

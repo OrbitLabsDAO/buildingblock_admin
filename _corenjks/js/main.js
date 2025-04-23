@@ -532,7 +532,7 @@ function applyFormValues() {
           field.value = value;
         }
       }
-
+      console.log(field);
       // Handle select dropdowns
       if (field.tagName === "SELECT") {
         const targetValue = theData[relatedKey];
