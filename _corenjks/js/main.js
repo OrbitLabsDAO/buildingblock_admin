@@ -4,7 +4,8 @@ let user;
 let oneTimeUrl = "";
 let cfImageDetails;
 let interval;
-let editData = "";
+//TODO rename this to theData as its used in all views now
+let theData = "";
 let foreignData = "";
 
 // Step 1: Get all collapse containers and links
@@ -382,7 +383,9 @@ async function getOneTimeUrl(callback) {
  * @param {Function} [callback] - A callback function to handle the returned data.
  * @returns {Promise<Object>} The retrieved data in JSON format, or an empty object if no data is found.
  */
-async function getData(callback) {
+
+//TODO can we remove the callback?
+async function getData(retunrnOne = true) {
   // Construct the URL for the API call
   let theUrl = apiUrl + `tables/${tableName}`;
 
@@ -394,8 +397,9 @@ async function getData(callback) {
 
   // If data is returned in the response
   if (res.data.length > 0) {
-    // Return the first item in the data array
-    return res.data[0];
+    // Return the first item or the whole data array
+    if (retunrnOne == true) return res.data[0];
+    else return res.data;
   } else {
     // Return an empty object if no data is found
     return {};
@@ -411,6 +415,7 @@ async function getData(callback) {
  *
  * @returns {Promise<Object>} An object containing the foreign data, or an empty object if an error occurs.
  */
+
 async function checkForeign() {
   // Gather elements with both data-foreigntable and data-foreignid attributes
   const lookups = Array.from(
@@ -474,7 +479,7 @@ async function checkForeign() {
   }
 }
 /**
- * Applies values from the `editData` object to the form fields.
+ * Applies values from the `theData` object to the form fields.
  * Supports fields of types:
  *  - input[type="number"]
  *  - input[data-type="varchar"]
@@ -487,7 +492,7 @@ async function checkForeign() {
  * The `foreignData` object is used to populate select dropdowns.
  */
 function applyFormValues() {
-  if (!editData || !foreignData) return;
+  if (!theData || !foreignData) return;
 
   document
     .querySelectorAll(
@@ -500,9 +505,9 @@ function applyFormValues() {
         ? baseName.slice(0, -2)
         : baseName;
 
-      // Apply the value from the editData object if it exists
-      if (editData.hasOwnProperty(baseName)) {
-        const value = editData[baseName];
+      // Apply the value from the theData object if it exists
+      if (theData.hasOwnProperty(baseName)) {
+        const value = theData[baseName];
 
         // Handle datepicker separately
         if (field.classList.contains("datepicker")) {
@@ -530,7 +535,7 @@ function applyFormValues() {
 
       // Handle select dropdowns
       if (field.tagName === "SELECT") {
-        const targetValue = editData[relatedKey];
+        const targetValue = theData[relatedKey];
         const optionsList = foreignData[rawName];
 
         if (Array.isArray(optionsList)) {
@@ -546,14 +551,14 @@ function applyFormValues() {
       }
 
       if (baseName == "map") {
-        document.getElementById("inp-map-view").src = editData[baseName];
+        document.getElementById("inp-map-view").src = theData[baseName];
       }
     });
 
   // Populate any Quill editors
   Object.entries(quillEditors).forEach(([fieldName, quillInstance]) => {
-    if (editData.hasOwnProperty(fieldName)) {
-      quillInstance.root.innerHTML = editData[fieldName];
+    if (theData.hasOwnProperty(fieldName)) {
+      quillInstance.root.innerHTML = theData[fieldName];
     }
   });
 

@@ -17,7 +17,7 @@ const initForm = async () => {
   await whenDocumentReady();
 
   // Retrieve the data for the specified table and ID
-  editData = await getData();
+  theData = await getData();
 
   // Fetch and populate foreign data into select elements
   foreignData = await checkForeign();

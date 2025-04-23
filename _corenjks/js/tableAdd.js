@@ -64,9 +64,6 @@ const initForm = async () => {
   // Retrieve the one-time URL token for image uploads, oneTimeUrl in in main.js as it is global
   oneTimeUrl = await getOneTimeUrl();
 
-  // Retrieve the data for the specified table and ID
-  //editData = await getData();
-
   // Fetch and populate foreign data into select elements
   foreignData = await checkForeign();
 
