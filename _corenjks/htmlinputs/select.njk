@@ -8,7 +8,7 @@
 {% set defaultConstraint = field.definition | selectattr("variant", "equalto", "default") | list | first %}
 {% set selectedValue = defaultConstraint and defaultConstraint.value and defaultConstraint.value.value or '' %}
 <label {% if field.name == "id" %} class="d-none" {% endif %}>{{ cleanLabel }}  {% if field.isRequired %}*{% endif %}</label>
-
+{{ field | dump }}
 <select
   class="form-control selectpicker {% if field.name == "id" %} d-none {% endif %}"
   name="inp-{{ field.name }}"
