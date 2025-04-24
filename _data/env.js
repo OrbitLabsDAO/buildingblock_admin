@@ -125,6 +125,7 @@ module.exports = {
        */
       country: "countryList",
       propertyType: "propertyTypes",
+      priceLocal: "range:1-10",
     },
     users: {
       /**

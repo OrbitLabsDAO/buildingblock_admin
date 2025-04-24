@@ -166,7 +166,6 @@ const generateTablePages = (
   const pageDir = path.join(siteDir, `tables/${tableName}`);
   fs.mkdirSync(pageDir, { recursive: true });
 
-  //validate fields function to render selects
   const validateFields = (fieldList, tableName) =>
     fieldList.map((field) => {
       const isRequired =
@@ -174,6 +173,7 @@ const generateTablePages = (
         field.definition.some(
           (def) => def.type === "constraint" && def.variant === "not null"
         );
+
       const checkConstraint = field.definition?.find(
         (def) => def.type === "constraint" && def.variant === "check"
       );
@@ -192,7 +192,34 @@ const generateTablePages = (
         }
       }
 
-      // 2. Check constraints (e.g., status IN (1, 2, 3))
+      // 2. Handle range: (e.g., "range:1-10")
+      const fieldMap = fieldOptionMapping?.[tableName];
+      if (fieldMap && fieldMap[field.name]) {
+        const mapping = fieldMap[field.name];
+        let options = [];
+
+        if (typeof mapping === "string" && mapping.startsWith("range:")) {
+          // Handle range like "range:1-10"
+          const [start, end] = mapping
+            .replace("range:", "")
+            .split("-")
+            .map(Number);
+
+          options = Array.from({ length: end - start + 1 }, (_, i) => {
+            const value = String(start + i);
+            return { value, label: value };
+          });
+          console.log(options);
+
+          // Only set selectOptions from range if it's not already set by the overrides
+          if (options.length > 0 && !selectOptions) {
+            field.inputType = "select";
+            selectOptions = options;
+          }
+        }
+      }
+
+      // 3. Check constraints (e.g., status IN (1, 2, 3))
       if (
         !selectOptions &&
         checkConstraint?.expression?.variant === "operation" &&
@@ -210,7 +237,7 @@ const generateTablePages = (
         }
       }
 
-      // 3. Boolean fallback
+      // 4. Boolean fallback
       if (
         !selectOptions &&
         field.datatype?.variant?.toLowerCase() === "boolean"
@@ -221,17 +248,14 @@ const generateTablePages = (
         ];
       }
 
-      // Default input type is based on SQL data type
-
+      // Determine input type
       let inputType = field.inputType;
-      if (inputType == "" || !inputType) {
+      if (!inputType || inputType === "") {
         inputType = field.datatype?.variant?.toLowerCase() || "text";
-        ///console.log(field);
-        // Special override cases
         if (field.foreignTable || selectOptions) {
           inputType = "select";
         } else if (inputType === "boolean") {
-          inputType = "select"; // or checkbox
+          inputType = "select";
         } else if (inputType === "varchar") {
           inputType = "varchar";
         } else if (inputType === "real") {
@@ -248,10 +272,14 @@ const generateTablePages = (
         }
       }
 
+      // Default selected value
+      const selectedValue = selectOptions?.[0]?.value ?? "";
+
       return {
         ...field,
         isRequired,
         selectOptions,
+        selectedValue,
         inputType,
       };
     });
@@ -581,7 +609,8 @@ async function updateSharedCountryList() {
 
     // === GENERATE TABLE PAGES ===
     console.log("✅ Processing Table files!");
-
+    const sharedOptions = env.SHAREDOPTIONS;
+    const fieldOptionMapping = env.FIELDOPTIONMAPPING;
     // Process each statement in the parsed schema
     parsedSchema.statement.forEach((stmt) => {
       // Check if the statement is a CREATE TABLE statement
@@ -692,9 +721,7 @@ async function updateSharedCountryList() {
         const sanitizedFieldsIndex = fields.filter(
           (f) => !env.EXCLUDEDFIELDSINDEX.includes(f.name)
         );
-        //set the shared optons and field options for the select
-        const sharedOptions = env.SHAREDOPTIONS;
-        const fieldOptionMapping = env.FIELDOPTIONMAPPING;
+
         // Generate table pages
         if (!env.EXCLUDETABLES.includes(tableName)) {
           generateTablePages(
