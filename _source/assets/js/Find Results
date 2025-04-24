@@ -1,0 +1,17 @@
+Searching 2039 files for ""lookUps":""}"
+
+/Users/cryptoskillz/Documents/code/orbitlabs/buildingblock/frontend/buildingblockreporting/tenant-index.njk:
+   10      let theFields = "{% for field in fields %}{% if loop.last %}{{ field }}{% else %}{{ field }},{% endif %}{% endfor %}";
+   11      //main settings array to handle all the variations of rendering.
+   12:     const theSettings = {"checkAdmin":0,"tableSchema":0,"allowOnlyOne":0,"editButton":1,"deleteButton":1,"customButton":"","customSelect":"","localLookUp":"","localReplace":"","table":"tenant","formatFields":"","fields":theFields,"crumb":"{{ crumb }}","foreignKey":"","lookUps":""}    
+   13  </script>
+   14  {% set theJs %}
+
+/Users/cryptoskillz/Documents/code/orbitlabs/buildingblock/frontend/buildingblockreporting/tenant-new.njk:
+    6      let theFields = "name,email,phone";
+    7      //main settings array to handle all the variations of rendering.
+    8:     const theSettings = {"checkAdmin":0,"tableSchema":0,"allowOnlyOne":0,"editButton":1,"deleteButton":1,"customButton":"","customSelect":"","localLookUp":"","localReplace":"","table":"tenant","formatFields":"","fields":theFields,"crumb":"{{ crumb }}","foreignKey":"","lookUps":""}  
+    9  </script>
+   10  {% include "admin/table-new.njk" %}
+
+2 matches across 2 files
