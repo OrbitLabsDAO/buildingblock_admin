@@ -41,6 +41,27 @@ module.exports = {
     "publishedAt",
     "deletedAt",
     "cfImageUrl",
+    "address1",
+    "address2",
+    "address3",
+    "address4",
+    "address5",
+    "address_5",
+    "country",
+    "propertyType",
+    "currentlyRented",
+    "adminId",
+    "description",
+    "admin",
+    "paymentAddress",
+    "telephone",
+    "mobile",
+    "priceUSD",
+    "priceBTC",
+    "exchangeRateToUSD",
+    "exchangeRateToBTC",
+    "currency",
+    "datePurchased",
   ], //these are the fields that will be removed from any rendering
   EXCLUDETABLES: ["userAccess"],
   RESERVEDTABLES: ["_user"], //these are the tables used internally that will be removed from any rendering
@@ -57,8 +78,8 @@ module.exports = {
      * @type {Object[]}
      */
     yesNo: [
-      { value: "yes", label: "Yes" },
-      { value: "no", label: "No" },
+      { value: "0", label: "No" },
+      { value: "1", label: "Yes" },
     ],
     /**
      * A list of user roles
@@ -68,6 +89,10 @@ module.exports = {
       { value: "admin", label: "Administrator" },
       { value: "editor", label: "Editor" },
       { value: "viewer", label: "Viewer" },
+    ],
+    propertyTypes: [
+      { value: "1", label: "Condo" },
+      { value: "2", label: "House" },
     ],
     /**
      * A list of countries fetched from restcountries.com
@@ -99,6 +124,8 @@ module.exports = {
        * @type {String}
        */
       country: "countryList",
+      propertyType: "propertyTypes",
+      priceLocal: "range:1-10",
     },
     users: {
       /**

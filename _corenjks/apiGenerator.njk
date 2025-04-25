@@ -106,7 +106,11 @@ async function handleGet(request, env, params, tableName) {
 
   const result = await env.DB.prepare(queryStr).bind().all();
   //get the excluded fields
-  const excludedFields = {{ env.EXCLUDEDFIELDS | dump | safe }};
+  let excludedFields;
+  if (id)
+    excludedFields = {{ env.EXCLUDEDFIELDS | dump | safe }};
+  else
+     excludedFields = {{ env.EXCLUDEDFIELDSINDEX | dump | safe }};
   const resultArray = Array.isArray(result.results) ? result.results : [result];
   const filteredResults = resultArray.map((item) => {
     const cleaned = {};

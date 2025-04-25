@@ -1,7 +1,7 @@
 <div class="form-group">
   <div class="form-group"  id="image-div">
-  <label>Choose an image</label>
-      <input type="file" class=" form-control-user"
+  <label>Choose an image  {% if field.isRequired %}*{% endif %}</label>
+      <input type="file" class=" form-control"
       name="inp-{{ field.name }}" id="inp-{{ field.name }}" 
       aria-describedby="{{ field.name }}" 
       required> 

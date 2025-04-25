@@ -4,7 +4,6 @@ layout: layout.njk
 {% set theJs %}
     {% include 'js/tableAdd.js' %}
 {% endset %}
-
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800" id="data-header"></h1>
@@ -12,54 +11,28 @@ layout: layout.njk
         <i class="fas fa-backward fa-sm text-white-50" id="btn-back-cy"></i> Back
     </a>
 </div>
-
 <p class="mb-4"></p>
-
 <div id="formInputs">
     <form action="/add_{{ tableName }}" method="post">
         {% set imagePreview = false %}
         {% set disabled = false %}
+        {% set viewType = "add" %}
         {% set disableButton = "" %}
         {% set defaultInteger = 0 %}
-
-        {% for field in fields %}
-            {% if field.type != "definition" or field.variant != "constraint" %}
-                {% if field.name and field.name != "id" %}
-                    <div class="form-group">
-                        {% if field.name == "image" %}
-                            {% include "htmlinputs/image.njk" %}
-                            {% set disableButton = "disabled" %}
-                        {% elif field.name == "password" %}
-                            <!-- TODO finish the input password UI -->
-                            {% include "htmlinputs/text.njk" %}
-                        {% elif field.foreignTable or field.selectOptions %}
-                            {% include "htmlinputs/select.njk" %}
-                        {% else %}
-                            {% if field.datatype.variant == "integer" %}
-                                {% include "htmlinputs/integer.njk" %}
-                            {% elif field.datatype.variant == "real" %}
-                                {% include "htmlinputs/real.njk" %}
-                            {% elif field.datatype.variant == "text" %}
-                                {% include "htmlinputs/text.njk" %}
-                            {% elif field.datatype.variant == "varchar" %}
-                                {% include "htmlinputs/varchar.njk" %}
-                            {% else %}
-                                {% include "htmlinputs/default.njk" %}
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                {% endif %}
-            {% endif %}
-        {% endfor %}
+        {% set showQuill = true %} 
+        <!-- process the fields -->
+        {% include("htmlinputs/fieldcheck.njk") %}      
     </form>
 </div>
-
 <input type="hidden" id="formTableName" name="formTableName" value="">
-
 <button class="btn btn-primary btn-user btn-block" id="btn-create" {{ disableButton }}>
     Create
 </button>
-
+<!-- Include the Quill js library -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+<!-- Include the Quill library -->
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<!-- Latest compiled and minified CSS -->
 <script type="text/javascript">
     {{ theJs | safe }}
 </script>

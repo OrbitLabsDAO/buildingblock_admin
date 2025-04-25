@@ -1,0 +1,19 @@
+{% for field in fields %}
+    {% set inputType = field.inputType %}
+    {%if viewType == "view" %}
+        {% if field.inputType == "password"  or field.inputType == "date" or field.inputType == "image"  %}   
+            {% set inputType = "text" %}
+        {% endif %} 
+    {% endif %}
+    {% set firstThree = field.name[0] ~ field.name[1] ~ field.name[2] %}
+    {% if field.name and field.name != "id" and firstThree != "fk_" %}               
+        <div class="form-group">
+            {% if inputType == "select" or inputType == "map" or inputType == "password"  or inputType == "text"   or inputType == "date" or inputType == "image"  %}   
+                {% set templatePath = "htmlinputs/" + (inputType or "default") + ".njk" %}
+                {% include templatePath %}
+            {% else %}
+                {% include "htmlinputs/generic.njk" %}
+            {% endif %}
+        </div>
+    {% endif %}
+{% endfor %}

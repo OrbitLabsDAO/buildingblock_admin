@@ -3,49 +3,49 @@ let parts = url.pathname.split("/").filter(Boolean);
 let tableName = parts.length > 1 ? parts[parts.length - 2] : null;
 let id = url.searchParams.get("id");
 
-let whenDocumentReady = (f) => {
-  /in/.test(document.readyState)
-    ? setTimeout("whenDocumentReady(" + f + ")", 9)
-    : f();
+/**
+ * Initializes the form by retrieving the necessary data and populating the form fields.
+ * This function is called once the document is ready and relies on the following functions:
+ * - getData(): Retrieves the data for the specified table and ID.
+ * - checkForeign(): Fetches and populates foreign data into select elements.
+ * - applyFormValues(): Populates the form fields with the retrieved data.
+ *
+ * @returns {Promise<void>} A Promise that resolves when the form is initialized.
+ */
+const initForm = async () => {
+  // Wait for the document to be ready
+  await whenDocumentReady();
+
+  // Retrieve the data for the specified table and ID
+  theData = await getData();
+
+  // Fetch and populate foreign data into select elements
+  foreignData = await checkForeign();
+
+  // Populate the form fields with the retrieved data
+  applyFormValues();
+
+  // Show the form
+  document.getElementById("showBody").classList.remove("d-none");
 };
 
-whenDocumentReady(
-  (isReady = () => {
-    let getViewDone = (response) => {
-      response = JSON.parse(response);
-      console.log(response);
+/**
+ * Waits for the document to be ready and then resolves the Promise.
+ * @returns {Promise<void>} A Promise that resolves when the document is ready.
+ */
+function whenDocumentReady() {
+  return new Promise((resolve) => {
+    if (document.readyState === "loading") {
+      // If the document is still loading, wait for the DOMContentLoaded event
+      document.addEventListener("DOMContentLoaded", resolve);
+    } else {
+      // If the document is already ready, resolve immediately
+      resolve();
+    }
+  });
+}
 
-      if (response.data.length > 0) {
-        const data = response.data[0];
-        // Loop through the returned data and populate the form fields
-        Object.keys(data).forEach((key) => {
-          if (key == "cfImageUrl") {
-            document.getElementById("image-div").classList.add("d-none");
-            document.getElementById("image-uploading-text").innerText =
-              "Image preview";
-            document.getElementById("image-preview").src = data[key];
-          } else {
-            let field = document.getElementById("inp-" + key);
-            if (field) {
-              if (key != "image") field.value = data[key];
-
-              // Set the value of the field
-            } else {
-              //we didnt find it so lets look again with id
-              let field2 = document.getElementById("inp-" + key + "Id");
-              if (field2) {
-                field2.type == "text";
-                field2.value = data[key];
-              }
-            }
-          }
-        });
-      }
-      document.getElementById("showBody").classList.remove("d-none");
-    };
-    // Show the table
-    let theUrl = apiUrl + `tables/${tableName}`;
-    if (id != null) theUrl += `?id=${id}`;
-    xhrcall(1, theUrl, "", "json", "", getViewDone);
-  })
-);
+// Make sure the page is ready before starting the data retrieval and form population
+whenDocumentReady().then(() => {
+  initForm();
+});

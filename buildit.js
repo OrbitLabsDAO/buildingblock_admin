@@ -1,4 +1,5 @@
 const fs = require("fs");
+
 const path = require("path");
 const sqliteParser = require("sqlite-parser");
 const nunjucks = require("nunjucks");
@@ -165,7 +166,6 @@ const generateTablePages = (
   const pageDir = path.join(siteDir, `tables/${tableName}`);
   fs.mkdirSync(pageDir, { recursive: true });
 
-  //validate fields function to render selects
   const validateFields = (fieldList, tableName) =>
     fieldList.map((field) => {
       const isRequired =
@@ -173,6 +173,7 @@ const generateTablePages = (
         field.definition.some(
           (def) => def.type === "constraint" && def.variant === "not null"
         );
+
       const checkConstraint = field.definition?.find(
         (def) => def.type === "constraint" && def.variant === "check"
       );
@@ -191,7 +192,34 @@ const generateTablePages = (
         }
       }
 
-      // 2. Check constraints (e.g., status IN (1, 2, 3))
+      // 2. Handle range: (e.g., "range:1-10")
+      const fieldMap = fieldOptionMapping?.[tableName];
+      if (fieldMap && fieldMap[field.name]) {
+        const mapping = fieldMap[field.name];
+        let options = [];
+
+        if (typeof mapping === "string" && mapping.startsWith("range:")) {
+          // Handle range like "range:1-10"
+          const [start, end] = mapping
+            .replace("range:", "")
+            .split("-")
+            .map(Number);
+
+          options = Array.from({ length: end - start + 1 }, (_, i) => {
+            const value = String(start + i);
+            return { value, label: value };
+          });
+          console.log(options);
+
+          // Only set selectOptions from range if it's not already set by the overrides
+          if (options.length > 0 && !selectOptions) {
+            field.inputType = "select";
+            selectOptions = options;
+          }
+        }
+      }
+
+      // 3. Check constraints (e.g., status IN (1, 2, 3))
       if (
         !selectOptions &&
         checkConstraint?.expression?.variant === "operation" &&
@@ -209,7 +237,7 @@ const generateTablePages = (
         }
       }
 
-      // 3. Boolean fallback
+      // 4. Boolean fallback
       if (
         !selectOptions &&
         field.datatype?.variant?.toLowerCase() === "boolean"
@@ -220,10 +248,39 @@ const generateTablePages = (
         ];
       }
 
+      // Determine input type
+      let inputType = field.inputType;
+      if (!inputType || inputType === "") {
+        inputType = field.datatype?.variant?.toLowerCase() || "text";
+        if (field.foreignTable || selectOptions) {
+          inputType = "select";
+        } else if (inputType === "boolean") {
+          inputType = "select";
+        } else if (inputType === "varchar") {
+          inputType = "varchar";
+        } else if (inputType === "real") {
+          inputType = "real";
+        } else if (inputType === "integer") {
+          inputType = "integer";
+        } else if (
+          inputType === "date" ||
+          field.name.toLowerCase().includes("date")
+        ) {
+          inputType = "date";
+        } else if (field.name.toLowerCase().includes("email")) {
+          inputType = "email";
+        }
+      }
+
+      // Default selected value
+      const selectedValue = selectOptions?.[0]?.value ?? "";
+
       return {
         ...field,
         isRequired,
         selectOptions,
+        selectedValue,
+        inputType,
       };
     });
 
@@ -403,7 +460,6 @@ const processCustomFolders = (
             env,
             tableNames,
           });
-          console.log(tableName);
           const final = layout
             ? renderTemplateWithLayout(layout, {
                 content: renderedInner,
@@ -426,52 +482,95 @@ const processCustomFolders = (
  * Fetches a list of countries from a public API and updates the shared options with country data.
  * Each country is represented as an object containing a country code and its common name.
  * The list is sorted alphabetically by country name and stored in `env.SHAREDOPTIONS.countryList`.
+ *
+ * TODO - store the downloaded list as a file and use it as a fall back if it fails to download
  */
 
 async function updateSharedCountryList() {
-  const urlEntry = env.DATALISTS.find(
-    (item) => item.value === "updateSharedCountryList"
-  );
-  if (!urlEntry) {
-    console.error("❌ URL for updateSharedCountryList not found in DATALISTS");
-    return;
-  }
+  try {
+    console.log("✅ Processing country list!");
 
-  const res = await fetch(urlEntry.URL);
-  const countries = await res.json();
-
-  const prioritise = urlEntry.prioritise || [];
-  const exclude = urlEntry.exclude || [];
-
-  // Build and filter list
-  const allOptions = countries
-    .map((c) => ({
-      value: c.cca2,
-      label: c.name.common,
-    }))
-    .filter((c) => c.value && c.label && !exclude.includes(c.value));
-
-  const topCountries = [];
-  const remainingCountries = [];
-
-  for (const country of allOptions) {
-    if (prioritise.includes(country.value)) {
-      topCountries.push(country);
-    } else {
-      remainingCountries.push(country);
+    const urlEntry = env.DATALISTS.find(
+      (item) => item.value === "updateSharedCountryList"
+    );
+    if (!urlEntry) {
+      console.error(
+        "❌ URL for updateSharedCountryList not found in DATALISTS"
+      );
+      return;
     }
+
+    let countries;
+    let fetchedFromRemote = false;
+
+    try {
+      const res = await fetch(urlEntry.URL);
+
+      if (!res.ok) {
+        throw new Error(`Fetch failed with status ${res.status}`);
+      }
+
+      countries = await res.json();
+      fetchedFromRemote = true;
+    } catch (fetchErr) {
+      console.warn(
+        "⚠️ Fetch failed, using fallback countries.json:",
+        fetchErr.message
+      );
+
+      const fallbackData = await fs.readFile("./_data/countries.json", "utf-8");
+      countries = JSON.parse(fallbackData);
+    }
+
+    const prioritise = urlEntry.prioritise || [];
+    const exclude = urlEntry.exclude || [];
+
+    const allOptions = countries
+      .map((c) => ({
+        value: c.cca2,
+        label: c.name.common,
+      }))
+      .filter((c) => c.value && c.label && !exclude.includes(c.value));
+
+    const topCountries = [];
+    const remainingCountries = [];
+
+    for (const country of allOptions) {
+      if (prioritise.includes(country.value)) {
+        topCountries.push(country);
+      } else {
+        remainingCountries.push(country);
+      }
+    }
+
+    topCountries.sort((a, b) => a.label.localeCompare(b.label));
+    remainingCountries.sort((a, b) => a.label.localeCompare(b.label));
+
+    const countryOptions = [...topCountries, ...remainingCountries];
+
+    env.SHAREDOPTIONS.countryList = countryOptions;
+
+    console.log(
+      `✅ Updated SHAREDOPTIONS.countryList with ${countryOptions.length} countries (Top: ${topCountries.length}, Excluded: ${exclude.length})`
+    );
+
+    // ✅ Save updated data back to the fallback file if fetched from remote
+    if (fetchedFromRemote) {
+      fs.writeFile(
+        "./_data/countries.json",
+        JSON.stringify(countries, null, 2),
+        (err) => {
+          if (err) {
+            console.error("❌ Failed to save country list:", err);
+          } else {
+            console.log("📁 Saved fresh country list to _data/countries.json");
+          }
+        }
+      );
+    }
+  } catch (err) {
+    console.error("❌ Failed to update country list:", err);
   }
-
-  topCountries.sort((a, b) => a.label.localeCompare(b.label));
-  remainingCountries.sort((a, b) => a.label.localeCompare(b.label));
-
-  const countryOptions = [...topCountries, ...remainingCountries];
-
-  env.SHAREDOPTIONS.countryList = countryOptions;
-
-  console.log(
-    `✅ Updated SHAREDOPTIONS.countryList with ${countryOptions.length} countries (Top: ${topCountries.length}, Excluded: ${exclude.length})`
-  );
 }
 
 // === BUILD START ===
@@ -510,7 +609,8 @@ async function updateSharedCountryList() {
 
     // === GENERATE TABLE PAGES ===
     console.log("✅ Processing Table files!");
-
+    const sharedOptions = env.SHAREDOPTIONS;
+    const fieldOptionMapping = env.FIELDOPTIONMAPPING;
     // Process each statement in the parsed schema
     parsedSchema.statement.forEach((stmt) => {
       // Check if the statement is a CREATE TABLE statement
@@ -524,7 +624,10 @@ async function updateSharedCountryList() {
         // Generate human-readable field labels
         // Loop through each field
         fields.forEach((field) => {
-          // Check if the field has a name and generate a human-readable label
+          // Set the default input type
+          field.type = "text";
+
+          // Generate a human-readable label
           if (field.name) {
             field.label = field.name
               .replace(/_/g, " ")
@@ -532,16 +635,75 @@ async function updateSharedCountryList() {
               .replace(/\b\w/g, (c) => c.toUpperCase());
           }
 
-          // Check if this field has a foreign key constraint
+          // Extract varchar/char max length
+          field.maxCharacters = 0;
+          if (
+            field.datatype &&
+            (field.datatype.variant === "varchar" ||
+              field.datatype.variant === "char") &&
+            field.datatype.args?.expression?.length > 0
+          ) {
+            const charLimit = field.datatype.args.expression[0].value;
+            field.maxCharacters = parseInt(charLimit, 10);
+          }
+
+          // Auto-detect date fields
+          const nameLower = field.name?.toLowerCase() || "";
+          if (
+            nameLower.includes("date") ||
+            nameLower.endsWith("at") || // like createdAt, updatedAt
+            field.datatype?.variant === "date" ||
+            field.datatype?.variant === "datetime" ||
+            ((nameLower.includes("date") || nameLower.includes("day")) &&
+              field.datatype?.variant === "varchar" &&
+              parseInt(field.maxCharacters, 10) === 10)
+          ) {
+            field.inputType = "date";
+          }
+
+          // Auto-detect telephone or mobile fields
+          if (
+            nameLower.includes("telephone") ||
+            nameLower.includes("mobile") ||
+            nameLower.includes("phone")
+          ) {
+            field.inputType = "tel";
+          }
+
+          // Auto-detect telephone or mobile fields
+          if (nameLower == "map") {
+            field.inputType = "map";
+          }
+
+          // Extract default value
+          if (Array.isArray(field.definition)) {
+            const defaultDef = field.definition.find(
+              (def) => def.variant === "default"
+            );
+
+            if (defaultDef) {
+              const defaultValNode = defaultDef.value;
+              if (defaultValNode?.type === "literal") {
+                field.inputValue = defaultValNode.value;
+              } else if (defaultValNode.value?.type === "identifier") {
+                field.inputValue = defaultValNode.name; // e.g., CURRENT_TIMESTAMP
+              }
+            }
+          }
+
+          // Check for foreign key constraints
           if (
             field.definition &&
             field.definition[0] &&
             field.definition[0].variant === "foreign key"
           ) {
-            const foreignTable = field.definition[0].references.name; // The table this field references
-            const foreignId = field.definition[0].references.columns[0].name; // The field it references
-            const primaryId = field.columns[0].name; // The primary key field name (the current field)
-            // Now loop through fields again to add foreign table and foreign id to the field that matches the primary field
+            const foreignTable = field.definition[0].references.name;
+            const foreignId = field.definition[0].references.columns[0].name;
+            const primaryId = field.columns[0].name;
+
+            field.inputType = "select";
+
+            // Match foreign reference to the actual field
             fields.forEach((compareField) => {
               if (compareField.name === primaryId) {
                 compareField.foreignTable = foreignTable;
@@ -559,9 +721,7 @@ async function updateSharedCountryList() {
         const sanitizedFieldsIndex = fields.filter(
           (f) => !env.EXCLUDEDFIELDSINDEX.includes(f.name)
         );
-        //set the shared optons and field options for the select
-        const sharedOptions = env.SHAREDOPTIONS;
-        const fieldOptionMapping = env.FIELDOPTIONMAPPING;
+
         // Generate table pages
         if (!env.EXCLUDETABLES.includes(tableName)) {
           generateTablePages(
